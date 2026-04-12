@@ -98,10 +98,10 @@ export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps)
                             key={barber.id}
                             onClick={() => setSelectedBarber(barber.id)}
                             className={cn(
-                                "group relative overflow-hidden rounded-xl backdrop-blur-xl border cursor-pointer transition-all duration-300",
+                                "group relative overflow-hidden rounded-xl backdrop-blur-md border cursor-pointer min-h-[44px] active:scale-95 transition-all duration-300",
                                 isSelected
                                     ? "bg-primary/20 border-primary shadow-[0_0_20px_rgba(var(--color-primary),0.2)]"
-                                    : "bg-black/40 border-white/10 hover:border-primary/40 hover:bg-black/60"
+                                    : "bg-white/5 border-white/10 hover:border-primary/40 hover:bg-white/10"
                             )}
                         >
                             <div className="flex items-center gap-4 p-4">

@@ -81,7 +81,7 @@ export default function BookingWizard() {
                 ) : step > 1 ? (
                     <div
                         onClick={() => setStep(1)}
-                        className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-black/80 hover:border-primary/50 transition-all relative z-20 group h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 1 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
@@ -116,7 +116,7 @@ export default function BookingWizard() {
                 ) : step > 2 ? (
                     <div
                         onClick={() => setStep(2)}
-                        className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-black/80 hover:border-primary/50 transition-all relative z-20 group h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 2 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
@@ -157,7 +157,7 @@ export default function BookingWizard() {
                 ) : step > 3 ? (
                     <div
                         onClick={() => setStep(3)}
-                        className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-black/80 hover:border-primary/50 transition-all relative z-20 group h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 3 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">

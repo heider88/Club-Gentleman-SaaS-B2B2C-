@@ -94,16 +94,16 @@ export function StaticHeader() {
                         >
                             {item.href ? (
                                 item.href.startsWith("#") ? (
-                                    <a href={item.href} className="flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
+                                    <a href={item.href} className="min-h-[44px] active:scale-95 flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
                                         {item.label}
                                     </a>
                                 ) : (
-                                    <Link href={item.href} className="flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
+                                    <Link href={item.href} className="min-h-[44px] active:scale-95 flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
                                         {item.label}
                                     </Link>
                                 )
                             ) : (
-                                <button className="flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
+                                <button className="min-h-[44px] active:scale-95 flex items-center gap-1.5 text-[13px] font-extrabold tracking-widest uppercase text-gray-300 hover:text-white transition-colors py-4 group">
                                     {item.label}
                                     <motion.div
                                         animate={{ rotate: activeDropdown === item.id ? 180 : 0 }}
@@ -150,7 +150,7 @@ export function StaticHeader() {
                 <div className="shrink-0 ml-4">
                     <a
                         href="#booking-section"
-                        className="bg-white hover:bg-gray-200 text-[#111] text-[11px] sm:text-[13px] font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#6D3294] hover:shadow-[0_0_20px_rgba(109,50,148,0.5)] flex items-center justify-center relative overflow-hidden group"
+                        className="bg-white min-h-[44px] active:scale-95 hover:bg-gray-200 text-[#111] text-[11px] sm:text-[13px] font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#6D3294] hover:shadow-[0_0_20px_rgba(109,50,148,0.5)] flex items-center justify-center relative overflow-hidden group"
                     >
                         <span className="relative z-10">Reservar Ahora</span>
                         {/* Brillo de efecto al pasar cursor */}

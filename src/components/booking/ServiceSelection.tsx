@@ -51,7 +51,7 @@ export function ServiceSelection({ onSelect }: ServiceSelectionProps) {
                     transition={{ delay: idx * 0.05 }}
                     key={service.name}
                     onClick={() => onSelect(service)}
-                    className="w-full text-left p-4 rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:bg-black/60 hover:border-primary/50 transition-all group"
+                    className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:bg-white/10 hover:border-primary/50 active:scale-95 min-h-[44px] transition-all group"
                 >
                     <div className="flex justify-between items-start mb-1">
                         <span className="font-bold text-base text-white group-hover:text-primary transition-colors">{service.name}</span>

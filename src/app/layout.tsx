@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased`}
+        className={`${inter.variable} ${playfair.variable} antialiased bg-gradient-to-br from-neutral-950 via-neutral-900 to-black text-white min-h-[100dvh] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]`}
         style={{ fontFamily: "var(--font-inter), sans-serif" }}
       >
         <StaticHeader />

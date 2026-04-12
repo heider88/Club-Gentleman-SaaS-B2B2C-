@@ -23,13 +23,11 @@ export default function LandingPage() {
   ]
 
   return (
-    // Aplicando el fondo gradiente con negro profundo -> morado -> fucsia
-    <main className="min-h-screen bg-gradient-to-br from-black via-[#6D3294] to-[#D946EF] text-white pb-20 pt-16 relative overflow-hidden">
-      {/* Overlay oscuro sutil para asegurar legibilidad */}
-      <div className="absolute inset-0 bg-black/10 pointer-events-none z-0"></div>
+    // Hereda Layout Background, con safeties bottom
+    <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
       {/* Header Section */}
-      <header className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
+      <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/20 pb-6">
           <div className="space-y-4">
             {/* Duplicando el tamaño del logo (antes w-48 h-24 sm:w-56 sm:h-28) */}
@@ -69,19 +67,19 @@ export default function LandingPage() {
                 href="https://www.facebook.com/profile.php?id=100065179103783"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 border border-white/20 bg-white/5 backdrop-blur-sm rounded-full hover:bg-[#1877F2] hover:border-[#1877F2] transition-all text-white/80 hover:text-white"
+                className="w-11 h-11 flex items-center justify-center border border-white/20 bg-white/5 backdrop-blur-md rounded-full hover:bg-[#1877F2] hover:border-[#1877F2] transition-all text-white/80 hover:text-white active:scale-95"
                 title="Facebook"
               >
-                <Facebook className="w-4 h-4" />
+                <Facebook className="w-5 h-5" />
               </a>
               <a
                 href="https://www.instagram.com/club_gentlemanbarber?igsh=cGcwd3F0YXEzb2hl&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 border border-white/20 bg-white/5 backdrop-blur-sm rounded-full hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:border-transparent transition-all text-white/80 hover:text-white"
+                className="w-11 h-11 flex items-center justify-center border border-white/20 bg-white/5 backdrop-blur-md rounded-full hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:border-transparent transition-all text-white/80 hover:text-white active:scale-95"
                 title="Instagram"
               >
-                <Instagram className="w-4 h-4" />
+                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -91,7 +89,7 @@ export default function LandingPage() {
       </header>
 
       {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-16 relative z-10 w-full">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-16 relative z-10 w-full">
 
         {/* Content Centrado */}
         <div className="w-full max-w-4xl mx-auto space-y-12">
@@ -128,7 +126,7 @@ export default function LandingPage() {
 
           {/* Booking Flow */}
           <div className="relative mt-8 scroll-mt-32" id="booking-section">
-            <div className="bg-[#111111]/75 backdrop-blur-xl text-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/10 w-full max-w-4xl mr-auto">
+            <div className="backdrop-blur-md bg-white/5 border border-white/10 text-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-full max-w-screen-xl mx-auto">
               <h2 className="text-2xl font-black text-white mb-6">Reserva tu cita</h2>
               <BookingWizard />
             </div>
@@ -139,7 +137,7 @@ export default function LandingPage() {
         <BarbersList />
 
         {/* Location Section */}
-        <section id="ubicacion" className="w-full max-w-5xl mx-auto pt-10">
+        <section id="ubicacion" className="w-full max-w-screen-xl mx-auto pt-10">
           <div className="flex items-center gap-3 mb-6">
             <MapPin className="w-8 h-8 text-pink-400 drop-shadow-md" />
             <h2 className="text-3xl font-black text-white uppercase tracking-wider">Ubicación</h2>

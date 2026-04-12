@@ -132,7 +132,7 @@ export function CalendarView({ barberId, date, durationMinutes, onSelect }: Cale
 
     if (slots.length === 0) {
         return (
-            <div className="p-8 text-center border border-white/5 rounded-2xl bg-black/40 backdrop-blur-xl text-white/50 space-y-2">
+            <div className="p-8 text-center border border-white/5 rounded-2xl bg-white/5 backdrop-blur-md text-white/50 space-y-2 min-h-[44px]">
                 <p>El barbero no labora el <strong>{format(date, 'EEEE d', { locale: es })}</strong></p>
                 <p className="text-xs">Por favor retrocede e intenta con otra fecha.</p>
             </div>
@@ -155,9 +155,9 @@ export function CalendarView({ barberId, date, durationMinutes, onSelect }: Cale
                         disabled={!slot.available}
                         onClick={() => slot.available && onSelect(slot.time)}
                         className={cn(
-                            "py-3 rounded-xl border text-sm font-medium transition-all duration-300",
+                            "py-3 rounded-xl border text-sm font-medium transition-all duration-300 min-h-[44px]",
                             slot.available
-                                ? "border-white/10 bg-black/40 backdrop-blur-sm hover:border-primary hover:bg-primary hover:text-primary-foreground text-white shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(var(--color-primary),0.4)]"
+                                ? "border-white/10 bg-white/5 backdrop-blur-md active:scale-95 hover:border-primary hover:bg-primary hover:text-primary-foreground text-white shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(var(--color-primary),0.4)]"
                                 : "opacity-40 cursor-not-allowed bg-black/20 border-white/5 text-white/50 hover:bg-black/20"
                         )}
                     >

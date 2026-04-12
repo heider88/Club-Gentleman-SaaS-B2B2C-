@@ -73,7 +73,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 <label className="text-sm font-bold text-white/90">Nombre Completo</label>
                 <input
                     {...register("name")}
-                    className="w-full p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
+                    className="w-full text-base min-h-[44px] p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
                     placeholder="Ej: Heider Navarro"
                 />
                 {errors.name && <p className="text-destructive font-semibold text-xs mt-1">{errors.name.message}</p>}
@@ -82,7 +82,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
             <div className="space-y-2">
                 <label className="text-sm font-bold text-white/90">Teléfono Móvil (WhatsApp)</label>
                 <div className="flex gap-2">
-                    <select className="p-3.5 rounded-xl bg-black/60 border border-white/10 text-white outline-none w-[90px] text-center font-medium">
+                    <select className="p-3.5 text-base min-h-[44px] rounded-xl bg-black/60 border border-white/10 text-white outline-none w-[90px] text-center font-medium">
                         <option>+57</option>
                         <option>+52</option>
                         <option>+1</option>
@@ -91,7 +91,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                     <input
                         {...register("phone")}
                         type="tel"
-                        className="flex-1 w-full p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
+                        className="flex-1 w-full text-base min-h-[44px] p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
                         placeholder="300 123 4567"
                     />
                 </div>
@@ -103,7 +103,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 <input
                     {...register("email")}
                     type="email"
-                    className="w-full p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
+                    className="w-full text-base min-h-[44px] p-3.5 rounded-xl bg-black/60 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/30"
                     placeholder="ejemplo@correo.com"
                 />
                 {errors.email && <p className="text-destructive font-semibold text-xs mt-1">{errors.email.message}</p>}
@@ -113,7 +113,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-[0_0_20px_rgba(var(--color-primary),0.5)] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                    className="w-full py-4 min-h-[44px] rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-[0_0_20px_rgba(var(--color-primary),0.5)] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
                 >
                     {isSubmitting ? "Enviando tu reserva segura..." : "Confirmar Reserva"}
                 </button>
