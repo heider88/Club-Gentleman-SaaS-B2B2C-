@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { createClient } from "@/lib/supabase/client"
+import { sendBookingEmail } from "@/app/actions/notifications"
 
 const formSchema = z.object({
     name: z.string().min(2, "El nombre completo es requerido"),
@@ -16,6 +17,8 @@ interface ContactFormProps {
     bookingData: {
         barberId: string;
         serviceId: string;
+        serviceName: string;
+        barberName: string;
         date: Date | null;
         time: string;
         serviceDuration: number;
@@ -58,6 +61,22 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 console.error("DB Error:", error);
                 onError("No se pudo guardar la reserva. Verifica conexión o disponibilidad.");
                 return;
+            }
+
+            console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE ---');
+            const emailResult = await sendBookingEmail({
+                customerName: data.name,
+                customerEmail: data.email,
+                serviceName: bookingData.serviceName || "Servicio VIP",
+                barberName: bookingData.barberName || "Profesional",
+                date: bookingData.date.toISOString().split('T')[0],
+                time: bookingData.time
+            });
+
+            if (!emailResult.success) {
+                console.error("Email warning:", emailResult.error);
+                // We won't block the UI because the DB part was successful,
+                // but we should log it.
             }
 
             onSuccess();

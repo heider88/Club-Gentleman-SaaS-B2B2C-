@@ -16,7 +16,7 @@ interface Barber {
 
 interface BarberSelectionProps {
     serviceName: string
-    onSelect: (barberId: string, exactServiceId: string, date: Date) => void
+    onSelect: (barberId: string, exactServiceId: string, date: Date, barberName: string) => void
 }
 
 export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps) {
@@ -77,7 +77,7 @@ export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps)
         if (!selectedBarber) return;
         const barberInfo = barbers.find(b => b.id === selectedBarber);
         if (barberInfo) {
-            onSelect(selectedBarber, barberInfo.exactServiceId, selectedDate);
+            onSelect(selectedBarber, barberInfo.exactServiceId, selectedDate, barberInfo.full_name || "Barbero");
         }
     }
 

@@ -13,6 +13,7 @@ export interface GlobalBookingState {
     serviceDuration: number;
     serviceId: string;
     barberId: string;
+    barberName: string;
     date: Date | null;
     time: string;
 }
@@ -24,6 +25,7 @@ export default function BookingWizard() {
         serviceDuration: 0,
         serviceId: "",
         barberId: "",
+        barberName: "",
         date: null,
         time: "",
     })
@@ -106,8 +108,8 @@ export default function BookingWizard() {
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             <BarberSelection
                                 serviceName={bookingData.serviceName}
-                                onSelect={(barberId, exactSvcId, date) => {
-                                    setBookingData(prev => ({ ...prev, barberId, serviceId: exactSvcId, date }))
+                                onSelect={(barberId, exactSvcId, date, barberName) => {
+                                    setBookingData(prev => ({ ...prev, barberId, serviceId: exactSvcId, date, barberName }))
                                     setStep(3)
                                 }}
                             />
