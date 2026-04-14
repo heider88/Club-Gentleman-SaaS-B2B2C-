@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { createClient } from "@/lib/supabase/client"
-import { sendBookingEmail } from "@/app/actions/notifications"
+import { sendBookingNotifications } from "@/app/actions/notifications"
 
 const formSchema = z.object({
     name: z.string().min(2, "El nombre completo es requerido"),
@@ -64,19 +64,19 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
             }
 
             console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE ---');
-            const emailResult = await sendBookingEmail({
+            const notificationResult = await sendBookingNotifications({
                 customerName: data.name,
-                customerEmail: data.email,
+                email: data.email,
+                phone: data.phone,
                 serviceName: bookingData.serviceName || "Servicio VIP",
                 barberName: bookingData.barberName || "Profesional",
                 date: bookingData.date.toISOString().split('T')[0],
                 time: bookingData.time
             });
 
-            if (!emailResult.success) {
-                console.error("Email warning:", emailResult.error);
-                // We won't block the UI because the DB part was successful,
-                // but we should log it.
+            if (!notificationResult.emailSent || !notificationResult.whatsappSent) {
+                console.error("Omnichannel warning:", notificationResult);
+                // No bloqueamos UI porque la DB guardó la cita con éxito
             }
 
             onSuccess();
