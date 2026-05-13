@@ -29,27 +29,25 @@ export default function ServicesPage() {
     })
 
     useEffect(() => {
-        fetchServices()
-    }, [])
-
-    async function fetchServices() {
-        setLoading(true)
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (user) {
-            setUserId(user.id)
-            const { data, error } = await supabase
-                .from('services')
-                .select('*')
-                .eq('barber_id', user.id)
-                .order('created_at', { ascending: true })
-
-            if (data) {
-                setServices(data as Service[])
+        const fetchServices = async () => {
+            setLoading(true)
+            const { data: { user } } = await supabase.auth.getUser()
+            
+            if (user) {
+                setUserId(user.id)
+                const { data } = await supabase
+                    .from('services')
+                    .select('*')
+                    .eq('barber_id', user.id)
+                    .order('created_at', { ascending: false })
+                
+                if (data) setServices(data)
             }
+            setLoading(false)
         }
-        setLoading(false)
-    }
+        
+        fetchServices()
+    }, [supabase])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
