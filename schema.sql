@@ -57,6 +57,21 @@ CREATE TABLE public.appointments (
   CONSTRAINT end_time_must_be_after_start_time CHECK (end_time > start_time)
 );
 
+-- =========================================================
+-- EXTENSIONES Y RESTRICCIONES AVANZADAS
+-- =========================================================
+-- Habilita btree_gist para permitir constraints de exclusión con campos regulares (como UUID)
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
+
+-- Constraint de Exclusión: Evita la "Doble Reserva" (Condición de Carrera)
+-- Asegura que un mismo barbero no tenga dos citas activas (no canceladas) que se superpongan en tiempo.
+ALTER TABLE public.appointments 
+ADD CONSTRAINT no_overlapping_appointments 
+EXCLUDE USING gist (
+  barber_id WITH =, 
+  tstzrange(start_time, end_time) WITH &&
+) WHERE (status != 'cancelled');
+
 -- Tabla de Bloqueos Manuales de Disponibilidad
 CREATE TABLE public.availability_blocks (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
