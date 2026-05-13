@@ -5,6 +5,25 @@ import { twilioClient } from "@/lib/twilio";
 import { BookingConfirmation } from "@/components/emails/BookingConfirmation";
 import React from "react";
 import { render } from "@react-email/render";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { headers } from "next/headers";
+
+// Inicializa Redis y RateLimiter SOLO si las variables de entorno existen
+// Esto evita que la app crashee en build o desarrollo si aún no pones las keys
+let ratelimit: Ratelimit | null = null;
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+    // Limita a 2 peticiones (SMS/Email) por ventana de 3 horas por IP
+    ratelimit = new Ratelimit({
+        redis: redis,
+        limiter: Ratelimit.slidingWindow(2, "3 h"),
+        analytics: true,
+    });
+}
 
 export interface BookingNotificationPayload {
     customerName: string;
@@ -18,6 +37,28 @@ export interface BookingNotificationPayload {
 
 export async function sendBookingNotifications(payload: BookingNotificationPayload) {
     console.log('--- NOTIFICATIONS ACTION TRIGGERED --- / Destinos:', payload.email, payload.phone);
+
+    // ---- 0. VERIFICACIÓN DE RATE LIMIT (SEGURIDAD) ----
+    if (ratelimit) {
+        const headersList = await headers();
+        // Intentar obtener la IP real (útil en Vercel, Cloudflare, etc.)
+        const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "127.0.0.1";
+        
+        const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_notifications_${ip}`);
+        
+        if (!success) {
+            console.error(`[SEGURIDAD] Rate limit excedido para IP: ${ip}. Bloqueando envío de SMS/Email.`);
+            // No lanzamos un error crudo para no romper el frontend si la cita ya se guardó en DB.
+            // Simplemente simulamos que falló el envío silenciosamente.
+            return {
+                emailSent: false,
+                whatsappSent: false,
+                error: "Rate limit exceeded"
+            };
+        }
+    } else {
+        console.warn("[SEGURIDAD] Las variables de entorno de UPSTASH no están configuradas. El Rate Limiting está APAGADO.");
+    }
 
     // ---- 1. PREPARACIÓN DEL CORREO ELECTRÓNICO ----
     const emailPromise = (async () => {
