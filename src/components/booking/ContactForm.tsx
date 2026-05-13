@@ -40,8 +40,11 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
 
         const supabase = createClient();
 
-        // Prepare Start and End time
-        const startStr = `${bookingData.date.toISOString().split('T')[0]}T${bookingData.time}:00`;
+        // Prepare Start and End time safely preserving local timezone
+        const year = bookingData.date.getFullYear();
+        const month = String(bookingData.date.getMonth() + 1).padStart(2, '0');
+        const day = String(bookingData.date.getDate()).padStart(2, '0');
+        const startStr = `${year}-${month}-${day}T${bookingData.time}:00`;
         const startTime = new Date(startStr);
         const endTime = new Date(startTime.getTime() + bookingData.serviceDuration * 60000);
 
@@ -70,7 +73,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 phone: data.phone,
                 serviceName: bookingData.serviceName || "Servicio VIP",
                 barberName: bookingData.barberName || "Profesional",
-                date: bookingData.date.toISOString().split('T')[0],
+                date: `${year}-${month}-${day}`,
                 time: bookingData.time
             });
 
