@@ -10,7 +10,7 @@ interface Service {
     name: string
     duration_minutes: number
     price: number
-    description: string
+    description: string | null
 }
 
 export default function ServicesPage() {
