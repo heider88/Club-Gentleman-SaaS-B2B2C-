@@ -28,24 +28,24 @@ export default function ServicesPage() {
         description: ""
     })
 
-    useEffect(() => {
-        const fetchServices = async () => {
-            setLoading(true)
-            const { data: { user } } = await supabase.auth.getUser()
-            
-            if (user) {
-                setUserId(user.id)
-                const { data } = await supabase
-                    .from('services')
-                    .select('*')
-                    .eq('barber_id', user.id)
-                    .order('created_at', { ascending: false })
-                
-                if (data) setServices(data)
-            }
-            setLoading(false)
-        }
+    const fetchServices = async () => {
+        setLoading(true)
+        const { data: { user } } = await supabase.auth.getUser()
         
+        if (user) {
+            setUserId(user.id)
+            const { data } = await supabase
+                .from('services')
+                .select('*')
+                .eq('barber_id', user.id)
+                .order('created_at', { ascending: false })
+            
+            if (data) setServices(data)
+        }
+        setLoading(false)
+    }
+
+    useEffect(() => {
         fetchServices()
     }, [supabase])
 
@@ -255,7 +255,7 @@ export default function ServicesPage() {
                             <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Descripción Breve (Opcional)</label>
                             <textarea
                                 name="description"
-                                value={currentService.description}
+                                        value={currentService.description || ""}
                                 onChange={handleChange}
                                 rows={2}
                                 placeholder="Incluye lavado, perfilado navaja y bebida de cortesía..."
