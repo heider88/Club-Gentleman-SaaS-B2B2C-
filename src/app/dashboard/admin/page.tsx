@@ -51,7 +51,10 @@ export default async function AdminPage() {
                         <h2 className="text-xl font-bold text-white">Nuevo Empleado</h2>
                     </div>
 
-                    <form action={createEmployee} className="space-y-4">
+                    <form action={async (formData) => {
+                        "use server";
+                        await createEmployee(formData);
+                    }} className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-white/80">Nombre Completo</label>
                             <input 
