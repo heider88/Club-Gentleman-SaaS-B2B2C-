@@ -25,6 +25,7 @@ export interface Database {
                     avatar_url: string | null
                     bio: string | null
                     phone: string | null
+                    role: 'admin' | 'barber'
                     schedule_settings: ScheduleSettings | null
                     created_at: string | null
                 }
@@ -35,6 +36,7 @@ export interface Database {
                     avatar_url?: string | null
                     bio?: string | null
                     phone?: string | null
+                    role?: 'admin' | 'barber'
                     schedule_settings?: ScheduleSettings | null
                     created_at?: string | null
                 }
@@ -45,6 +47,7 @@ export interface Database {
                     avatar_url?: string | null
                     bio?: string | null
                     phone?: string | null
+                    role?: 'admin' | 'barber'
                     schedule_settings?: ScheduleSettings | null
                     created_at?: string | null
                 }
