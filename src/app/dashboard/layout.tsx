@@ -20,6 +20,7 @@ export default function DashboardLayout({
         { label: "Servicios", href: "/dashboard/services", icon: "Scissors" },
         // La sección de Horarios ahora se gestiona directamente dentro de "Perfil" (schedule_settings JSONB)
         { label: "Perfil / Horarios", href: "/dashboard/profile", icon: "User" },
+        { label: "Administración", href: "/dashboard/admin", icon: "Lock" }, // Ocultaremos esto en el cliente si no es admin, pero por ahora estará aquí
     ]
 
     return (

@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 2. Enumeradores
 CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
+CREATE TYPE user_role AS ENUM ('admin', 'barber');
 
 -- =========================================================
 -- TABLAS
@@ -20,6 +21,7 @@ CREATE TABLE public.profiles (
   avatar_url TEXT,
   bio TEXT,
   phone TEXT,
+  role user_role DEFAULT 'barber',
   -- JSONB para máxima flexibilidad en configuraciones complejas de agenda
   schedule_settings JSONB DEFAULT '{"workDays": [1,2,3,4,5,6], "startHour": 9, "endHour": 19, "lunchStart": 13, "lunchEnd": 14}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW()
