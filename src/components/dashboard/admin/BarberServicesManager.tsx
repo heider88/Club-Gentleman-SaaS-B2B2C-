@@ -11,7 +11,7 @@ interface Service {
     name: string
     price: number
     duration_minutes: number
-    description?: string
+    description?: string | null
 }
 
 export function BarberServicesManager({ barberId, globalServices }: { barberId: string, globalServices: Service[] }) {
