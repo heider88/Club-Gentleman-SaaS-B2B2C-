@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { startOfDay, endOfDay, format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Clock, CalendarX2, CalendarDays, Contact, Banknote } from "lucide-react"
+import { CalendarX2, CalendarDays } from "lucide-react"
+import { AppointmentCard } from "@/components/dashboard/AppointmentCard"
+import { InternalBookingModal } from "@/components/dashboard/InternalBookingModal"
 
 // Types helpers for nested query
 type AppointmentWithService = {
@@ -23,21 +25,22 @@ export default async function DashboardPage() {
     // 1. Iniciar cliente seguro del Server
     const supabase = await createClient()
 
-    // 2. Fetch de usuario o Redirección estricta (Server Action / Redirect FOUC safe)
+    // 2. Fetch de usuario o Redirección estricta
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
         redirect("/login")
     }
 
-    // 3. Obtener el perfil para personalizar bienvenida
+    // 3. Obtener el perfil para personalizar bienvenida y evaluar el ROL
     const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, role')
         .eq('id', user.id)
         .single()
 
     const barberName = profile?.full_name?.split(' ')[0] || 'Barbero'
+    const userRole = profile?.role || 'barber'
 
     // 4. Fechas exactas del "Día de Hoy"
     const now = new Date()
@@ -45,7 +48,9 @@ export default async function DashboardPage() {
     const endStr = endOfDay(now).toISOString()
 
     // 5. Consulta Supabase con Joins y Ordenamiento vía RLS Segura
-    const { data: appointmentsRes } = await supabase
+    // OJO: Si eres 'admin', esta RLS en BD ahora te permitirá ver TODAS las citas si lo configuras así,
+    // pero por ahora filtramos por el barber_id para ver la agenda propia o la general si removemos el eq()
+    let query = supabase
         .from('appointments')
         .select(`
             id,
@@ -54,16 +59,31 @@ export default async function DashboardPage() {
             customer_name,
             customer_phone,
             status,
+            barber_id,
+            profiles (
+                full_name
+            ),
             services (
                 name,
                 duration_minutes,
                 price
             )
         `)
-        .eq('barber_id', user.id)
         .gte('start_time', startStr)
         .lte('start_time', endStr)
+        .neq('status', 'cancelled')
         .order('start_time', { ascending: true })
+        
+    // Si NO es admin, forzamos a que solo vea sus propias citas
+    // (Aun si el admin quiere ver solo las suyas, lo dejamos así por default, o removemos el eq() si el admin debe ver TODAS)
+    if (userRole !== 'admin') {
+        query = query.eq('barber_id', user.id)
+    } else {
+        // En un futuro, el admin podría querer filtrar por barbero, aquí mostramos TODAS para el admin en el día de hoy
+        // query = query.eq('barber_id', user.id) 
+    }
+
+    const { data: appointmentsRes } = await query
 
     const appointments = (appointmentsRes as any as AppointmentWithService[]) || []
 
@@ -71,34 +91,37 @@ export default async function DashboardPage() {
     const pendingCount = appointments.filter(a => a.status === 'pending').length;
     const completedCount = appointments.filter(a => a.status === 'completed').length;
 
-    // Función formateadora segura 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
-    }
-
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             {/* Header / Greetings */}
-            <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white">
-                    ¡Buenos días, <span className="text-primary">{barberName}</span>!
-                </h1>
-                <p className="text-muted-foreground flex items-center gap-2 font-medium">
-                    <CalendarDays className="w-5 h-5 text-white/50" />
-                    Hoy es {format(now, "EEEE, d 'de' MMMM yyyy", { locale: es })}
-                </p>
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-6">
+                <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-white">
+                        ¡Buenos días, <span className="text-primary">{barberName}</span>!
+                    </h1>
+                    <p className="text-muted-foreground flex items-center gap-2 font-medium mt-2">
+                        <CalendarDays className="w-5 h-5 text-white/50" />
+                        Hoy es {format(now, "EEEE, d 'de' MMMM yyyy", { locale: es })}
+                    </p>
+                </div>
+                {/* Botón de Agendar Manual (Inyectando el Barber ID) */}
+                {userRole === 'barber' && (
+                    <InternalBookingModal barberId={user.id} />
+                )}
             </header>
 
             {/* Citas del Día */}
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-white/90">Agenda del Día</h2>
+                    <h2 className="text-xl font-bold text-white/90">
+                        {userRole === 'admin' ? "Agenda General (Todas las citas)" : "Tu Agenda del Día"}
+                    </h2>
                     <div className="flex gap-3 text-sm">
-                        <span className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold">
+                        <span className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
                             {appointments.length} Total
                         </span>
                         {pendingCount > 0 && (
-                            <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold">
+                            <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(251,146,60,0.2)]">
                                 {pendingCount} Pendientes
                             </span>
                         )}
@@ -119,55 +142,10 @@ export default async function DashboardPage() {
                     </div>
                 ) : (
                     /* LISTADO DE CITAS */
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {appointments.map((appt) => {
-                            const isCompleted = appt.status === 'completed';
-                            const isPending = appt.status === 'pending';
-
-                            return (
-                                <div
-                                    key={appt.id}
-                                    className={`relative rounded-2xl p-6 bg-card border hover:border-primary/40 backdrop-blur-sm transition-all duration-300 shadow-[0_2px_15px_rgba(0,0,0,0.4)] ${isCompleted ? 'border-primary/10 opacity-70' : 'border-white/10'}`}
-                                >
-                                    {/* Indicadores de status */}
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-primary" />
-                                            <span className="font-bold text-[15px]">{format(new Date(appt.start_time), 'HH:mm')}</span>
-                                            <span className="text-white/30 px-1">-</span>
-                                            <span className="text-white/50 text-[15px]">{format(new Date(appt.end_time), 'HH:mm')}</span>
-                                        </div>
-                                        {isPending && (
-                                            <span className="w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)] animate-pulse" title="Pendiente" />
-                                        )}
-                                    </div>
-
-                                    {/* Info Cliente */}
-                                    <div className="mb-4">
-                                        <h3 className="text-lg font-bold text-white/90 flex items-center gap-2">
-                                            <Contact className="w-5 h-5 text-white/40" />
-                                            {appt.customer_name}
-                                        </h3>
-                                        <p className="text-xs font-medium text-white/40 ml-7 tracking-wide">{appt.customer_phone}</p>
-                                    </div>
-
-                                    {/* Info Servicio */}
-                                    <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-white/40 uppercase font-bold tracking-wider mb-0.5">Servicio</span>
-                                            <span className="text-sm font-semibold text-white/80">{appt.services?.name || 'Servicio Externo'}</span>
-                                        </div>
-                                        <div className="flex flex-col items-end">
-                                            <span className="text-xs text-white/40 uppercase font-bold tracking-wider mb-0.5">Monto</span>
-                                            <span className="text-sm font-bold text-primary flex items-center gap-1">
-                                                <Banknote className="w-3.5 h-3.5" />
-                                                {formatCurrency(appt.services?.price || 0)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        })}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {appointments.map((appt) => (
+                            <AppointmentCard key={appt.id} appt={appt} userRole={userRole} />
+                        ))}
                     </div>
                 )}
             </section>

@@ -18,6 +18,7 @@ export default function ServicesPage() {
     const [services, setServices] = useState<Service[]>([])
     const [loading, setLoading] = useState(true)
     const [userId, setUserId] = useState<string | null>(null)
+    const [isAdmin, setIsAdmin] = useState(false)
 
     const [isEditing, setIsEditing] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -34,6 +35,11 @@ export default function ServicesPage() {
         
         if (user) {
             setUserId(user.id)
+            
+            // Check if user is admin to show specific text
+            const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+            setIsAdmin(profile?.role === 'admin')
+
             const { data } = await supabase
                 .from('services')
                 .select('*')
@@ -177,8 +183,14 @@ export default function ServicesPage() {
         <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
             <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-6">
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-white">Catálogo de Servicios</h1>
-                    <p className="text-muted-foreground font-medium mt-1">Administra los cortes que ofreces, personaliza precios y sus tiempos asociados.</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-white">
+                        {isAdmin ? "Catálogo Global de Servicios" : "Catálogo de Servicios"}
+                    </h1>
+                    <p className="text-muted-foreground font-medium mt-1">
+                        {isAdmin 
+                            ? "Crea las plantillas base de tus servicios. Luego podrás importarlos a los perfiles de cada barbero desde el panel de Administración." 
+                            : "Administra los cortes que ofreces, personaliza precios y sus tiempos asociados."}
+                    </p>
                 </div>
                 {!isEditing && (
                     <button

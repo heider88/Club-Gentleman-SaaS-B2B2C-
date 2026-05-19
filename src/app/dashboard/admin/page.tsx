@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { createEmployee } from "@/app/actions/admin"
-import { UserPlus, ShieldAlert, Users } from "lucide-react"
+import { ShieldAlert, Users } from "lucide-react"
+import { DeleteEmployeeButton } from "@/components/dashboard/DeleteEmployeeButton"
+import { CollapsibleEmployeeForm } from "@/components/dashboard/admin/CollapsibleEmployeeForm"
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -23,110 +24,63 @@ export default async function AdminPage() {
         redirect("/dashboard")
     }
 
-    // 2. Fetch de la lista de todos los empleados actuales (Solo el admin puede leer todo sin RLS si usamos adminClient, 
-    // pero temporalmente lo leeremos normal porque el admin debería tener acceso a ver perfiles públicos).
+    // 2. Fetch de la lista de todos los empleados actuales
     const { data: barbers } = await supabase
         .from('profiles')
         .select('id, full_name, email, role')
         .eq('role', 'barber')
+        .order('created_at', { ascending: true })
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+        <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto pb-12">
+            <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
+                <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
                     Panel de Administración <ShieldAlert className="text-primary w-8 h-8" />
                 </h1>
-                <p className="text-muted-foreground mt-2">
-                    Zona de alto riesgo. Desde aquí puedes crear cuentas de acceso para nuevos barberos.
+                <p className="text-muted-foreground font-medium">
+                    Zona de alto riesgo. Gestiona a tu equipo de barberos desde aquí.
                 </p>
-            </div>
+            </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Columna Izquierda: Formulario de Creación */}
-                <div className="bg-card/50 backdrop-blur-xl border border-border rounded-3xl p-6 shadow-xl">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-3 bg-primary/20 rounded-xl">
-                            <UserPlus className="w-6 h-6 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-bold text-white">Nuevo Empleado</h2>
+            {/* Formulario Desplegable */}
+            <CollapsibleEmployeeForm />
+
+            {/* Lista de Barberos Actuales */}
+            <div className="bg-card/90 backdrop-blur-xl border border-border rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="p-3 bg-white/10 rounded-xl">
+                        <Users className="w-6 h-6 text-white" />
                     </div>
-
-                    <form action={async (formData) => {
-                        "use server";
-                        await createEmployee(formData);
-                    }} className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-white/80">Nombre Completo</label>
-                            <input 
-                                type="text" 
-                                name="fullName" 
-                                required
-                                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
-                                placeholder="Ej: Carlos Peluquero"
-                            />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-white/80">Correo de Acceso</label>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                required
-                                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
-                                placeholder="ejemplo@barberia.com"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-white/80">Contraseña Temporal</label>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                required
-                                minLength={6}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
-                                placeholder="Mínimo 6 caracteres"
-                            />
-                        </div>
-
-                        <button 
-                            type="submit"
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl p-4 mt-4 transition-all active:scale-95"
-                        >
-                            Crear Cuenta de Barbero
-                        </button>
-                    </form>
+                    <h2 className="text-xl font-bold text-white">Equipo Actual ({barbers?.length || 0})</h2>
                 </div>
 
-                {/* Columna Derecha: Lista de Barberos Actuales */}
-                <div className="bg-card/50 backdrop-blur-xl border border-border rounded-3xl p-6 shadow-xl h-fit">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-3 bg-white/10 rounded-xl">
-                            <Users className="w-6 h-6 text-white" />
-                        </div>
-                        <h2 className="text-xl font-bold text-white">Equipo Actual</h2>
-                    </div>
-
-                    {barbers && barbers.length > 0 ? (
-                        <div className="space-y-3">
-                            {barbers.map(barber => (
-                                <div key={barber.id} className="p-4 bg-black/40 border border-white/10 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                                    <div>
-                                        <p className="font-bold text-white">{barber.full_name || "Sin nombre"}</p>
-                                        <p className="text-xs text-muted-foreground">{barber.email}</p>
-                                    </div>
-                                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 bg-white/10 rounded-md text-white/70 w-fit">
+                {barbers && barbers.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {barbers.map(barber => (
+                            <div key={barber.id} className="p-6 bg-black/40 border border-white/10 rounded-2xl flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors shadow-lg">
+                                <div>
+                                    <p className="font-bold text-white text-lg">{barber.full_name || "Sin nombre"}</p>
+                                    <p className="text-sm text-muted-foreground">{barber.email}</p>
+                                </div>
+                                <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
+                                    <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-white/10 rounded-lg text-white/70 w-fit">
                                         Barbero
                                     </span>
+                                    <div className="flex items-center gap-2">
+                                        <a href={`/dashboard/admin/barber/${barber.id}`} className="text-xs uppercase font-bold tracking-wider px-5 py-2.5 bg-primary/20 hover:bg-primary text-primary hover:text-primary-foreground rounded-xl transition-all">
+                                            Gestionar
+                                        </a>
+                                        <DeleteEmployeeButton userId={barber.id} userName={barber.full_name || "Empleado"} />
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-sm text-muted-foreground text-center py-8">
-                            Aún no has creado cuentas para tus empleados.
-                        </p>
-                    )}
-                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground text-center py-16 border border-dashed border-white/10 rounded-3xl bg-black/20">
+                        Aún no has creado cuentas para tus empleados.
+                    </p>
+                )}
             </div>
         </div>
     )

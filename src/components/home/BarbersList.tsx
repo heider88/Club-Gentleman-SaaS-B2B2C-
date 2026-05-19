@@ -16,6 +16,7 @@ export default function BarbersList() {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('id, full_name, bio, avatar_url')
+                .eq('role', 'barber')
                 .order('created_at', { ascending: true })
 
             if (data && data.length > 0) {

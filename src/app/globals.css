@@ -71,10 +71,17 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Optimización para iOS y dispositivos táctiles antiguos */
+    -webkit-tap-highlight-color: transparent;
   }
   
   /* Reset for Urban Dark vibe */
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-bold;
+  }
+
+  /* Soporte para scroll suave en tablas y contenedores horizontales en iOS antiguo */
+  .overflow-x-auto, .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
   }
 }

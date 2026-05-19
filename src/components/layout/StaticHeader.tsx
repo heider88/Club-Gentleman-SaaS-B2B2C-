@@ -4,11 +4,16 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ChevronDown, Instagram, Facebook } from "lucide-react"
 
 export function StaticHeader() {
+    const pathname = usePathname()
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
     const [isScrolled, setIsScrolled] = useState(false)
+
+    // No mostrar el encabezado en el panel de control o en el login
+    const isDashboardOrLogin = pathname?.startsWith('/dashboard') || pathname?.startsWith('/login')
 
     useEffect(() => {
         const handleScroll = () => {
@@ -18,9 +23,15 @@ export function StaticHeader() {
                 setIsScrolled(false)
             }
         }
-        window.addEventListener("scroll", handleScroll)
-        return () => window.removeEventListener("scroll", handleScroll)
-    }, [])
+        if (!isDashboardOrLogin) {
+            window.addEventListener("scroll", handleScroll)
+            return () => window.removeEventListener("scroll", handleScroll)
+        }
+    }, [isDashboardOrLogin])
+
+    if (isDashboardOrLogin) {
+        return null;
+    }
 
     const navItems = [
         {

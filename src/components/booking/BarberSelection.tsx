@@ -43,9 +43,9 @@ export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps)
             setLoading(true)
             const supabase = createClient()
 
-            // Traer perfiles y servicios donde nombre coincida
+            // Traer perfiles SOLO de barberos y servicios donde nombre coincida
             const [profilesRes, servicesRes] = await Promise.all([
-                supabase.from('profiles').select('*'),
+                supabase.from('profiles').select('*').eq('role', 'barber'),
                 supabase.from('services').select('id, barber_id, name').eq('name', serviceName)
             ])
 
