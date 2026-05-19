@@ -40,7 +40,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                 </div>
             </div>
 
-            <nav className="flex md:flex-col w-full justify-around md:justify-start md:space-y-2">
+            <nav className="flex md:flex-col w-full justify-around md:justify-start md:space-y-2 md:mb-auto">
                 {NAV_ITEMS.map((item) => {
                     const isActive = pathname === item.href
                     const Icon = item.icon
@@ -61,17 +61,16 @@ export function DashboardSidebar({ role }: { role: string }) {
                         </Link>
                     )
                 })}
-            </nav>
-
-            <div className="hidden md:block mt-auto">
+                
+                {/* Botón de Cerrar Sesión (Móvil y Desktop) */}
                 <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-xl w-full transition-colors"
+                    className="flex flex-col md:flex-row items-center justify-center md:justify-start md:px-4 md:py-3 rounded-xl transition-all gap-1 md:gap-3 text-red-400 hover:text-red-300 md:text-destructive md:hover:bg-destructive/10"
                 >
-                    <LogOut className="w-5 h-5" />
-                    Cerrar Sesión
+                    <LogOut className="w-5 h-5 md:w-5 md:h-5" />
+                    <span className="text-[10px] md:text-sm font-medium">Salir</span>
                 </button>
-            </div>
+            </nav>
         </aside>
     )
 }
