@@ -95,7 +95,9 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                     <span className="w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)] animate-pulse" title="Pendiente" />
                 )}
                 {isCompleted && (
-                    <CheckCircle2 className="w-5 h-5 text-primary" title="Completada" />
+                    <span title="Completada">
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                    </span>
                 )}
             </div>
 
