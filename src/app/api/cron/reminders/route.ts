@@ -50,11 +50,15 @@ export async function GET(request: Request) {
             for (const appt of appointments) {
                 // Solo si dejó un correo válido (y no el dummy "local@barberia.app")
                 if (appt.customer_email && appt.customer_email.includes('@') && !appt.customer_email.includes('local@')) {
+                    // Supabase typed bindings
+                    const serviceInfo = appt.services as unknown as { name: string } | { name: string }[] | null;
+                    const profileInfo = appt.profiles as unknown as { full_name: string } | { full_name: string }[] | null;
+                    
                     const emailHtml = await render(
                         React.createElement(BookingReminder, {
                             customerName: appt.customer_name,
-                            serviceName: appt.services?.name || 'Servicio de Barbería',
-                            barberName: appt.profiles?.full_name || 'Tu Barbero',
+                            serviceName: (Array.isArray(serviceInfo) ? serviceInfo[0]?.name : serviceInfo?.name) || 'Servicio de Barbería',
+                            barberName: (Array.isArray(profileInfo) ? profileInfo[0]?.full_name : profileInfo?.full_name) || 'Tu Barbero',
                             time: new Date(appt.start_time).toLocaleString('es-CO', { hour: '2-digit', minute: '2-digit' })
                         })
                     );
