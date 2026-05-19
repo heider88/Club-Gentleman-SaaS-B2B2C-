@@ -31,8 +31,8 @@ export default async function LandingPage() {
       : fallbackImages;
 
   return (
-    // Hereda Layout Background, con safeties bottom
-    <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
+    // Hereda Layout Background, pero lo sobreescribimos para la parte de clientes con el degradado negro a morado
+    <main className="bg-gradient-to-r from-black to-[#6D3294] min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
       {/* Header Section */}
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
