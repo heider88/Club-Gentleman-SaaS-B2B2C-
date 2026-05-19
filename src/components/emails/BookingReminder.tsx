@@ -28,7 +28,7 @@ export const BookingReminder = ({
     return (
         <Html>
             <Head />
-            <Preview>¡Tu cita en Club Gentleman es en menos de 2 horas!</Preview>
+            <Preview>¡Buenos días! Hoy tienes una cita en Club Gentleman.</Preview>
             <Tailwind>
                 <Body className="bg-[#121212] my-auto mx-auto font-sans text-white px-2">
                     <Container className="border border-solid border-[#ffffff20] rounded-[24px] my-[40px] mx-auto p-[40px] max-w-[500px] bg-[#1a1a1a]">
@@ -43,11 +43,11 @@ export const BookingReminder = ({
                         </Section>
 
                         <Heading className="text-white text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-                            <strong>{customerName}</strong>, ¡te esperamos pronto!
+                            ¡Buenos días, <strong>{customerName}</strong>!
                         </Heading>
 
                         <Text className="text-[#a1a1aa] text-[15px] leading-[24px]">
-                            Este es un recordatorio automático. Tu cita está programada en menos de dos horas:
+                            Te escribimos para recordarte que tienes una cita programada con nosotros el día de hoy:
                         </Text>
 
                         <Section className="bg-[#000000] rounded-xl border border-[#ffffff10] p-6 my-6 text-center">

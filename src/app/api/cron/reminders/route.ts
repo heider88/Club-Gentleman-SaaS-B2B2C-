@@ -16,13 +16,13 @@ export async function GET(request: Request) {
     }
 
     try {
-        console.log("CRON JOB INIT: Buscando citas para enviar recordatorios...");
+        console.log("CRON JOB INIT: Buscando citas del día de hoy para enviar recordatorios...");
         const adminClient = createAdminClient();
         
-        // Ventana de tiempo: Entre 1 hora 45 mins y 2 horas 15 mins en el futuro
+        // Ventana de tiempo: Todo el día de hoy (desde este momento hasta la medianoche)
         const now = new Date();
-        const futureStart = new Date(now.getTime() + 105 * 60000); // 1h 45m
-        const futureEnd = new Date(now.getTime() + 135 * 60000);   // 2h 15m
+        const endOfToday = new Date(now);
+        endOfToday.setHours(23, 59, 59, 999);
 
         const { data: appointments, error } = await adminClient
             .from('appointments')
@@ -36,12 +36,12 @@ export async function GET(request: Request) {
                 profiles(full_name)
             `)
             .eq('status', 'pending')
-            .gte('start_time', futureStart.toISOString())
-            .lte('start_time', futureEnd.toISOString());
+            .gte('start_time', now.toISOString())
+            .lte('start_time', endOfToday.toISOString());
 
         if (error) throw error;
 
-        console.log(`CRON: Se encontraron ${appointments?.length || 0} citas en la ventana de 2 horas.`);
+        console.log(`CRON: Se encontraron ${appointments?.length || 0} citas para hoy.`);
 
         const emailsSent = [];
 
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
                     const { error: resendError } = await resend.emails.send({
                         from: "onboarding@resend.dev", // Cambiar a 'citas@tudominio.com' cuando haya dominio
                         to: appt.customer_email,
-                        subject: `⏰ Recordatorio de cita en 2 horas - Club Gentleman`,
+                        subject: `⏰ Recordatorio de tu cita para hoy - Club Gentleman`,
                         html: emailHtml,
                     });
 
