@@ -77,8 +77,8 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 time: bookingData.time
             });
 
-            if (!notificationResult.emailSent || !notificationResult.whatsappSent) {
-                console.error("Omnichannel warning:", notificationResult);
+            if (!notificationResult.emailSent) {
+                console.error("Email warning:", notificationResult);
                 // No bloqueamos UI porque la DB guardó la cita con éxito
             }
 
