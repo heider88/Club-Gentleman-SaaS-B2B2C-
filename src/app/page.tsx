@@ -36,20 +36,20 @@ export default async function LandingPage() {
 
       {/* Header Section */}
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/20 pb-6">
-          <div className="space-y-4">
-            {/* Duplicando el tamaño del logo (antes w-48 h-24 sm:w-56 sm:h-28) */}
-            <div className="relative w-96 h-48 sm:w-[28rem] sm:h-56 -ml-2 drop-shadow-2xl">
+        <div className="flex flex-col items-center gap-6 border-b border-white/20 pb-8">
+          <div className="space-y-6 flex flex-col items-center text-center">
+            {/* Logo Centrado */}
+            <div className="relative w-96 h-48 sm:w-[28rem] sm:h-56 drop-shadow-2xl">
               <Image
-                src="/logo.png"
+                src="/lojito.png"
                 alt="Club Gentleman For Men Logo"
                 fill
-                className="object-contain object-left scale-110 origin-left"
+                className="object-contain object-center scale-110"
                 priority
               />
             </div>
             <h1 className="sr-only">Club Gentleman For Men</h1>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/80 font-medium">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/80 font-medium">
               <div className="flex items-center gap-1 text-yellow-400">
                 <Star className="w-4 h-4 fill-current" />
                 <span className="text-white">5.0 <span className="text-white/60 font-normal">(341 reviews)</span></span>
@@ -66,11 +66,11 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+          <div className="flex flex-col items-center gap-3 w-full sm:w-auto mt-2">
             <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
               Barbería
             </span>
-            <div className="flex gap-2">
+            <div className="flex justify-center gap-2">
               <a
                 href="https://www.facebook.com/profile.php?id=100065179103783"
                 target="_blank"

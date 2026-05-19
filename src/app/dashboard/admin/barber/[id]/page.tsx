@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { User, Scissors, CalendarDays, ArrowLeft, Clock } from "lucide-react"
+import { User, Scissors, CalendarDays, ArrowLeft, Clock, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { BarberBasicInfoForm } from "@/components/dashboard/admin/BarberBasicInfoForm"
 import { BarberServicesManager } from "@/components/dashboard/admin/BarberServicesManager"
 import { BarberScheduleManager } from "@/components/dashboard/admin/BarberScheduleManager"
+
+import { AdminSecurityManager } from "@/components/dashboard/admin/AdminSecurityManager"
 
 export default async function BarberManagerPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -83,6 +85,19 @@ export default async function BarberManagerPage({ params }: { params: Promise<{ 
                                 initialName={barber.full_name} 
                                 initialBio={barber.bio} 
                                 initialPhone={barber.phone} 
+                            />
+                        </div>
+                    </section>
+
+                    {/* Seguridad / Accesos (SOLO ADMIN) */}
+                    <section className="bg-card/90 backdrop-blur-xl border border-red-500/20 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
+                            <ShieldCheck className="w-5 h-5 text-red-400" /> Credenciales de Acceso
+                        </h2>
+                        <div className="relative z-10">
+                            <AdminSecurityManager 
+                                barberId={barber.id} 
+                                currentEmail={barber.email || ""} 
                             />
                         </div>
                     </section>

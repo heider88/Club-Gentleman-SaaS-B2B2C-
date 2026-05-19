@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Save } from "lucide-react"
+import { updateBarberProfile } from "@/app/actions/admin"
 
 // Types for Schedule Settings JSONB
 export interface ScheduleSettings {
@@ -29,7 +29,6 @@ const DAYS = [
 ]
 
 export function BarberScheduleManager({ barberId, initialSettings }: { barberId: string, initialSettings: any }) {
-    const supabase = createClient()
     const [saving, setSaving] = useState(false)
     
     // Parse the jsonb, fallback to default if missing or invalid
@@ -56,13 +55,11 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
 
     const handleSave = async () => {
         setSaving(true)
-        const { error } = await supabase
-            .from('profiles')
-            .update({ schedule_settings: settings })
-            .eq('id', barberId)
+        
+        const result = await updateBarberProfile(barberId, { schedule_settings: settings })
 
-        if (error) {
-            toast.error("Error al guardar horario", { description: error.message })
+        if (result.error) {
+            toast.error("Error al guardar horario", { description: result.error })
         } else {
             toast.success("Horario del barbero actualizado")
         }

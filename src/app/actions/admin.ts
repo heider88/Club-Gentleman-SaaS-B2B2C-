@@ -130,3 +130,66 @@ export async function importServicesToBarber(barberId: string, servicesToImport:
     return { success: true, data };
 }
 
+export async function updateBarberProfile(barberId: string, updates: any) {
+    await requireAdmin();
+    const adminClient = createAdminClient();
+    
+    const { data, error } = await adminClient
+        .from('profiles')
+        .update(updates)
+        .eq('id', barberId)
+        .select();
+        
+    if (error) return { error: error.message };
+    
+    revalidatePath(`/dashboard/admin/barber/${barberId}`);
+    return { success: true, data };
+}
+
+export async function updateEmployeePassword(userId: string, newPassword: string) {
+    await requireAdmin();
+    const adminClient = createAdminClient();
+
+    const { data, error } = await adminClient.auth.admin.updateUserById(userId, {
+        password: newPassword
+    });
+
+    if (error) {
+        console.error("Error al actualizar contraseña:", error);
+        return { error: `Error: ${error.message}` };
+    }
+
+    return { success: true, message: "Contraseña actualizada exitosamente." };
+}
+
+export async function updateEmployeeEmail(userId: string, newEmail: string) {
+    await requireAdmin();
+    const adminClient = createAdminClient();
+
+    // 1. Actualizar en el sistema de autenticación (auth.users)
+    const { data: authData, error: authError } = await adminClient.auth.admin.updateUserById(userId, {
+        email: newEmail,
+        email_confirm: true // Confirmar automáticamente para evitar bloqueos
+    });
+
+    if (authError) {
+        console.error("Error al actualizar email en Auth:", authError);
+        return { error: `Error Auth: ${authError.message}` };
+    }
+
+    // 2. Sincronizar el correo en la tabla pública de profiles
+    const { error: profileError } = await adminClient
+        .from('profiles')
+        .update({ email: newEmail })
+        .eq('id', userId);
+
+    if (profileError) {
+        console.error("Error al sincronizar email en Profiles:", profileError);
+        // Retornamos success parcial porque el login sí cambió, pero avisamos.
+        return { success: true, message: "Email actualizado en acceso, pero falló sincronización en perfil público." };
+    }
+    
+    revalidatePath(`/dashboard/admin/barber/${userId}`);
+    return { success: true, message: "Correo de acceso actualizado exitosamente." };
+}
+

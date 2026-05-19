@@ -118,9 +118,9 @@ CREATE POLICY "Barbers can manage own services" ON public.services FOR ALL USING
 CREATE POLICY "Public can create appointments" ON public.appointments FOR INSERT WITH CHECK (true);
 -- SELECT (Barbero): El dueño lee todo (Nombres y Horarios)
 CREATE POLICY "Barbers can view their appointments" ON public.appointments FOR SELECT USING (auth.uid() = barber_id);
--- UPDATE / DELETE: El dueño gestiona su propia fila
+-- UPDATE: El dueño gestiona su propia fila (necesario para marcar como completada)
 CREATE POLICY "Barbers can modify their appointments" ON public.appointments FOR UPDATE USING (auth.uid() = barber_id);
-CREATE POLICY "Barbers can delete their appointments" ON public.appointments FOR DELETE USING (auth.uid() = barber_id);
+-- DELETE: Eliminado para barberos por reglas de negocio. Solo Admin (Service Role) puede eliminar/cancelar.
 
 
 -- Privacidad en Appointments (Protección de PII por Data Exfiltration) -----

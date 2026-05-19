@@ -146,8 +146,8 @@ export default function ProfilePage() {
             .update({
                 full_name: profile.full_name,
                 bio: profile.bio,
-                phone: profile.phone,
-                schedule_settings: schedule as any // Supabase inferred TS expects valid json
+                phone: profile.phone
+                // Nota: schedule_settings eliminado porque solo el Admin puede actualizar horarios
             })
             .eq('id', userId)
 
@@ -286,11 +286,11 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    {/* Schedule Engine JSONB */}
-                    <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-8 space-y-8 shadow-xl">
+                    {/* Schedule Engine JSONB (Solo Lectura) */}
+                    <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-8 space-y-8 shadow-xl opacity-75">
                         <h2 className="text-xl font-bold flex items-center gap-2 text-white">
                             <span className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><Clock className="w-4 h-4" /></span>
-                            Horarios de Atención
+                            Horarios de Atención (Asignados por el Administrador)
                         </h2>
 
                         {/* Work Days Picker */}
@@ -302,16 +302,15 @@ export default function ProfilePage() {
                                 {DAYS_MAP.map(day => {
                                     const isSelected = schedule.workDays.includes(day.value)
                                     return (
-                                        <button
+                                        <div
                                             key={day.value}
-                                            onClick={() => toggleWorkDay(day.value)}
-                                            className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${isSelected
+                                            className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors cursor-default ${isSelected
                                                     ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(var(--color-primary),0.3)]'
-                                                    : 'bg-black/50 text-white/50 border-white/5 hover:border-white/20'
+                                                    : 'bg-black/50 text-white/50 border-white/5'
                                                 }`}
                                         >
                                             {day.label}
-                                        </button>
+                                        </div>
                                     )
                                 })}
                             </div>
@@ -326,19 +325,17 @@ export default function ProfilePage() {
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50">Apertura (Hora Militar)</label>
                                     <input
-                                        type="number" min="0" max="23"
+                                        type="number" readOnly
                                         value={schedule.startHour}
-                                        onChange={(e) => setSchedule(p => ({ ...p, startHour: parseInt(e.target.value) || 0 }))}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white font-mono"
+                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50">Cierre (Hora Militar)</label>
                                     <input
-                                        type="number" min="0" max="23"
+                                        type="number" readOnly
                                         value={schedule.endHour}
-                                        onChange={(e) => setSchedule(p => ({ ...p, endHour: parseInt(e.target.value) || 0 }))}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white font-mono"
+                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
                                     />
                                 </div>
                             </div>
@@ -350,19 +347,17 @@ export default function ProfilePage() {
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50">Inicio (Hora Militar)</label>
                                     <input
-                                        type="number" min="0" max="23"
+                                        type="number" readOnly
                                         value={schedule.lunchStart}
-                                        onChange={(e) => setSchedule(p => ({ ...p, lunchStart: parseInt(e.target.value) || 0 }))}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white font-mono"
+                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs text-white/50">Fin (Hora Militar)</label>
                                     <input
-                                        type="number" min="0" max="23"
+                                        type="number" readOnly
                                         value={schedule.lunchEnd}
-                                        onChange={(e) => setSchedule(p => ({ ...p, lunchEnd: parseInt(e.target.value) || 0 }))}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white font-mono"
+                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
                                     />
                                 </div>
                             </div>

@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Save } from "lucide-react"
+import { updateBarberProfile } from "@/app/actions/admin"
 
 export function BarberBasicInfoForm({ 
     barberId, 
@@ -20,19 +20,15 @@ export function BarberBasicInfoForm({
     const [bio, setBio] = useState(initialBio || "")
     const [phone, setPhone] = useState(initialPhone || "")
     const [saving, setSaving] = useState(false)
-    const supabase = createClient()
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
 
-        const { error } = await supabase
-            .from('profiles')
-            .update({ full_name: name, bio, phone })
-            .eq('id', barberId)
+        const result = await updateBarberProfile(barberId, { full_name: name, bio, phone })
 
-        if (error) {
-            toast.error("Error al actualizar la información", { description: error.message })
+        if (result.error) {
+            toast.error("Error al actualizar la información", { description: result.error })
         } else {
             toast.success("Información actualizada correctamente")
         }
