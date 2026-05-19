@@ -191,6 +191,30 @@ export interface Database {
                     }
                 ]
             }
+            gallery_images: {
+                Row: {
+                    id: string
+                    image_url: string
+                    caption: string | null
+                    order_index: number | null
+                    created_at: string | null
+                }
+                Insert: {
+                    id?: string
+                    image_url: string
+                    caption?: string | null
+                    order_index?: number | null
+                    created_at?: string | null
+                }
+                Update: {
+                    id?: string
+                    image_url?: string
+                    caption?: string | null
+                    order_index?: number | null
+                    created_at?: string | null
+                }
+                Relationships: []
+            }
         }
         Views: {
             [_ in never]: never
