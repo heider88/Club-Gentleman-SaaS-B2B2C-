@@ -23,7 +23,7 @@ interface AppointmentRecord {
     services: { name: string, price: number } | null
 }
 
-export function BarberHistory({ barberId, barberName }: { barberId: string, barberName: string }) {
+export function BarberHistory({ barberId, barberName, commissionPercentage }: { barberId: string, barberName: string, commissionPercentage: number }) {
     const supabase = createClient()
     const [filter, setFilter] = useState<FilterType>('daily')
     const [appointments, setAppointments] = useState<AppointmentRecord[]>([])
@@ -32,6 +32,8 @@ export function BarberHistory({ barberId, barberName }: { barberId: string, barb
     // Derived KPIs
     const totalRevenue = appointments.reduce((sum, a) => sum + (a.services?.price || 0), 0)
     const totalAppointments = appointments.length
+    const storeCut = totalRevenue * ((100 - commissionPercentage) / 100)
+    const barberCut = totalRevenue * (commissionPercentage / 100)
 
     useEffect(() => {
         const fetchHistoryData = async () => {
@@ -97,18 +99,19 @@ export function BarberHistory({ barberId, barberName }: { barberId: string, barb
         doc.setFontSize(10)
         doc.setTextColor(100)
         const periodLabels = { daily: 'Hoy', weekly: 'Esta Semana', monthly: 'Este Mes' }
-        doc.text(`Periodo: ${periodLabels[filter]} - Generado: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 34)
+        doc.text(`Periodo: ${periodLabels[filter]} - Generado: ${format(new Date(), 'dd/MM/yyyy h:mm a')}`, 14, 34)
         
         doc.setFontSize(12)
         doc.setTextColor(0)
         doc.text(`Producción Total Generada: ${formatCurrency(totalRevenue)}`, 14, 44)
-        doc.text(`Servicios Completados: ${totalAppointments}`, 14, 51)
+        doc.text(`Pago al Profesional (${commissionPercentage}%): ${formatCurrency(barberCut)}`, 14, 51)
+        doc.text(`Servicios Completados: ${totalAppointments}`, 14, 58)
 
         autoTable(doc, {
-            startY: 58,
+            startY: 65,
             head: [['Fecha y Hora', 'Cliente', 'Servicio Realizado', 'Monto ($)']],
             body: appointments.map(a => [
-                format(new Date(a.start_time), 'dd/MM/yyyy HH:mm'),
+                format(new Date(a.start_time), 'dd/MM/yyyy h:mm a'),
                 a.customer_name,
                 a.services?.name || 'N/A',
                 formatCurrency(a.services?.price || 0)
@@ -159,15 +162,18 @@ export function BarberHistory({ barberId, barberName }: { barberId: string, barb
                     </h3>
                 </div>
 
-                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group sm:col-span-2">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all" />
                     <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Producción Total</span>
+                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Tu Ganancia Neta ({commissionPercentage}%)</span>
                         <div className="p-2 bg-green-500/20 rounded-xl"><Banknote className="w-5 h-5 text-green-400" /></div>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">
-                        {loading ? '...' : formatCurrency(totalRevenue)}
-                    </h3>
+                    <div className="flex items-baseline gap-2 relative z-10">
+                        <h3 className="text-4xl font-black text-green-400">
+                            {loading ? '...' : formatCurrency(barberCut)}
+                        </h3>
+                        <span className="text-sm font-medium text-white/40 line-through decoration-white/20">De {formatCurrency(totalRevenue)} prod. total</span>
+                    </div>
                 </div>
             </div>
 
@@ -207,7 +213,7 @@ export function BarberHistory({ barberId, barberName }: { barberId: string, barb
                                 appointments.map(appt => (
                                     <tr key={appt.id} className="hover:bg-white/5 transition-colors">
                                         <td className="p-4 text-sm text-white/80 whitespace-nowrap">
-                                            {format(new Date(appt.start_time), "d MMM yyyy - HH:mm", { locale: es })}
+                                            {format(new Date(appt.start_time), "d MMM yyyy - h:mm a", { locale: es })}
                                         </td>
                                         <td className="p-4 text-sm text-white font-medium whitespace-nowrap">
                                             {appt.customer_name}

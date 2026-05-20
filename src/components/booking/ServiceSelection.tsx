@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
 
 interface ServiceGroup {
+    id: string
     name: string
     price: number
     duration: number
@@ -11,10 +12,11 @@ interface ServiceGroup {
 }
 
 interface ServiceSelectionProps {
+    barberId: string
     onSelect: (service: ServiceGroup) => void
 }
 
-export function ServiceSelection({ onSelect }: ServiceSelectionProps) {
+export function ServiceSelection({ barberId, onSelect }: ServiceSelectionProps) {
     const [services, setServices] = useState<ServiceGroup[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -22,21 +24,23 @@ export function ServiceSelection({ onSelect }: ServiceSelectionProps) {
         async function fetchServices() {
             setLoading(true)
             const supabase = createClient()
-            const { data, error } = await supabase.from('services').select('*')
+            const { data } = await supabase.from('services').select('*').eq('barber_id', barberId).order('name')
+            
             if (data) {
-                // Group duplicates by name
-                const unique = Array.from(new Map(data.map(item => [item.name, {
+                // Ya no necesitamos agrupar por nombre porque ahora es por barbero
+                const mapped = data.map(item => ({
+                    id: item.id,
                     name: item.name,
                     price: item.price,
                     duration: item.duration_minutes,
                     description: item.description
-                }])).values());
-                setServices(unique)
+                }))
+                setServices(mapped)
             }
             setLoading(false)
         }
-        fetchServices()
-    }, [])
+        if (barberId) fetchServices()
+    }, [barberId])
 
     if (loading) return <div className="text-white/50 text-sm animate-pulse p-4">Cargando servicios...</div>
 
@@ -49,7 +53,7 @@ export function ServiceSelection({ onSelect }: ServiceSelectionProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    key={service.name}
+                    key={service.id}
                     onClick={() => onSelect(service)}
                     className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:bg-white/10 hover:border-primary/50 active:scale-95 min-h-[44px] transition-all group"
                 >

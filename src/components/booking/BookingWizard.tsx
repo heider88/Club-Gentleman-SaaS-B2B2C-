@@ -61,7 +61,7 @@ export default function BookingWizard() {
         >
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
 
-            {/* Step 1: Service */}
+            {/* Step 1: Barber & Date */}
             <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 1 ? 'w-[300px] sm:w-[350px]' : 'w-[200px]'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 1 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
@@ -72,12 +72,14 @@ export default function BookingWizard() {
 
                 {step === 1 ? (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
-                        <h3 className="text-xl font-bold mb-4 text-white">Elige un Servicio</h3>
+                        <h3 className="text-xl font-bold mb-4 text-white">Barbero & Fecha</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
-                            <ServiceSelection onSelect={(svc) => {
-                                setBookingData(prev => ({ ...prev, serviceName: svc.name, serviceDuration: svc.duration }))
-                                setStep(2)
-                            }} />
+                            <BarberSelection
+                                onSelect={(barberId, _ignore, date, barberName) => {
+                                    setBookingData(prev => ({ ...prev, barberId, date, barberName }))
+                                    setStep(2)
+                                }}
+                            />
                         </div>
                     </motion.div>
                 ) : step > 1 ? (
@@ -87,13 +89,13 @@ export default function BookingWizard() {
                     >
                         <span className="text-sm font-medium text-white/80">Paso 1 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Editar Servicio <Edit2 className="w-3.5 h-3.5" />
+                            Editar Barbero/Día <Edit2 className="w-3.5 h-3.5" />
                         </div>
                     </div>
                 ) : null}
             </div>
 
-            {/* Step 2: Barber & Date */}
+            {/* Step 2: Service */}
             <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 2 ? 'w-[300px] sm:w-[350px]' : step > 2 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 2 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 2 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
@@ -104,15 +106,19 @@ export default function BookingWizard() {
 
                 {step === 2 ? (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
-                        <h3 className="text-xl font-bold mb-4 text-white">Barbero & Fecha</h3>
+                        <h3 className="text-xl font-bold mb-4 text-white">Elige un Servicio</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
-                            <BarberSelection
-                                serviceName={bookingData.serviceName}
-                                onSelect={(barberId, exactSvcId, date, barberName) => {
-                                    setBookingData(prev => ({ ...prev, barberId, serviceId: exactSvcId, date, barberName }))
-                                    setStep(3)
-                                }}
-                            />
+                            {!bookingData.barberId ? (
+                                <p className="text-white/50 text-sm">Faltan datos previos.</p> // Failsafe
+                            ) : (
+                                <ServiceSelection 
+                                    barberId={bookingData.barberId}
+                                    onSelect={(svc) => {
+                                        setBookingData(prev => ({ ...prev, serviceId: svc.id, serviceName: svc.name, serviceDuration: svc.duration }))
+                                        setStep(3)
+                                    }} 
+                                />
+                            )}
                         </div>
                     </motion.div>
                 ) : step > 2 ? (
@@ -122,7 +128,7 @@ export default function BookingWizard() {
                     >
                         <span className="text-sm font-medium text-white/80">Paso 2 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Editar Barbero/Día <Edit2 className="w-3.5 h-3.5" />
+                            Editar Servicio <Edit2 className="w-3.5 h-3.5" />
                         </div>
                     </div>
                 ) : null}

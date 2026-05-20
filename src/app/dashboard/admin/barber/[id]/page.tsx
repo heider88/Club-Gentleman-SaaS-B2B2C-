@@ -85,6 +85,8 @@ export default async function BarberManagerPage({ params }: { params: Promise<{ 
                                 initialName={barber.full_name} 
                                 initialBio={barber.bio} 
                                 initialPhone={barber.phone} 
+                                initialSpecialty={barber.specialty}
+                                initialCommission={barber.commission_percentage}
                             />
                         </div>
                     </section>

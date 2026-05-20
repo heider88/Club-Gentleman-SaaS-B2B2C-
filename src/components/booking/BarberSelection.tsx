@@ -15,12 +15,11 @@ interface Barber {
 }
 
 interface BarberSelectionProps {
-    serviceName: string
     onSelect: (barberId: string, exactServiceId: string, date: Date, barberName: string) => void
 }
 
-export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps) {
-    const [barbers, setBarbers] = useState<(Barber & { exactServiceId: string })[]>([])
+export function BarberSelection({ onSelect }: BarberSelectionProps) {
+    const [barbers, setBarbers] = useState<Barber[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedBarber, setSelectedBarber] = useState<string | null>(null)
     const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -43,26 +42,17 @@ export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps)
             setLoading(true)
             const supabase = createClient()
 
-            // Traer perfiles SOLO de barberos y servicios donde nombre coincida
-            const [profilesRes, servicesRes] = await Promise.all([
-                supabase.from('profiles').select('*').eq('role', 'barber'),
-                supabase.from('services').select('id, barber_id, name').eq('name', serviceName)
-            ])
+            // Traer todos los perfiles que son barberos (o equipo en general)
+            const { data } = await supabase.from('profiles').select('*').eq('role', 'barber')
 
-            if (profilesRes.data && servicesRes.data) {
-                // Filtrar barberos que dictan este servicio
-                const available = profilesRes.data.map(profile => {
-                    const svc = servicesRes.data.find(s => s.barber_id === profile.id);
-                    if (!svc) return null;
-                    return { ...profile, exactServiceId: svc.id } as Barber & { exactServiceId: string };
-                }).filter(Boolean) as (Barber & { exactServiceId: string })[]
-
-                setBarbers(available)
+            if (data) {
+                // Remove exactServiceId requirement since services are now fetched AFTER barber selection
+                setBarbers(data as unknown as Barber[])
             }
             setLoading(false)
         }
         fetchBarbers()
-    }, [serviceName])
+    }, [])
 
     // Fechas siguientes
     const days = useMemo(() => {
@@ -77,12 +67,12 @@ export function BarberSelection({ serviceName, onSelect }: BarberSelectionProps)
         if (!selectedBarber) return;
         const barberInfo = barbers.find(b => b.id === selectedBarber);
         if (barberInfo) {
-            onSelect(selectedBarber, barberInfo.exactServiceId, selectedDate, barberInfo.full_name || "Barbero");
+            onSelect(selectedBarber, "", selectedDate, barberInfo.full_name || "Barbero");
         }
     }
 
-    if (loading) return <div className="text-white/50 text-sm animate-pulse p-4">Cargando barberos...</div>
-    if (barbers.length === 0) return <div className="text-white/50 text-sm p-4 text-center">Nadie ofrece este servicio de momento.</div>
+    if (loading) return <div className="text-white/50 text-sm animate-pulse p-4">Cargando equipo...</div>
+    if (barbers.length === 0) return <div className="text-white/50 text-sm p-4 text-center">Aún no hay equipo registrado.</div>
 
     return (
         <div className="flex flex-col gap-6">

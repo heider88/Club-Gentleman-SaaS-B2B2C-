@@ -11,7 +11,7 @@ export default async function HistoryPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, role')
+        .select('full_name, role, commission_percentage')
         .eq('id', user.id)
         .single()
 
@@ -31,7 +31,11 @@ export default async function HistoryPage() {
                 </p>
             </header>
 
-            <BarberHistory barberId={user.id} barberName={profile.full_name || 'Barbero'} />
+            <BarberHistory 
+                barberId={user.id} 
+                barberName={profile.full_name || 'Barbero'} 
+                commissionPercentage={profile.commission_percentage || 50} 
+            />
         </div>
     )
 }

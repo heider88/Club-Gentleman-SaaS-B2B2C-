@@ -148,15 +148,17 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                             value={newService.price || ''} onChange={e => setNewService({...newService, price: Number(e.target.value)})}
                             className="w-1/2 p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
                         />
-                        <select 
-                            value={newService.duration_minutes} onChange={e => setNewService({...newService, duration_minutes: Number(e.target.value)})}
-                            className="w-1/2 p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none"
-                        >
-                            <option value="15">15 min</option>
-                            <option value="30">30 min</option>
-                            <option value="45">45 min</option>
-                            <option value="60">60 min</option>
-                        </select>
+                        <div className="relative w-1/2">
+                            <input 
+                                type="number"
+                                min="5"
+                                value={newService.duration_minutes || ''} 
+                                onChange={e => setNewService({...newService, duration_minutes: Number(e.target.value)})}
+                                placeholder="Minutos"
+                                className="w-full p-2 pr-10 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-xs">min</span>
+                        </div>
                     </div>
                     <div className="flex gap-2 justify-end pt-2">
                         <button type="button" onClick={() => setIsCreating(false)} className="text-white/50 hover:text-white text-xs px-2"><X className="w-4 h-4"/></button>

@@ -87,9 +87,9 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             <div className="flex justify-between items-start mb-4">
                 <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-[15px]">{format(new Date(appt.start_time), 'HH:mm')}</span>
+                    <span className="font-bold text-[15px]">{format(new Date(appt.start_time), 'h:mm a')}</span>
                     <span className="text-white/30 px-1">-</span>
-                    <span className="text-white/50 text-[15px]">{format(new Date(appt.end_time), 'HH:mm')}</span>
+                    <span className="text-white/50 text-[15px]">{format(new Date(appt.end_time), 'h:mm a')}</span>
                 </div>
                 {isPending && (
                     <span className="w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)] animate-pulse" title="Pendiente" />

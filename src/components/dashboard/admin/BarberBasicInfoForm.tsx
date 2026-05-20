@@ -9,23 +9,35 @@ export function BarberBasicInfoForm({
     barberId, 
     initialName, 
     initialBio, 
-    initialPhone 
+    initialPhone,
+    initialSpecialty,
+    initialCommission
 }: { 
     barberId: string, 
     initialName: string | null, 
     initialBio: string | null,
-    initialPhone: string | null 
+    initialPhone: string | null,
+    initialSpecialty: string | null,
+    initialCommission: number | null
 }) {
     const [name, setName] = useState(initialName || "")
     const [bio, setBio] = useState(initialBio || "")
     const [phone, setPhone] = useState(initialPhone || "")
+    const [specialty, setSpecialty] = useState(initialSpecialty || "Barbero")
+    const [commission, setCommission] = useState(initialCommission?.toString() || "50")
     const [saving, setSaving] = useState(false)
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
 
-        const result = await updateBarberProfile(barberId, { full_name: name, bio, phone })
+        const result = await updateBarberProfile(barberId, { 
+            full_name: name, 
+            bio, 
+            phone,
+            specialty,
+            commission_percentage: parseFloat(commission) || 50
+        })
 
         if (result.error) {
             toast.error("Error al actualizar la información", { description: result.error })
@@ -60,8 +72,37 @@ export function BarberBasicInfoForm({
                 />
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Especialidad / Título</label>
+                    <input 
+                        type="text" 
+                        value={specialty}
+                        onChange={(e) => setSpecialty(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none transition-all text-white font-medium"
+                        placeholder="Ej. Barbero, Manicurista..."
+                    />
+                </div>
+                
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">% Comisión del Empleado</label>
+                    <div className="relative">
+                        <input 
+                            type="number" 
+                            min="0"
+                            max="100"
+                            value={commission}
+                            onChange={(e) => setCommission(e.target.value)}
+                            className="w-full p-3 pr-8 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none transition-all text-white font-medium"
+                            placeholder="50"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 font-bold">%</span>
+                    </div>
+                </div>
+            </div>
+
             <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Biografía / Especialidad</label>
+                <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Biografía</label>
                 <textarea 
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}

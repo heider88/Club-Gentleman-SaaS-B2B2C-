@@ -22,7 +22,7 @@ export default async function ReportsPage() {
     // Obtener la lista de barberos para el filtro
     const { data: barbers } = await supabase
         .from('profiles')
-        .select('id, full_name')
+        .select('id, full_name, commission_percentage')
         .eq('role', 'barber')
         .order('full_name', { ascending: true })
 

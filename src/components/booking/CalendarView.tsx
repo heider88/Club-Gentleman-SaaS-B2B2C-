@@ -107,8 +107,8 @@ export function CalendarView({ barberId, date, durationMinutes, onSelect }: Cale
                     break;
                 }
 
-                // format time e.g., '09:00'
-                const timeStr = format(slotStart, 'HH:mm');
+                // format time e.g., '09:00 AM'
+                const timeStr = format(slotStart, 'h:mm a');
 
                 generatedSlots.push({
                     time: timeStr,

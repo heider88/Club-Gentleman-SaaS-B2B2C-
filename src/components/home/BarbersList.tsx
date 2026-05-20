@@ -13,9 +13,9 @@ export default function BarbersList() {
     useEffect(() => {
         async function fetchBarbers() {
             setLoading(true)
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('profiles')
-                .select('id, full_name, bio, avatar_url')
+                .select('id, full_name, bio, avatar_url, specialty')
                 .eq('role', 'barber')
                 .order('created_at', { ascending: true })
 
@@ -75,9 +75,12 @@ export default function BarbersList() {
                             </div>
                         </div>
 
-                        <h3 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-primary transition-colors">
+                        <h3 className="text-2xl font-black text-white tracking-tight group-hover:text-primary transition-colors">
                             {barber.full_name}
                         </h3>
+                        <p className="text-xs font-bold text-primary uppercase tracking-widest mb-4">
+                            {barber.specialty || "Barbero"}
+                        </p>
 
                         <p className="text-sm text-white/60 leading-relaxed font-medium">
                             {barber.bio || "Artista residente en el club, listo para elevar tu estilo al máximo nivel. Reserva con este experto hoy mismo."}

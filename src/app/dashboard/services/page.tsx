@@ -245,21 +245,20 @@ export default function ServicesPage() {
                             </div>
 
                             <div className="space-y-2 sm:col-span-2 md:col-span-1">
-                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Tiempo Asignado en Agenda *</label>
-                                <select
-                                    name="duration_minutes"
-                                    required
-                                    value={currentService.duration_minutes}
-                                    onChange={handleChange}
-                                    className="w-full p-4 rounded-xl bg-black/50 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white font-medium appearance-none"
-                                >
-                                    <option value="15" className="bg-background">15 min (Arreglo rápido)</option>
-                                    <option value="30" className="bg-background">30 min (Media Hora)</option>
-                                    <option value="45" className="bg-background">45 min (Estándar)</option>
-                                    <option value="60" className="bg-background">60 min (1 Hora)</option>
-                                    <option value="90" className="bg-background">90 min (Corte + Barba + Spa)</option>
-                                    <option value="120" className="bg-background">120 min (2 Horas Premium)</option>
-                                </select>
+                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Tiempo Asignado en Agenda (Minutos) *</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        name="duration_minutes"
+                                        min="5"
+                                        required
+                                        value={currentService.duration_minutes || ''}
+                                        onChange={handleChange}
+                                        placeholder="Ej. 40"
+                                        className="w-full p-4 pr-12 rounded-xl bg-black/50 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white font-medium"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 font-bold text-sm">min</span>
+                                </div>
                             </div>
                         </div>
 

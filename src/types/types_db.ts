@@ -24,6 +24,8 @@ export interface Database {
                     full_name: string | null
                     avatar_url: string | null
                     bio: string | null
+                    specialty: string | null
+                    commission_percentage: number | null
                     phone: string | null
                     role: 'admin' | 'barber'
                     schedule_settings: ScheduleSettings | null
@@ -35,6 +37,8 @@ export interface Database {
                     full_name?: string | null
                     avatar_url?: string | null
                     bio?: string | null
+                    specialty?: string | null
+                    commission_percentage?: number | null
                     phone?: string | null
                     role?: 'admin' | 'barber'
                     schedule_settings?: ScheduleSettings | null
@@ -46,6 +50,8 @@ export interface Database {
                     full_name?: string | null
                     avatar_url?: string | null
                     bio?: string | null
+                    specialty?: string | null
+                    commission_percentage?: number | null
                     phone?: string | null
                     role?: 'admin' | 'barber'
                     schedule_settings?: ScheduleSettings | null

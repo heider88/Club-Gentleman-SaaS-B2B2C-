@@ -19,6 +19,7 @@ type FilterType = 'daily' | 'weekly' | 'monthly'
 interface Barber {
     id: string
     full_name: string | null
+    commission_percentage: number | null
 }
 
 interface AppointmentRecord {
@@ -41,6 +42,12 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
     const totalRevenue = appointments.reduce((sum, a) => sum + (a.services?.price || 0), 0)
     const totalAppointments = appointments.length
     const averageTicket = totalAppointments > 0 ? totalRevenue / totalAppointments : 0
+    
+    // Si hay un barbero seleccionado, calculamos su comisión
+    const selectedBarberData = barbers.find(b => b.id === selectedBarber)
+    const commissionPercentage = selectedBarberData?.commission_percentage || 50
+    const barberCut = selectedBarber !== 'all' ? totalRevenue * (commissionPercentage / 100) : 0
+    const storeCut = selectedBarber !== 'all' ? totalRevenue * ((100 - commissionPercentage) / 100) : totalRevenue
 
     useEffect(() => {
         const fetchReportData = async () => {
@@ -119,11 +126,18 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
         doc.setFontSize(12)
         doc.setTextColor(0)
         doc.text(`Ingresos Totales: ${formatCurrency(totalRevenue)}`, 14, 38)
-        doc.text(`Citas Completadas: ${totalAppointments}`, 14, 45)
+        
+        if (selectedBarber !== 'all') {
+            doc.text(`Pago al Profesional (${commissionPercentage}%): ${formatCurrency(barberCut)}`, 14, 45)
+            doc.text(`Ganancia Tienda (${100 - commissionPercentage}%): ${formatCurrency(storeCut)}`, 14, 52)
+            doc.text(`Citas Completadas: ${totalAppointments}`, 14, 59)
+        } else {
+            doc.text(`Citas Completadas: ${totalAppointments}`, 14, 45)
+        }
 
         // Tabla
         autoTable(doc, {
-            startY: 55,
+            startY: selectedBarber !== 'all' ? 66 : 55,
             head: [['Fecha y Hora', 'Barbero', 'Cliente', 'Servicio', 'Monto ($)']],
             body: appointments.map(a => [
                 format(new Date(a.start_time), 'dd/MM/yyyy HH:mm'),
@@ -193,27 +207,54 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
                     </h3>
                 </div>
 
-                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
-                    <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Citas Finalizadas</span>
-                        <div className="p-2 bg-primary/20 rounded-xl"><CheckCircle2 className="w-5 h-5 text-primary" /></div>
-                    </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">
-                        {loading ? '...' : totalAppointments}
-                    </h3>
-                </div>
+                {selectedBarber !== 'all' ? (
+                    <>
+                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all" />
+                            <div className="flex justify-between items-start mb-2 relative z-10">
+                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Pago al Profesional</span>
+                                <span className="text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded-md">{commissionPercentage}%</span>
+                            </div>
+                            <h3 className="text-3xl font-black text-purple-400 relative z-10">
+                                {loading ? '...' : formatCurrency(barberCut)}
+                            </h3>
+                        </div>
+                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
+                            <div className="flex justify-between items-start mb-2 relative z-10">
+                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ganancia Tienda</span>
+                                <span className="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">{100 - commissionPercentage}%</span>
+                            </div>
+                            <h3 className="text-3xl font-black text-emerald-400 relative z-10">
+                                {loading ? '...' : formatCurrency(storeCut)}
+                            </h3>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
+                            <div className="flex justify-between items-start mb-2 relative z-10">
+                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Citas Finalizadas</span>
+                                <div className="p-2 bg-primary/20 rounded-xl"><CheckCircle2 className="w-5 h-5 text-primary" /></div>
+                            </div>
+                            <h3 className="text-3xl font-black text-white relative z-10">
+                                {loading ? '...' : totalAppointments}
+                            </h3>
+                        </div>
 
-                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all" />
-                    <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ticket Promedio</span>
-                        <div className="p-2 bg-blue-500/20 rounded-xl"><Scissors className="w-5 h-5 text-blue-400" /></div>
-                    </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">
-                        {loading ? '...' : formatCurrency(averageTicket)}
-                    </h3>
-                </div>
+                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all" />
+                            <div className="flex justify-between items-start mb-2 relative z-10">
+                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ticket Promedio</span>
+                                <div className="p-2 bg-blue-500/20 rounded-xl"><Scissors className="w-5 h-5 text-blue-400" /></div>
+                            </div>
+                            <h3 className="text-3xl font-black text-white relative z-10">
+                                {loading ? '...' : formatCurrency(averageTicket)}
+                            </h3>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Listado de Ventas (Tabla) */}
@@ -254,7 +295,7 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
                                 appointments.map(appt => (
                                     <tr key={appt.id} className="hover:bg-white/5 transition-colors">
                                         <td className="p-4 text-sm text-white/80 whitespace-nowrap">
-                                            {format(new Date(appt.start_time), "d MMM yyyy - HH:mm", { locale: es })}
+                                            {format(new Date(appt.start_time), "d MMM yyyy - h:mm a", { locale: es })}
                                         </td>
                                         <td className="p-4 text-sm font-bold text-primary whitespace-nowrap">
                                             {appt.profiles?.full_name || 'Desconocido'}

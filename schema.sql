@@ -20,6 +20,8 @@ CREATE TABLE public.profiles (
   full_name TEXT,
   avatar_url TEXT,
   bio TEXT,
+  specialty TEXT DEFAULT 'Barbero',
+  commission_percentage DECIMAL(5,2) DEFAULT 50.00,
   phone TEXT,
   role user_role DEFAULT 'barber',
   -- JSONB para máxima flexibilidad en configuraciones complejas de agenda
