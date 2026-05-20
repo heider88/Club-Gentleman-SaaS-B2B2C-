@@ -1,6 +1,4 @@
 "use client"
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
 
 interface ServiceGroup {
@@ -9,46 +7,31 @@ interface ServiceGroup {
     price: number
     duration: number
     description: string | null
+    barber_id?: string
 }
 
 interface ServiceSelectionProps {
+    services: any[]
     barberId: string
     onSelect: (service: ServiceGroup) => void
 }
 
-export function ServiceSelection({ barberId, onSelect }: ServiceSelectionProps) {
-    const [services, setServices] = useState<ServiceGroup[]>([])
-    const [loading, setLoading] = useState(true)
+export function ServiceSelection({ services, barberId, onSelect }: ServiceSelectionProps) {
+    const barberServices = services
+        .filter(s => s.barber_id === barberId)
+        .map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            duration: item.duration_minutes,
+            description: item.description
+        }))
 
-    useEffect(() => {
-        async function fetchServices() {
-            setLoading(true)
-            const supabase = createClient()
-            const { data } = await supabase.from('services').select('*').eq('barber_id', barberId).order('name')
-            
-            if (data) {
-                // Ya no necesitamos agrupar por nombre porque ahora es por barbero
-                const mapped = data.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    duration: item.duration_minutes,
-                    description: item.description
-                }))
-                setServices(mapped)
-            }
-            setLoading(false)
-        }
-        if (barberId) fetchServices()
-    }, [barberId])
-
-    if (loading) return <div className="text-white/50 text-sm animate-pulse p-4">Cargando servicios...</div>
-
-    if (services.length === 0) return <div className="text-white/50 text-sm p-4">No hay servicios disponibles actualmente.</div>
+    if (!barberServices || barberServices.length === 0) return <div className="text-white/50 text-sm p-4">No hay servicios disponibles actualmente.</div>
 
     return (
         <div className="flex flex-col gap-3">
-            {services.map((service, idx) => (
+            {barberServices.map((service, idx) => (
                 <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -59,7 +42,7 @@ export function ServiceSelection({ barberId, onSelect }: ServiceSelectionProps) 
                 >
                     <div className="flex justify-between items-start mb-1">
                         <span className="font-bold text-base text-white group-hover:text-primary transition-colors">{service.name}</span>
-                        <span className="font-semibold text-primary">${service.price}</span>
+                        <span className="font-bold text-white">${service.price}</span>
                     </div>
                     {service.description && (
                         <p className="text-sm text-white/60 mb-2 line-clamp-2">{service.description}</p>

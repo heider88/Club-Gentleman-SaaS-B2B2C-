@@ -18,7 +18,12 @@ export interface GlobalBookingState {
     time: string;
 }
 
-export default function BookingWizard() {
+interface BookingWizardProps {
+    barbers: any[];
+    services: any[];
+}
+
+export default function BookingWizard({ barbers, services }: BookingWizardProps) {
     const [step, setStep] = useState(1)
     const [bookingData, setBookingData] = useState<GlobalBookingState>({
         serviceName: "",
@@ -75,6 +80,7 @@ export default function BookingWizard() {
                         <h3 className="text-xl font-bold mb-4 text-white">Elige al Profesional</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             <BarberSelection
+                                barbers={barbers}
                                 onSelect={(barberId, _ignore, _date, barberName) => {
                                     setBookingData(prev => ({ ...prev, barberId, barberName }))
                                     setStep(2)
@@ -112,6 +118,7 @@ export default function BookingWizard() {
                                 <p className="text-white/50 text-sm">Faltan datos previos.</p> // Failsafe
                             ) : (
                                 <ServiceSelection 
+                                    services={services}
                                     barberId={bookingData.barberId}
                                     onSelect={(svc) => {
                                         setBookingData(prev => ({ ...prev, serviceId: svc.id, serviceName: svc.name, serviceDuration: svc.duration }))

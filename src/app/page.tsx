@@ -30,6 +30,23 @@ export default async function LandingPage() {
       ? galleryImages.map(g => g.image_url) 
       : fallbackImages;
 
+  // Fetch Barbers
+  const { data: barbersData } = await supabase
+      .from('profiles')
+      .select('id, full_name, bio, avatar_url, specialty')
+      .eq('role', 'barber')
+      .order('created_at', { ascending: true })
+
+  const barbers = barbersData || [];
+
+  // Fetch Services
+  const { data: servicesData } = await supabase
+      .from('services')
+      .select('*')
+      .order('name')
+
+  const services = servicesData || [];
+
   return (
     <>
       {/* Fondo Fijo Degradado a nivel de raíz para no ser recortado por overflow-hidden */}
@@ -139,13 +156,13 @@ export default async function LandingPage() {
           <div className="relative mt-8 scroll-mt-32" id="booking-section">
             <div className="backdrop-blur-md bg-white/5 border border-white/10 text-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-full max-w-screen-xl mx-auto">
               <h2 className="text-2xl font-black text-white mb-6">Reserva tu cita</h2>
-              <BookingWizard />
+              <BookingWizard barbers={barbers} services={services} />
             </div>
           </div>
         </div>
 
         {/* Team Section */}
-        <BarbersList />
+        <BarbersList barbers={barbers} />
 
         {/* Location Section */}
         <section id="ubicacion" className="w-full max-w-screen-xl mx-auto pt-10">

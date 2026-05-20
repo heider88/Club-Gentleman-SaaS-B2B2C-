@@ -1,6 +1,4 @@
 "use client"
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
 import { ChevronRight, Scissors } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -15,31 +13,12 @@ interface Barber {
 }
 
 interface BarberSelectionProps {
+    barbers: Barber[]
     onSelect: (barberId: string, exactServiceId: string, date: Date, barberName: string) => void
 }
 
-export function BarberSelection({ onSelect }: BarberSelectionProps) {
-    const [barbers, setBarbers] = useState<Barber[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        async function fetchBarbers() {
-            setLoading(true)
-            const supabase = createClient()
-
-            // Traer todos los perfiles que son barberos
-            const { data } = await supabase.from('profiles').select('id, full_name, avatar_url, bio, specialty').eq('role', 'barber')
-
-            if (data) {
-                setBarbers(data as unknown as Barber[])
-            }
-            setLoading(false)
-        }
-        fetchBarbers()
-    }, [])
-
-    if (loading) return <div className="text-white/50 text-sm animate-pulse p-4">Cargando equipo...</div>
-    if (barbers.length === 0) return <div className="text-white/50 text-sm p-4 text-center">Aún no hay equipo registrado.</div>
+export function BarberSelection({ barbers, onSelect }: BarberSelectionProps) {
+    if (!barbers || barbers.length === 0) return <div className="text-white/50 text-sm p-4 text-center">Aún no hay equipo registrado.</div>
 
     return (
         <div className="flex flex-col gap-6">
