@@ -63,12 +63,12 @@ export function StaticHeader() {
         <div className={`w-full font-sans flex flex-col sticky top-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-[#111111]/75 backdrop-blur-xl border-b border-white/10 shadow-2xl' : 'bg-[#111111] border-b border-white/10 shadow-lg'}`}>
 
             {/* Encabezado Principal de Navegación */}
-            <header className="flex items-center justify-between px-6 sm:px-12 py-4 lg:py-5 max-w-[1400px] mx-auto w-full relative z-10">
+            <header className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-12 py-4 lg:py-5 max-w-[1400px] mx-auto w-full relative z-10 gap-3 sm:gap-0">
 
                 {/* Izquierda: Logo de la barbería */}
                 <Link
                     href="/"
-                    className="flex items-center gap-4 group"
+                    className="flex items-center gap-2 sm:gap-4 group shrink-0"
                     onClick={(e) => {
                         if (window.location.pathname === "/") {
                             e.preventDefault();
@@ -158,10 +158,10 @@ export function StaticHeader() {
                 </nav>
 
                 {/* Derecha: Botón Reservar Ahora (Sustituyendo el "Empezar" / Sin login) */}
-                <div className="shrink-0 ml-4">
+                <div className="shrink-0 w-full sm:w-auto mt-1 sm:mt-0 sm:ml-4 flex justify-center">
                     <a
                         href="#booking-section"
-                        className="bg-white min-h-[44px] active:scale-95 hover:bg-gray-200 text-[#111] text-[11px] sm:text-[13px] font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#6D3294] hover:shadow-[0_0_20px_rgba(109,50,148,0.5)] flex items-center justify-center relative overflow-hidden group"
+                        className="bg-white min-h-[44px] active:scale-95 hover:bg-gray-200 text-[#111] text-[12px] sm:text-[13px] font-black px-8 py-3 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#6D3294] hover:shadow-[0_0_20px_rgba(109,50,148,0.5)] flex items-center justify-center relative overflow-hidden group w-full sm:w-auto"
                     >
                         <span className="relative z-10">Reservar Ahora</span>
                         {/* Brillo de efecto al pasar cursor */}
