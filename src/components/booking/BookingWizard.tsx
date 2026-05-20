@@ -61,7 +61,7 @@ export default function BookingWizard() {
         >
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
 
-            {/* Step 1: Barber & Date */}
+            {/* Step 1: Barber */}
             <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 1 ? 'w-[300px] sm:w-[350px]' : 'w-[200px]'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 1 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
@@ -72,11 +72,11 @@ export default function BookingWizard() {
 
                 {step === 1 ? (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
-                        <h3 className="text-xl font-bold mb-4 text-white">Barbero & Fecha</h3>
+                        <h3 className="text-xl font-bold mb-4 text-white">Elige al Profesional</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             <BarberSelection
-                                onSelect={(barberId, _ignore, date, barberName) => {
-                                    setBookingData(prev => ({ ...prev, barberId, date, barberName }))
+                                onSelect={(barberId, _ignore, _date, barberName) => {
+                                    setBookingData(prev => ({ ...prev, barberId, barberName }))
                                     setStep(2)
                                 }}
                             />
@@ -89,7 +89,7 @@ export default function BookingWizard() {
                     >
                         <span className="text-sm font-medium text-white/80">Paso 1 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Editar Barbero/Día <Edit2 className="w-3.5 h-3.5" />
+                            Cambiar Profesional <Edit2 className="w-3.5 h-3.5" />
                         </div>
                     </div>
                 ) : null}
@@ -145,17 +145,17 @@ export default function BookingWizard() {
 
                 {step === 3 ? (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
-                        <h3 className="text-xl font-bold mb-4 text-white">Hora Exacta</h3>
+                        <h3 className="text-xl font-bold mb-4 text-white">Fecha y Hora</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
-                            {!bookingData.barberId || !bookingData.date ? (
+                            {!bookingData.barberId || !bookingData.serviceId ? (
                                 <p className="text-white/50 text-sm">Faltan datos previos.</p> // Failsafe
                             ) : (
                                 <CalendarView
                                     barberId={bookingData.barberId}
                                     date={bookingData.date}
                                     durationMinutes={bookingData.serviceDuration}
-                                    onSelect={(time) => {
-                                        setBookingData(prev => ({ ...prev, time }))
+                                    onSelect={(time, date) => {
+                                        setBookingData(prev => ({ ...prev, time, date }))
                                         setStep(4)
                                     }}
                                 />
