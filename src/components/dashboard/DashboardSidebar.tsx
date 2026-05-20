@@ -17,7 +17,7 @@ export function DashboardSidebar({ role }: { role: string }) {
         { label: "Mi Historial", href: "/dashboard/history", icon: FileText, showTo: ['barber'] },
         { label: "Reportes", href: "/dashboard/reports", icon: FileText, showTo: ['admin'] },
         { label: "Servicios", href: "/dashboard/services", icon: Scissors, showTo: ['admin'] },
-        { label: "Perfil / Horarios", href: "/dashboard/profile", icon: User, showTo: ['admin'] },
+        { label: "Perfil / Horarios", href: "/dashboard/profile", icon: User, showTo: ['admin', 'barber'] },
         { label: "Config Web", href: "/dashboard/admin/gallery", icon: ImageIcon, showTo: ['admin'] }, 
         { label: "Administración", href: "/dashboard/admin", icon: Lock, showTo: ['admin'] }, 
     ].filter(item => item.showTo.includes(role))

@@ -44,12 +44,11 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
 
         setIsSaving(true)
         
-        // Calcular startTime y endTime
-        const [hours, minutes] = selectedTime.split(':')
-        const startDateTime = new Date(selectedDate)
-        startDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+        // El formato de selectedTime viene del CalendarView ("h:mm a") (ej: "3:30 PM")
+        // Usaremos parse de date-fns para reconstruir la fecha
+        const startDateTime = parse(selectedTime, 'h:mm a', selectedDate)
         
-        const endDateTime = new Date(startDateTime.getTime() + selectedService.duration_minutes * 60000)
+        const endDateTime = new Date(startDateTime.getTime() + (selectedService.duration_minutes as number) * 60000)
 
         const { error } = await supabase.from('appointments').insert([{
             barber_id: barberId,
@@ -150,55 +149,46 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
                                         </div>
                                     </div>
 
-                                    {/* 2. Servicio y Fecha */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Servicio *</label>
-                                            <select 
-                                                required
-                                                value={selectedServiceId} 
-                                                onChange={e => {
-                                                    setSelectedServiceId(e.target.value)
-                                                    setSelectedTime("") // Reset time if service changes
-                                                }}
-                                                className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none text-sm"
-                                            >
-                                                <option value="" disabled>Selecciona...</option>
-                                                {services.map(s => <option key={s.id} value={s.id}>{s.name} ({s.duration_minutes}m)</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Día de la Cita *</label>
-                                            <input 
-                                                type="date" 
-                                                required
-                                                value={format(selectedDate, 'yyyy-MM-dd')}
-                                                onChange={e => {
-                                                    setSelectedDate(parse(e.target.value, 'yyyy-MM-dd', new Date()))
-                                                    setSelectedTime("")
-                                                }}
-                                                className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary text-sm [color-scheme:dark]"
-                                                min={format(new Date(), 'yyyy-MM-dd')}
-                                            />
-                                        </div>
+                                    {/* 2. Servicio */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Servicio *</label>
+                                        <select 
+                                            required
+                                            value={selectedServiceId} 
+                                            onChange={e => {
+                                                setSelectedServiceId(e.target.value)
+                                                setSelectedTime("") // Reset time if service changes
+                                            }}
+                                            className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none text-sm"
+                                        >
+                                            <option value="" disabled>Selecciona...</option>
+                                            {services.map(s => <option key={s.id as string} value={s.id as string}>{s.name as string} ({s.duration_minutes as number}m)</option>)}
+                                        </select>
                                     </div>
 
-                                    {/* 3. Selección de Hora (Solo si hay servicio y fecha) */}
-                                    {selectedService && selectedDate && (
+                                    {/* 3. Selección de Día y Hora (Solo si hay servicio seleccionado) */}
+                                    {selectedService && (
                                         <div className="pt-2 border-t border-white/5">
-                                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 mb-2 block">Elige la hora disponible</label>
                                             <div className="bg-black/20 rounded-2xl p-4 border border-white/5">
                                                 <CalendarView 
                                                     barberId={barberId}
                                                     date={selectedDate}
-                                                    durationMinutes={selectedService.duration_minutes}
-                                                    onSelect={(time) => setSelectedTime(time)}
+                                                    durationMinutes={selectedService.duration_minutes as number}
+                                                    onSelect={(time, date) => {
+                                                        setSelectedTime(time)
+                                                        setSelectedDate(date)
+                                                    }}
                                                 />
                                             </div>
                                             {selectedTime && (
-                                                <div className="mt-4 flex items-center justify-center gap-2 text-primary font-bold bg-primary/10 py-2 rounded-xl border border-primary/20">
-                                                    <CheckCircle2 className="w-5 h-5" /> 
-                                                    Hora seleccionada: {selectedTime}
+                                                <div className="mt-4 flex flex-col items-center justify-center gap-1 text-primary bg-primary/10 py-3 rounded-xl border border-primary/20">
+                                                    <div className="flex items-center gap-2 font-bold">
+                                                        <CheckCircle2 className="w-5 h-5" /> 
+                                                        Hora seleccionada: {selectedTime}
+                                                    </div>
+                                                    <span className="text-xs text-primary/70">
+                                                        {format(selectedDate, "EEEE d 'de' MMMM", { locale: require('date-fns/locale/es').es })}
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
