@@ -95,12 +95,19 @@ export async function deleteEmployee(userId: string) {
 
 // -- NUEVO: Gestión de Servicios del Barbero saltando RLS --
 
-export async function manageBarberService(action: 'add' | 'delete', payload: any) {
+export async function manageBarberService(action: 'add' | 'delete' | 'update', payload: any) {
     await requireAdmin();
     const adminClient = createAdminClient();
     
     if (action === 'add') {
         const { data, error } = await adminClient.from('services').insert(payload).select().single();
+        if (error) return { error: error.message };
+        return { success: true, data };
+    }
+    
+    if (action === 'update') {
+        const { id, ...updates } = payload;
+        const { data, error } = await adminClient.from('services').update(updates).eq('id', id).select().single();
         if (error) return { error: error.message };
         return { success: true, data };
     }

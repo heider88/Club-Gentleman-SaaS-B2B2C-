@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
-import { Scissors, Trash2, Plus, Save, X, Download } from "lucide-react"
+import { Scissors, Trash2, Plus, Save, X, Download, Edit2 } from "lucide-react"
 import { manageBarberService, importServicesToBarber } from "@/app/actions/admin"
 
 interface Service {
@@ -21,6 +21,9 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
     const [isCreating, setIsCreating] = useState(false)
     const [saving, setSaving] = useState(false)
     const [newService, setNewService] = useState({ name: "", price: 0, duration_minutes: 30 })
+
+    const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
+    const [editForm, setEditForm] = useState({ name: "", price: 0, duration_minutes: 30 })
 
     // Estado del Modal de Importación
     const [showImportModal, setShowImportModal] = useState(false)
@@ -78,6 +81,40 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
             setServices([res.data, ...services])
             setIsCreating(false)
             setNewService({ name: "", price: 0, duration_minutes: 30 })
+        }
+
+        setSaving(false)
+    }
+
+    const startEditing = (service: Service) => {
+        setEditingServiceId(service.id)
+        setEditForm({ name: service.name, price: service.price, duration_minutes: service.duration_minutes })
+    }
+
+    const cancelEditing = () => {
+        setEditingServiceId(null)
+    }
+
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!editingServiceId) return
+        setSaving(true)
+
+        const payload = {
+            id: editingServiceId,
+            name: editForm.name,
+            price: editForm.price,
+            duration_minutes: editForm.duration_minutes
+        }
+
+        const res = await manageBarberService('update', payload)
+
+        if (res?.error) {
+            toast.error("Error al actualizar servicio", { description: res.error })
+        } else if (res?.data) {
+            toast.success("Servicio actualizado")
+            setServices(services.map(s => s.id === editingServiceId ? res.data : s))
+            setEditingServiceId(null)
         }
 
         setSaving(false)
@@ -237,19 +274,62 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                 {services.length === 0 && !isCreating ? (
                     <p className="text-white/40 text-sm text-center py-4">Este barbero no tiene servicios asignados.</p>
                 ) : (
-                    services.map(s => (
-                        <div key={s.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-colors">
-                            <div>
-                                <p className="text-white font-medium text-sm flex items-center gap-2">
-                                    <Scissors className="w-3 h-3 text-primary" /> {s.name}
-                                </p>
-                                <p className="text-white/50 text-xs mt-0.5">{formatCurrency(s.price)} • {s.duration_minutes} min</p>
+                    services.map(s => {
+                        if (editingServiceId === s.id) {
+                            return (
+                                <form key={s.id} onSubmit={handleUpdate} className="bg-white/10 border border-primary/50 p-3 rounded-xl space-y-3">
+                                    <input 
+                                        type="text" required placeholder="Nombre (Ej. Corte Clásico)"
+                                        value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})}
+                                        className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                                    />
+                                    <div className="flex gap-2">
+                                        <input 
+                                            type="number" required placeholder="Precio $" min="0"
+                                            value={editForm.price || ''} onChange={e => setEditForm({...editForm, price: Number(e.target.value)})}
+                                            className="w-1/2 p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                                        />
+                                        <div className="relative w-1/2">
+                                            <input 
+                                                type="number"
+                                                min="5"
+                                                value={editForm.duration_minutes || ''} 
+                                                onChange={e => setEditForm({...editForm, duration_minutes: Number(e.target.value)})}
+                                                placeholder="Minutos"
+                                                className="w-full p-2 pr-10 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                                            />
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-xs">min</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 justify-end pt-1">
+                                        <button type="button" onClick={cancelEditing} className="text-white/50 hover:text-white text-xs px-2"><X className="w-4 h-4"/></button>
+                                        <button type="submit" disabled={saving} className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded disabled:opacity-50 flex gap-1 items-center">
+                                            {saving ? 'Guardando...' : <><Save className="w-3 h-3"/> Guardar</>}
+                                        </button>
+                                    </div>
+                                </form>
+                            )
+                        }
+
+                        return (
+                            <div key={s.id} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-colors">
+                                <div>
+                                    <p className="text-white font-medium text-sm flex items-center gap-2">
+                                        <Scissors className="w-3 h-3 text-primary" /> {s.name}
+                                    </p>
+                                    <p className="text-white/50 text-xs mt-0.5">{formatCurrency(s.price)} • {s.duration_minutes} min</p>
+                                </div>
+                                <div className="flex gap-1">
+                                    <button onClick={() => startEditing(s)} className="p-2 text-white/40 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => handleDelete(s.id)} className="p-2 text-white/40 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
-                            <button onClick={() => handleDelete(s.id)} className="p-2 text-white/30 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ))
+                        )
+                    })
                 )}
             </div>
         </div>
