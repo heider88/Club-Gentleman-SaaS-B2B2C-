@@ -89,7 +89,7 @@ export default async function DashboardPage() {
 
     // Contadores para resumen rápido
     const pendingCount = appointments.filter(a => a.status === 'pending').length;
-    const completedCount = appointments.filter(a => a.status === 'completed').length;
+    
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">

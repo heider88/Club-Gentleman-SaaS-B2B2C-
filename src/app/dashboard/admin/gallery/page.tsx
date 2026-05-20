@@ -32,7 +32,7 @@ export default async function AdminGalleryPage() {
                     Configuración Web <ImageIcon className="w-8 h-8 text-primary" />
                 </h1>
                 <p className="text-muted-foreground font-medium">
-                    Gestiona las fotografías que aparecen en la sección "Nuestro Trabajo" de la página principal.
+                    Gestiona las fotografías que aparecen en la sección &quot;Nuestro Trabajo&quot; de la página principal.
                 </p>
             </header>
 

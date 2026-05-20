@@ -27,19 +27,20 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
     const [selectedToImport, setSelectedToImport] = useState<string[]>([])
     const [isImporting, setIsImporting] = useState(false)
 
-    const fetchServices = async () => {
-        setLoading(true)
-        const { data } = await supabase
-            .from('services')
-            .select('id, name, price, duration_minutes')
-            .eq('barber_id', barberId)
-            .order('created_at', { ascending: false })
-        
-        if (data) setServices(data)
-        setLoading(false)
-    }
-
-    useEffect(() => { fetchServices() }, [barberId])
+    useEffect(() => { 
+        const fetchServices = async () => {
+            setLoading(true)
+            const { data } = await supabase
+                .from('services')
+                .select('id, name, price, duration_minutes')
+                .eq('barber_id', barberId)
+                .order('created_at', { ascending: false })
+            
+            if (data) setServices(data)
+            setLoading(false)
+        }
+        fetchServices() 
+    }, [barberId, supabase])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
@@ -181,7 +182,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                         
                         <div className="p-4 overflow-y-auto space-y-2 flex-1">
                             {globalServices.length === 0 ? (
-                                <p className="text-white/50 text-sm text-center py-4">No hay servicios globales creados. Ve a la pestaña "Servicios" como administrador para crear plantillas.</p>
+                                <p className="text-white/50 text-sm text-center py-4">No hay servicios globales creados. Ve a la pestaña &quot;Servicios&quot; como administrador para crear plantillas.</p>
                             ) : (
                                 <>
                                     <div className="flex justify-end mb-2">

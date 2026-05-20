@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { format, parse, isAfter, isBefore, addMinutes, startOfDay, endOfDay, isSameDay } from "date-fns"
+import { format, isAfter, isBefore, addMinutes, startOfDay, endOfDay, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"

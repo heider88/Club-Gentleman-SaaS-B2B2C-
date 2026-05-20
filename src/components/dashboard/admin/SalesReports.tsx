@@ -43,54 +43,54 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
     const averageTicket = totalAppointments > 0 ? totalRevenue / totalAppointments : 0
 
     useEffect(() => {
+        const fetchReportData = async () => {
+            setLoading(true)
+            const now = new Date()
+            let startStr = ""
+            let endStr = ""
+
+            if (filter === 'daily') {
+                startStr = startOfDay(now).toISOString()
+                endStr = endOfDay(now).toISOString()
+            } else if (filter === 'weekly') {
+                startStr = startOfWeek(now, { weekStartsOn: 1 }).toISOString() // Lunes
+                endStr = endOfWeek(now, { weekStartsOn: 1 }).toISOString()
+            } else if (filter === 'monthly') {
+                startStr = startOfMonth(now).toISOString()
+                endStr = endOfMonth(now).toISOString()
+            }
+
+            let query = supabase
+                .from('appointments')
+                .select(`
+                    id, 
+                    start_time, 
+                    customer_name, 
+                    barber_id,
+                    profiles(full_name),
+                    services(name, price)
+                `)
+                .eq('status', 'completed')
+                .gte('start_time', startStr)
+                .lte('start_time', endStr)
+                .order('start_time', { ascending: false })
+
+            if (selectedBarber !== 'all') {
+                query = query.eq('barber_id', selectedBarber)
+            }
+
+            const { data, error } = await query
+
+            if (error) {
+                toast.error("Error al cargar reportes", { description: error.message })
+            } else {
+                setAppointments((data as any) || [])
+            }
+            setLoading(false)
+        }
+        
         fetchReportData()
-    }, [filter, selectedBarber])
-
-    const fetchReportData = async () => {
-        setLoading(true)
-        const now = new Date()
-        let startStr = ""
-        let endStr = ""
-
-        if (filter === 'daily') {
-            startStr = startOfDay(now).toISOString()
-            endStr = endOfDay(now).toISOString()
-        } else if (filter === 'weekly') {
-            startStr = startOfWeek(now, { weekStartsOn: 1 }).toISOString() // Lunes
-            endStr = endOfWeek(now, { weekStartsOn: 1 }).toISOString()
-        } else if (filter === 'monthly') {
-            startStr = startOfMonth(now).toISOString()
-            endStr = endOfMonth(now).toISOString()
-        }
-
-        let query = supabase
-            .from('appointments')
-            .select(`
-                id, 
-                start_time, 
-                customer_name, 
-                barber_id,
-                profiles(full_name),
-                services(name, price)
-            `)
-            .eq('status', 'completed')
-            .gte('start_time', startStr)
-            .lte('start_time', endStr)
-            .order('start_time', { ascending: false })
-
-        if (selectedBarber !== 'all') {
-            query = query.eq('barber_id', selectedBarber)
-        }
-
-        const { data, error } = await query
-
-        if (error) {
-            toast.error("Error al cargar reportes", { description: error.message })
-        } else {
-            setAppointments((data as any) || [])
-        }
-        setLoading(false)
-    }
+    }, [filter, selectedBarber, supabase])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
