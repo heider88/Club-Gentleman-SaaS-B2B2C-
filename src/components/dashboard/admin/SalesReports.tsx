@@ -39,15 +39,25 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
     const [loading, setLoading] = useState(true)
 
     // Derived KPIs
-    const totalRevenue = appointments.reduce((sum, a) => sum + (a.services?.price || 0), 0)
+    let totalRevenue = 0
+    let barberCut = 0
+    let storeCut = 0
+
+    appointments.forEach(a => {
+        const price = a.services?.price || 0
+        totalRevenue += price
+        
+        const barberData = barbers.find(b => b.id === a.barber_id)
+        const commPct = barberData?.commission_percentage ?? 50
+        
+        const cut = price * (commPct / 100)
+        barberCut += cut
+        storeCut += (price - cut)
+    })
+
     const totalAppointments = appointments.length
     const averageTicket = totalAppointments > 0 ? totalRevenue / totalAppointments : 0
-    
-    // Si hay un barbero seleccionado, calculamos su comisión
     const selectedBarberData = barbers.find(b => b.id === selectedBarber)
-    const commissionPercentage = selectedBarberData?.commission_percentage || 50
-    const barberCut = selectedBarber !== 'all' ? totalRevenue * (commissionPercentage / 100) : 0
-    const storeCut = selectedBarber !== 'all' ? totalRevenue * ((100 - commissionPercentage) / 100) : totalRevenue
 
     useEffect(() => {
         const fetchReportData = async () => {
@@ -128,25 +138,38 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
         doc.text(`Ingresos Totales: ${formatCurrency(totalRevenue)}`, 14, 38)
         
         if (selectedBarber !== 'all') {
-            doc.text(`Pago al Profesional (${commissionPercentage}%): ${formatCurrency(barberCut)}`, 14, 45)
-            doc.text(`Ganancia Tienda (${100 - commissionPercentage}%): ${formatCurrency(storeCut)}`, 14, 52)
+            const commPercentage = selectedBarberData?.commission_percentage ?? 50
+            doc.text(`Pago al Profesional (${commPercentage}%): ${formatCurrency(barberCut)}`, 14, 45)
+            doc.text(`Ganancia Tienda (${100 - commPercentage}%): ${formatCurrency(storeCut)}`, 14, 52)
             doc.text(`Citas Completadas: ${totalAppointments}`, 14, 59)
         } else {
-            doc.text(`Citas Completadas: ${totalAppointments}`, 14, 45)
+            doc.text(`Pago a Profesionales: ${formatCurrency(barberCut)}`, 14, 45)
+            doc.text(`Ganancia Tienda: ${formatCurrency(storeCut)}`, 14, 52)
+            doc.text(`Citas Completadas: ${totalAppointments}`, 14, 59)
         }
 
         // Tabla
         autoTable(doc, {
-            startY: selectedBarber !== 'all' ? 66 : 55,
-            head: [['Fecha y Hora', 'Barbero', 'Cliente', 'Servicio', 'Monto ($)']],
-            body: appointments.map(a => [
-                format(new Date(a.start_time), 'dd/MM/yyyy HH:mm'),
-                a.profiles?.full_name || 'Desconocido',
-                a.customer_name,
-                a.services?.name || 'N/A',
-                formatCurrency(a.services?.price || 0)
-            ]),
-            foot: [['', '', '', 'TOTAL', formatCurrency(totalRevenue)]],
+            startY: 66,
+            head: [['Fecha y Hora', 'Barbero', 'Cliente', 'Servicio', 'Total', 'Tienda', 'Prof.']],
+            body: appointments.map(a => {
+                const price = a.services?.price || 0
+                const bData = barbers.find(b => b.id === a.barber_id)
+                const commPct = bData?.commission_percentage ?? 50
+                const bCut = price * (commPct / 100)
+                const sCut = price - bCut
+
+                return [
+                    format(new Date(a.start_time), 'dd/MM/yyyy HH:mm'),
+                    a.profiles?.full_name || 'Desconocido',
+                    a.customer_name,
+                    a.services?.name || 'N/A',
+                    formatCurrency(price),
+                    formatCurrency(sCut),
+                    formatCurrency(bCut)
+                ]
+            }),
+            foot: [['', '', '', 'TOTALES', formatCurrency(totalRevenue), formatCurrency(storeCut), formatCurrency(barberCut)]],
             theme: 'grid',
             headStyles: { fillColor: [109, 50, 148] }, // Color primario de tu marca #6D3294 (aprox)
             footStyles: { fillColor: [40, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' }
@@ -195,66 +218,54 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all" />
                     <div className="flex justify-between items-start mb-2 relative z-10">
                         <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ingresos Totales</span>
                         <div className="p-2 bg-green-500/20 rounded-xl"><Banknote className="w-5 h-5 text-green-400" /></div>
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">
+                    <h3 className="text-2xl sm:text-3xl font-black text-white relative z-10">
                         {loading ? '...' : formatCurrency(totalRevenue)}
                     </h3>
                 </div>
 
-                {selectedBarber !== 'all' ? (
-                    <>
-                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all" />
-                            <div className="flex justify-between items-start mb-2 relative z-10">
-                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Pago al Profesional</span>
-                                <span className="text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded-md">{commissionPercentage}%</span>
-                            </div>
-                            <h3 className="text-3xl font-black text-purple-400 relative z-10">
-                                {loading ? '...' : formatCurrency(barberCut)}
-                            </h3>
-                        </div>
-                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
-                            <div className="flex justify-between items-start mb-2 relative z-10">
-                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ganancia Tienda</span>
-                                <span className="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">{100 - commissionPercentage}%</span>
-                            </div>
-                            <h3 className="text-3xl font-black text-emerald-400 relative z-10">
-                                {loading ? '...' : formatCurrency(storeCut)}
-                            </h3>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
-                            <div className="flex justify-between items-start mb-2 relative z-10">
-                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Citas Finalizadas</span>
-                                <div className="p-2 bg-primary/20 rounded-xl"><CheckCircle2 className="w-5 h-5 text-primary" /></div>
-                            </div>
-                            <h3 className="text-3xl font-black text-white relative z-10">
-                                {loading ? '...' : totalAppointments}
-                            </h3>
-                        </div>
+                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
+                    <div className="flex justify-between items-start mb-2 relative z-10">
+                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ganancia Tienda</span>
+                        {selectedBarber !== 'all' && (
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">{(100 - (selectedBarberData?.commission_percentage ?? 50))}%</span>
+                        )}
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-emerald-400 relative z-10">
+                        {loading ? '...' : formatCurrency(storeCut)}
+                    </h3>
+                </div>
 
-                        <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all" />
-                            <div className="flex justify-between items-start mb-2 relative z-10">
-                                <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Ticket Promedio</span>
-                                <div className="p-2 bg-blue-500/20 rounded-xl"><Scissors className="w-5 h-5 text-blue-400" /></div>
-                            </div>
-                            <h3 className="text-3xl font-black text-white relative z-10">
-                                {loading ? '...' : formatCurrency(averageTicket)}
-                            </h3>
-                        </div>
-                    </>
-                )}
+                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all" />
+                    <div className="flex justify-between items-start mb-2 relative z-10">
+                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">{selectedBarber === 'all' ? 'Pago a Profesionales' : 'Pago al Profesional'}</span>
+                        {selectedBarber !== 'all' && (
+                            <span className="text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded-md">{(selectedBarberData?.commission_percentage ?? 50)}%</span>
+                        )}
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-purple-400 relative z-10">
+                        {loading ? '...' : formatCurrency(barberCut)}
+                    </h3>
+                </div>
+
+                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
+                    <div className="flex justify-between items-start mb-2 relative z-10">
+                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Citas Finalizadas</span>
+                        <div className="p-2 bg-primary/20 rounded-xl"><CheckCircle2 className="w-5 h-5 text-primary" /></div>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-white relative z-10">
+                        {loading ? '...' : totalAppointments}
+                    </h3>
+                </div>
             </div>
 
             {/* Listado de Ventas (Tabla) */}
@@ -273,13 +284,15 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
                                 <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Barbero</th>
                                 <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Cliente</th>
                                 <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Servicio</th>
-                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap text-right">Monto</th>
+                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap text-right">Total</th>
+                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap text-right">Tienda</th>
+                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap text-right">Prof.</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-white/40">
+                                    <td colSpan={7} className="p-8 text-center text-white/40">
                                         <div className="flex items-center justify-center gap-2">
                                             <Search className="w-4 h-4 animate-spin" /> Procesando datos...
                                         </div>
@@ -287,30 +300,44 @@ export function SalesReports({ barbers }: { barbers: Barber[] }) {
                                 </tr>
                             ) : appointments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-12 text-center text-white/40">
+                                    <td colSpan={7} className="p-12 text-center text-white/40">
                                         No hay citas completadas en este periodo.
                                     </td>
                                 </tr>
                             ) : (
-                                appointments.map(appt => (
-                                    <tr key={appt.id} className="hover:bg-white/5 transition-colors">
-                                        <td className="p-4 text-sm text-white/80 whitespace-nowrap">
-                                            {format(new Date(appt.start_time), "d MMM yyyy - h:mm a", { locale: es })}
-                                        </td>
-                                        <td className="p-4 text-sm font-bold text-primary whitespace-nowrap">
-                                            {appt.profiles?.full_name || 'Desconocido'}
-                                        </td>
-                                        <td className="p-4 text-sm text-white whitespace-nowrap">
-                                            {appt.customer_name}
-                                        </td>
-                                        <td className="p-4 text-sm text-white/60 whitespace-nowrap">
-                                            {appt.services?.name || 'N/A'}
-                                        </td>
-                                        <td className="p-4 text-sm font-bold text-green-400 text-right whitespace-nowrap">
-                                            {formatCurrency(appt.services?.price || 0)}
-                                        </td>
-                                    </tr>
-                                ))
+                                appointments.map(appt => {
+                                    const price = appt.services?.price || 0
+                                    const bData = barbers.find(b => b.id === appt.barber_id)
+                                    const commPct = bData?.commission_percentage ?? 50
+                                    const bCut = price * (commPct / 100)
+                                    const sCut = price - bCut
+
+                                    return (
+                                        <tr key={appt.id} className="hover:bg-white/5 transition-colors">
+                                            <td className="p-4 text-sm text-white/80 whitespace-nowrap">
+                                                {format(new Date(appt.start_time), "d MMM yyyy - h:mm a", { locale: es })}
+                                            </td>
+                                            <td className="p-4 text-sm font-bold text-primary whitespace-nowrap">
+                                                {appt.profiles?.full_name || 'Desconocido'}
+                                            </td>
+                                            <td className="p-4 text-sm text-white whitespace-nowrap">
+                                                {appt.customer_name}
+                                            </td>
+                                            <td className="p-4 text-sm text-white/60 whitespace-nowrap">
+                                                {appt.services?.name || 'N/A'}
+                                            </td>
+                                            <td className="p-4 text-sm font-bold text-white text-right whitespace-nowrap">
+                                                {formatCurrency(price)}
+                                            </td>
+                                            <td className="p-4 text-sm font-bold text-emerald-400 text-right whitespace-nowrap">
+                                                {formatCurrency(sCut)}
+                                            </td>
+                                            <td className="p-4 text-sm font-bold text-purple-400 text-right whitespace-nowrap">
+                                                {formatCurrency(bCut)}
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             )}
                         </tbody>
                     </table>
