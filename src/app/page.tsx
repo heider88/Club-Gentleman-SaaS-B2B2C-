@@ -31,13 +31,13 @@ export default async function LandingPage() {
       : fallbackImages;
 
   return (
-    // Hereda Layout Background, pero usamos un fondo fixed para evitar cortes por "overscroll" en móviles
-    <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
-
-      {/* Fondo Fijo Degradado */}
+    <>
+      {/* Fondo Fijo Degradado a nivel de raíz para no ser recortado por overflow-hidden */}
       <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-10 pointer-events-none" />
 
-      {/* Header Section */}
+      <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
+
+        {/* Header Section */}
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
         <div className="flex flex-col items-center gap-6 border-b border-white/20 pb-8">
           <div className="space-y-6 flex flex-col items-center text-center">
@@ -197,5 +197,6 @@ export default async function LandingPage() {
         <GallerySection initialPhotos={initialPhotos} />
       </div>
     </main>
+    </>
   )
 }
