@@ -118,6 +118,10 @@ CREATE POLICY "Barbers can manage own services" ON public.services FOR ALL USING
 CREATE POLICY "Public can create appointments" ON public.appointments FOR INSERT WITH CHECK (true);
 -- SELECT (Barbero): El dueño lee todo (Nombres y Horarios)
 CREATE POLICY "Barbers can view their appointments" ON public.appointments FOR SELECT USING (auth.uid() = barber_id);
+-- SELECT (Admin): El dueño o administrador puede ver TODO el negocio
+CREATE POLICY "Admins can view all appointments" ON public.appointments FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
 -- UPDATE: El dueño gestiona su propia fila (necesario para marcar como completada)
 CREATE POLICY "Barbers can modify their appointments" ON public.appointments FOR UPDATE USING (auth.uid() = barber_id);
 -- DELETE: Eliminado para barberos por reglas de negocio. Solo Admin (Service Role) puede eliminar/cancelar.
@@ -141,3 +145,7 @@ GRANT INSERT ON public.appointments TO anon;
 CREATE POLICY "Public can view blocks" ON public.availability_blocks FOR SELECT USING (true);
 -- ALL: El barbero dueño gestiona los bloqueos
 CREATE POLICY "Barbers can manage blocks" ON public.availability_blocks FOR ALL USING (auth.uid() = barber_id);
+-- SELECT (Admin): El Admin puede ver los bloqueos de todos
+CREATE POLICY "Admins can view all blocks" ON public.availability_blocks FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
