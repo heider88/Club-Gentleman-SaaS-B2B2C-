@@ -139,8 +139,8 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                     available: !isColliding(slotStart, slotEnd)
                 })
 
-                // advance by 30 mins
-                current = addMinutes(current, 30);
+                // advance by 15 mins to maximize schedule packing
+                current = addMinutes(current, 15);
             }
 
             setSlots(generatedSlots)
