@@ -129,7 +129,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     }, [filteredAppointments])
 
     // Generar los "ticks" de tiempo (cada 30 min)
-    const timeSlots = []
+    const timeSlots: Date[] = []
     const baseDate = startOfDay(selectedDate)
     for (let h = startHour; h <= endHour; h++) {
         timeSlots.push(addMinutes(baseDate, h * 60))
