@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { Star, MapPin, Clock, Instagram, Facebook, ChevronUp } from "lucide-react"
-import BookingWizard from "@/components/booking/BookingWizard"
-import BarbersList from "@/components/home/BarbersList"
-import { GallerySection } from "@/components/home/GallerySection"
+import dynamic from "next/dynamic"
 import Image from "next/image"
+
+const BookingWizard = dynamic(() => import("@/components/booking/BookingWizard"), { ssr: false })
+const BarbersList = dynamic(() => import("@/components/home/BarbersList"))
+const GallerySection = dynamic(() => import("@/components/home/GallerySection").then(mod => mod.GallerySection))
 
 // Revalidar caché de la Landing Page cada 1 hora (3600 segundos) automáticamente,
 // y también de forma inmediata cuando el Admin suba una foto desde el panel.
@@ -52,12 +54,8 @@ export default async function LandingPage() {
       {/* Fondo Fijo Degradado Restaurado */}
       <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none" />
       
-      {/* Mantenemos solo el Ruido SVG sutil para darle una textura premium al degradado */}
-      <div className="fixed inset-0 opacity-[0.04] mix-blend-overlay -z-10 pointer-events-none"
-           style={{
-             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-           }}
-      />
+      {/* Noise background ligero en lugar de feTurbulence SVG pesado */}
+      <div className="fixed inset-0 opacity-[0.03] mix-blend-overlay -z-10 pointer-events-none bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMNDxESFjk7Z3EAAAA/SURBVDjLpc0xDQAwDMOg0i69r1gJtN1o8wI4y8y+tO99n/mQ14e8PuT1Ia8PeX3I60NeH/L6kNeHvD7k9aG3DyHwBf3zT0nLAAAAAElFTkSuQmCC')] bg-repeat" />
 
       <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
@@ -70,7 +68,7 @@ export default async function LandingPage() {
             {/* Logo Centrado (Tamaño doble, reducido 20%) */}
             <div className="relative w-[76vw] sm:w-[45rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
               <Image
-                src="/lojito.png"
+                src="/lojito.webp"
                 alt="Club Gentleman For Men Logo"
                 fill
                 className="object-contain object-center scale-110 sm:scale-125"
@@ -229,11 +227,10 @@ export default async function LandingPage() {
               className="w-full md:w-[400px] h-64 bg-black/80 rounded-2xl overflow-hidden relative grayscale opacity-60 hover:grayscale-0 hover:opacity-100 hover:shadow-[0_0_40px_rgba(109,50,148,0.3)] transition-all duration-700 border border-white/10 group cursor-pointer block"
             >
               <Image
-                src="/shop.jpg"
+                src="/shop.webp"
                 alt="Fachada Club Gentleman For Men"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
-                unoptimized
               />
 
               {/* Etiqueta flotante al posar el mouse */}

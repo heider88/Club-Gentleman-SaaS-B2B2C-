@@ -143,6 +143,16 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
     const appointments = (appointmentsRes as any as AppointmentWithService[]) || []
 
+    // Fetch all active barbers if user is admin to pass to AdminCalendarView
+    let allBarbersList: any[] = []
+    if (userRole === 'admin') {
+        const { data: barbersRes } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url')
+            .eq('role', 'barber')
+        allBarbersList = barbersRes || []
+    }
+
     // Contadores para resumen rápido
     const pendingCount = appointments.filter(a => a.status === 'pending').length;
     
@@ -189,7 +199,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                     </div>
                 </div>
 
-                {appointments.length === 0 ? (
+                {userRole === 'admin' ? (
+                    <AdminCalendarView appointments={appointments} userRole={userRole} selectedDate={selectedDate} barbersList={allBarbersList} />
+                ) : appointments.length === 0 ? (
                     /* EMPTY STATE (Luxury Industrial) */
                     <div className="relative overflow-hidden w-full h-[300px] flex flex-col items-center justify-center p-8 border border-dash-border bg-dash-panel group">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-dash-panel-alt rounded-full blur-[80px] pointer-events-none transition-all duration-700" />
@@ -199,8 +211,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                             Aún no hay clientes agendados. ¡Aprovecha el tiempo para optimizar tus herramientas!
                         </p>
                     </div>
-                ) : userRole === 'admin' ? (
-                    <AdminCalendarView appointments={appointments} userRole={userRole} selectedDate={selectedDate} />
                 ) : (
                     /* TIMELINE VIEW */
                     <DashboardTimeline appointments={appointments} userRole={userRole} />

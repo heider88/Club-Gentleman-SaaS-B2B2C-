@@ -37,7 +37,6 @@ export default function BarbersList({ barbers }: BarbersListProps) {
                                     alt={barber.full_name}
                                     fill
                                     className="object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-                                    unoptimized
                                 />
                             ) : (
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-stone-900 to-stone-800 flex items-center justify-center text-8xl opacity-50">

@@ -43,7 +43,6 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
                     alt={`Trabajo de barbería ${i + 1}`}
                     fill
                     className="object-cover grayscale opacity-60 group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[800ms] ease-out"
-                    unoptimized
                   />
                   
                   {/* Brutalist Overlay Info */}
