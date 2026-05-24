@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { CalendarDays, Scissors, User, Lock, LogOut, FileText, ImageIcon, Users, XCircle, PanelLeftClose, PanelLeftOpen, BarChart3, ChevronDown } from "lucide-react"
+import { CalendarDays, Scissors, User, Lock, LogOut, FileText, ImageIcon, Users, XCircle, PanelLeftClose, PanelLeftOpen, BarChart3, CalendarClock } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ThemeToggle } from "./ThemeToggle"
 import { useState } from "react"
@@ -26,6 +26,7 @@ export function DashboardSidebar({ role }: { role: string }) {
     const ADMIN_ITEMS = [
         { label: "Business & Analytics", href: "/dashboard/reports", icon: BarChart3, showTo: ['admin'] },
         { label: "Directorio Clientes", href: "/dashboard/admin/customers", icon: Users, showTo: ['admin'] },
+        { label: "Bloqueos & Horarios", href: "/dashboard/admin/schedules", icon: CalendarClock, showTo: ['admin'] },
         { label: "Canceladas", href: "/dashboard/admin/cancelled", icon: XCircle, showTo: ['admin'] },
         { label: "Servicios", href: "/dashboard/services", icon: Scissors, showTo: ['admin'] },
         { label: "Config Web", href: "/dashboard/admin/gallery", icon: ImageIcon, showTo: ['admin'] }, 
