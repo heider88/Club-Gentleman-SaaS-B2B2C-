@@ -65,12 +65,12 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     React.useEffect(() => {
         const newBarbers = allBarbers.filter(b => !selectedBarbers.includes(b.id));
         if (newBarbers.length > 0 && selectedBarbers.length > 0) {
-            setSelectedBarbers(prev => [...prev, ...newBarbers.map(b => b.id)]);
+            setTimeout(() => setSelectedBarbers(prev => [...prev, ...newBarbers.map(b => b.id)]), 0);
         }
         if (selectedBarbers.length === 0 && allBarbers.length > 0) {
-             setSelectedBarbers(allBarbers.map(b => b.id));
+             setTimeout(() => setSelectedBarbers(allBarbers.map(b => b.id)), 0);
         }
-    }, [allBarbers]);
+    }, [allBarbers, selectedBarbers]);
 
     const toggleBarber = (id: string) => {
         setSelectedBarbers(prev => 

@@ -64,51 +64,58 @@ export default async function CancelledAppointmentsPage() {
                     <p className="text-dash-text-soft font-jakarta mt-2 relative z-10 text-center max-w-sm">No existen registros de citas canceladas en la plataforma.</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto border border-dash-border bg-dash-panel/30">
-                    <table className="w-full text-left font-jakarta text-sm">
-                        <thead>
-                            <tr className="border-b border-dash-border bg-dash-panel-alt/50">
-                                <th className="p-4 font-bold uppercase tracking-widest text-[10px] text-dash-text-muted">Fecha Cita</th>
-                                <th className="p-4 font-bold uppercase tracking-widest text-[10px] text-dash-text-muted">Cliente</th>
-                                <th className="p-4 font-bold uppercase tracking-widest text-[10px] text-dash-text-muted">Servicio & Valor</th>
-                                <th className="p-4 font-bold uppercase tracking-widest text-[10px] text-dash-text-muted">Profesional Asignado</th>
-                                <th className="p-4 font-bold uppercase tracking-widest text-[10px] text-dash-text-muted">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {appointments.map((appt: any) => (
-                                <tr key={appt.id} className="border-b border-dash-border/50 hover:bg-white/5 transition-colors group">
-                                    <td className="p-4">
-                                        <div className="font-oswald text-lg text-dash-text tracking-wide uppercase">
-                                            {format(new Date(appt.start_time), "dd MMM yyyy", { locale: es })}
-                                        </div>
-                                        <div className="text-dash-text-soft text-xs mt-1">
-                                            {format(new Date(appt.start_time), "HH:mm")}
-                                        </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="font-bold text-dash-text">{appt.customer_name}</div>
-                                        <div className="text-dash-text-muted text-xs font-mono mt-1">{appt.customer_phone || "N/A"}</div>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="text-dash-text">{appt.services?.name || "Eliminado"}</div>
-                                        <div className="text-dash-text-soft font-mono text-xs mt-1">${appt.services?.price || "0"}</div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className="inline-block border border-dash-border-alt bg-dash-panel-alt px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-dash-text-soft">
-                                            {appt.profiles?.full_name || "N/A"}
-                                        </span>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-2">
-                                            <XCircle className="w-4 h-4 text-red-500" />
-                                            <span className="text-red-500 font-bold uppercase tracking-widest text-[10px]">Cancelada</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="grid grid-cols-1 gap-1">
+                    {appointments.map((appt: any, i: number) => (
+                        <div 
+                            key={appt.id} 
+                            className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-transparent border-b border-dash-border hover:bg-red-500/[0.02] transition-colors relative overflow-hidden animate-in fade-in slide-in-from-bottom-4"
+                            style={{ animationDelay: `${i * 30}ms`, animationFillMode: 'both' }}
+                        >
+                            {/* Hover accent line */}
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            
+                            {/* Fecha */}
+                            <div className="md:w-1/5 mb-4 md:mb-0">
+                                <span className="font-mono text-[10px] text-dash-text-soft uppercase tracking-[0.2em] block mb-1">Schedule</span>
+                                <div className="font-oswald text-xl text-dash-text tracking-wide uppercase group-hover:text-red-500 transition-colors">
+                                    {format(new Date(appt.start_time), "dd MMM yyyy", { locale: es })}
+                                </div>
+                                <div className="text-dash-text-muted text-xs font-mono mt-1">
+                                    {format(new Date(appt.start_time), "HH:mm")}
+                                </div>
+                            </div>
+
+                            {/* Cliente */}
+                            <div className="md:w-1/4 mb-4 md:mb-0">
+                                <span className="font-mono text-[10px] text-dash-text-soft uppercase tracking-[0.2em] block mb-1">Target</span>
+                                <div className="font-bold text-dash-text text-base">{appt.customer_name}</div>
+                                <div className="text-dash-text-muted text-xs font-mono mt-1">{appt.customer_phone || "N/A"}</div>
+                            </div>
+
+                            {/* Servicio y Barbero */}
+                            <div className="md:w-1/3 mb-4 md:mb-0 border-l border-dash-border/50 pl-6">
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="font-mono text-[10px] text-dash-text-soft uppercase tracking-[0.2em]">Service / Operative</span>
+                                    <span className="text-dash-text-soft font-mono text-xs">${appt.services?.price || "0"}</span>
+                                </div>
+                                <div className="text-dash-text font-medium text-sm truncate">{appt.services?.name || "Eliminado"}</div>
+                                <div className="mt-2 inline-block border border-dash-border bg-dash-bg px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-dash-text-muted">
+                                    {appt.profiles?.full_name || "N/A"}
+                                </div>
+                            </div>
+
+                            {/* Status */}
+                            <div className="md:w-auto md:text-right mt-4 md:mt-0">
+                                <div className="flex items-center gap-2 md:justify-end">
+                                    <XCircle className="w-4 h-4 text-red-500 animate-pulse" />
+                                    <span className="text-red-500 font-bold uppercase tracking-[0.2em] text-[10px]">Voided</span>
+                                </div>
+                                <div className="text-dash-text-soft text-[9px] font-mono mt-2 opacity-50 uppercase">
+                                    ID: {appt.id.split('-')[0]}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
