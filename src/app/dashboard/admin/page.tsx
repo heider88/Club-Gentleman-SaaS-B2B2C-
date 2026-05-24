@@ -34,7 +34,7 @@ export default async function AdminPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto pb-12">
             <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-dash-text flex items-center gap-3">
                     Panel de Administración <ShieldAlert className="text-primary w-8 h-8" />
                 </h1>
                 <p className="text-muted-foreground font-medium">
@@ -48,22 +48,22 @@ export default async function AdminPage() {
             {/* Lista de Barberos Actuales */}
             <div className="bg-card/90 backdrop-blur-xl border border-border rounded-3xl p-6 sm:p-8 shadow-xl">
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="p-3 bg-white/10 rounded-xl">
-                        <Users className="w-6 h-6 text-white" />
+                    <div className="p-3 bg-dash-text/10 rounded-xl">
+                        <Users className="w-6 h-6 text-dash-text" />
                     </div>
-                    <h2 className="text-xl font-bold text-white">Equipo Actual ({barbers?.length || 0})</h2>
+                    <h2 className="text-xl font-bold text-dash-text">Equipo Actual ({barbers?.length || 0})</h2>
                 </div>
 
                 {barbers && barbers.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {barbers.map(barber => (
-                            <div key={barber.id} className="p-6 bg-black/40 border border-white/10 rounded-2xl flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors shadow-lg">
+                            <div key={barber.id} className="p-6 bg-dash-panel/40 border border-white/10 rounded-2xl flex flex-col justify-between gap-4 hover:border-primary/40 transition-colors shadow-lg">
                                 <div>
-                                    <p className="font-bold text-white text-lg">{barber.full_name || "Sin nombre"}</p>
+                                    <p className="font-bold text-dash-text text-lg">{barber.full_name || "Sin nombre"}</p>
                                     <p className="text-sm text-muted-foreground">{barber.email}</p>
                                 </div>
                                 <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
-                                    <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-white/10 rounded-lg text-white/70 w-fit">
+                                    <span className="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-dash-text/10 rounded-lg text-dash-text/70 w-fit">
                                         Barbero
                                     </span>
                                     <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export default async function AdminPage() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-muted-foreground text-center py-16 border border-dashed border-white/10 rounded-3xl bg-black/20">
+                    <p className="text-sm text-muted-foreground text-center py-16 border border-dashed border-white/10 rounded-3xl bg-dash-panel/20">
                         Aún no has creado cuentas para tus empleados.
                     </p>
                 )}

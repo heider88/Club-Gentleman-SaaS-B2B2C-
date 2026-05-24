@@ -68,6 +68,40 @@
 
   --font-oswald: var(--font-oswald), sans-serif;
   --font-jakarta: var(--font-jakarta), sans-serif;
+
+  /* Dashboard Semantic Variables (Luxury Industrial Light/Dark) */
+  --color-dash-bg: var(--dash-bg);
+  --color-dash-panel: var(--dash-panel);
+  --color-dash-panel-alt: var(--dash-panel-alt);
+  --color-dash-border: var(--dash-border);
+  --color-dash-border-alt: var(--dash-border-alt);
+  --color-dash-text: var(--dash-text);
+  --color-dash-text-muted: var(--dash-text-muted);
+  --color-dash-text-soft: var(--dash-text-soft);
+}
+
+@layer base {
+  :root {
+    --dash-bg: #f8f8f8;
+    --dash-panel: #ffffff;
+    --dash-panel-alt: #f4f4f5;
+    --dash-border: #d4d4d8;
+    --dash-border-alt: #a1a1aa;
+    --dash-text: #18181b;
+    --dash-text-muted: #52525b;
+    --dash-text-soft: #71717a;
+  }
+
+  .dark {
+    --dash-bg: #0a0a0a;
+    --dash-panel: #000000;
+    --dash-panel-alt: #18181b;
+    --dash-border: #27272a;
+    --dash-border-alt: #3f3f46;
+    --dash-text: #ffffff;
+    --dash-text-muted: #71717a;
+    --dash-text-soft: #a1a1aa;
+  }
 }
 
 @layer base {

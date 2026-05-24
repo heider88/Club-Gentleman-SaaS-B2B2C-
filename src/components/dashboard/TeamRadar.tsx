@@ -98,29 +98,29 @@ export function TeamRadar({ currentUserId }: { currentUserId: string }) {
     if (loading || team.length === 0) return null
 
     return (
-        <section className="mb-8 border-b border-zinc-800 pb-6">
+        <section className="mb-8 border-b border-dash-border pb-6">
             <div className="flex items-center gap-2 mb-6">
                 <div className="w-1.5 h-4 bg-zinc-600"></div>
-                <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Radar del Equipo</h2>
+                <h2 className="text-xs font-bold text-dash-text-muted uppercase tracking-widest">Radar del Equipo</h2>
             </div>
             
             {/* Scroll Horizontal para móviles */}
             <div className="flex overflow-x-auto pb-2 gap-4 scrollbar-hide snap-x">
                 {team.map(member => (
-                    <div key={member.id} className="snap-start min-w-[200px] bg-black border border-zinc-800 p-3 flex items-center gap-3">
-                        <div className="w-10 h-10 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
+                    <div key={member.id} className="snap-start min-w-[200px] bg-dash-panel border border-dash-border p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
                             {member.avatarUrl ? (
                                 <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover grayscale" />
                             ) : (
                                 <span className="grayscale opacity-50">🧔🏻‍♂️</span>
                             )}
                             {/* Indicador de estado flotante */}
-                            <span className={`absolute -bottom-1 -right-1 w-3 h-3 border-2 border-black ${member.isAvailable ? 'bg-white' : 'bg-zinc-600'}`} />
+                            <span className={`absolute -bottom-1 -right-1 w-3 h-3 border-2 border-black ${member.isAvailable ? 'bg-dash-text' : 'bg-zinc-600'}`} />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold font-oswald uppercase tracking-widest text-zinc-200 truncate">{member.name}</span>
+                            <span className="text-xs font-bold font-oswald uppercase tracking-widest text-dash-text truncate">{member.name}</span>
                             <div className="flex items-center gap-1 mt-0.5">
-                                <span className={`text-[10px] uppercase font-bold tracking-wider truncate ${member.isAvailable ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                <span className={`text-[10px] uppercase font-bold tracking-wider truncate ${member.isAvailable ? 'text-dash-text-soft' : 'text-dash-text-muted'}`}>
                                     {member.statusText}
                                 </span>
                             </div>

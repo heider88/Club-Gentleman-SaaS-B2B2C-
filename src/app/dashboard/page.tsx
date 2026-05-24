@@ -97,13 +97,13 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             {/* Header / Greetings */}
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-8">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-dash-border pb-8">
                 <div>
-                    <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-white uppercase">
-                        ¡Hola, <span className="text-zinc-500">{barberName}</span>!
+                    <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-dash-text uppercase">
+                        ¡Hola, <span className="text-dash-text-muted">{barberName}</span>!
                     </h1>
-                    <p className="text-zinc-400 font-jakarta flex items-center gap-2 text-sm mt-3 uppercase tracking-widest font-bold">
-                        <CalendarDays className="w-4 h-4 text-zinc-600" />
+                    <p className="text-dash-text-soft font-jakarta flex items-center gap-2 text-sm mt-3 uppercase tracking-widest font-bold">
+                        <CalendarDays className="w-4 h-4 text-dash-text-muted" />
                         {format(now, "EEEE, d 'de' MMMM yyyy", { locale: es })}
                     </p>
                 </div>
@@ -119,15 +119,15 @@ export default async function DashboardPage() {
             {/* Citas del Día */}
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="font-oswald text-2xl font-medium text-white tracking-wide uppercase">
+                    <h2 className="font-oswald text-2xl font-medium text-dash-text tracking-wide uppercase">
                         {userRole === 'admin' ? "Agenda General" : "Línea de Tiempo"}
                     </h2>
                     <div className="flex gap-2">
-                        <span className="bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 text-xs font-bold uppercase tracking-widest">
+                        <span className="bg-dash-panel-alt border border-dash-border text-dash-text-soft px-3 py-1 text-xs font-bold uppercase tracking-widest">
                             {appointments.length} Total
                         </span>
                         {pendingCount > 0 && (
-                            <span className="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                            <span className="bg-dash-text text-dash-bg px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                                 {pendingCount} Pendientes
                             </span>
                         )}
@@ -136,11 +136,11 @@ export default async function DashboardPage() {
 
                 {appointments.length === 0 ? (
                     /* EMPTY STATE (Luxury Industrial) */
-                    <div className="relative overflow-hidden w-full h-[300px] flex flex-col items-center justify-center p-8 border border-zinc-800 bg-black group">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-zinc-900 rounded-full blur-[80px] pointer-events-none transition-all duration-700" />
+                    <div className="relative overflow-hidden w-full h-[300px] flex flex-col items-center justify-center p-8 border border-dash-border bg-dash-panel group">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-dash-panel-alt rounded-full blur-[80px] pointer-events-none transition-all duration-700" />
                         <CalendarX2 className="w-12 h-12 text-zinc-700 mb-4 transition-transform group-hover:scale-110 duration-500 relative z-10" />
-                        <h3 className="font-oswald text-2xl font-medium text-zinc-300 tracking-wide uppercase relative z-10">Sin Citas Hoy</h3>
-                        <p className="text-zinc-600 text-sm mt-2 text-center max-w-xs relative z-10 font-jakarta">
+                        <h3 className="font-oswald text-2xl font-medium text-dash-text-soft tracking-wide uppercase relative z-10">Sin Citas Hoy</h3>
+                        <p className="text-dash-text-muted text-sm mt-2 text-center max-w-xs relative z-10 font-jakarta">
                             Aún no hay clientes agendados. ¡Aprovecha el tiempo para optimizar tus herramientas!
                         </p>
                     </div>

@@ -29,7 +29,7 @@ export default async function ReportsPage() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-7xl mx-auto pb-12">
             <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white">
+                <h1 className="text-3xl font-extrabold tracking-tight text-dash-text">
                     Reportes Financieros
                 </h1>
                 <p className="text-muted-foreground font-medium">

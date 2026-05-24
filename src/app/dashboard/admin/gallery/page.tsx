@@ -28,7 +28,7 @@ export default async function AdminGalleryPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
             <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-dash-text flex items-center gap-3">
                     Configuración Web <ImageIcon className="w-8 h-8 text-primary" />
                 </h1>
                 <p className="text-muted-foreground font-medium">

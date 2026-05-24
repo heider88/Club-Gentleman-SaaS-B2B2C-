@@ -162,19 +162,19 @@ export default function ProfilePage() {
     if (loading) {
         return (
             <div className="p-8 text-center animate-pulse flex flex-col items-center justify-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-white/10" />
-                <span className="text-white/50">Cargando la vitrina de tu perfil...</span>
+                <div className="w-16 h-16 rounded-full bg-dash-text/10" />
+                <span className="text-dash-text/50">Cargando la vitrina de tu perfil...</span>
             </div>
         )
     }
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-            <header className="flex flex-col gap-2 border-b border-zinc-800 pb-8">
-                <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-white uppercase">
+            <header className="flex flex-col gap-2 border-b border-dash-border pb-8">
+                <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-dash-text uppercase">
                     Configuración de Perfil
                 </h1>
-                <p className="text-zinc-500 font-jakarta text-sm uppercase tracking-widest font-bold">
+                <p className="text-dash-text-muted font-jakarta text-sm uppercase tracking-widest font-bold">
                     Personaliza cómo te verán tus clientes y cuáles son tus franjas laborales.
                 </p>
             </header>
@@ -182,8 +182,8 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Visual Settings - Left Column */}
                 <div className="md:col-span-1 space-y-6">
-                    <div className="bg-black border border-zinc-800 p-8 flex flex-col items-center text-center space-y-6">
-                        <div className="relative w-40 h-40 overflow-hidden bg-zinc-900 border border-zinc-700">
+                    <div className="bg-dash-panel border border-dash-border p-8 flex flex-col items-center text-center space-y-6">
+                        <div className="relative w-40 h-40 overflow-hidden bg-dash-panel-alt border border-dash-border-alt">
                             {profile.avatar_url ? (
                                 <Image
                                     src={profile.avatar_url}
@@ -198,14 +198,14 @@ export default function ProfilePage() {
                                 </div>
                             )}
                             {uploading && (
-                                <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-                                    <span className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-white animate-spin" />
+                                <div className="absolute inset-0 bg-dash-panel/80 flex items-center justify-center">
+                                    <span className="w-8 h-8 rounded-full border-2 border-dash-border-alt border-t-white animate-spin" />
                                 </div>
                             )}
                         </div>
                         <div className="space-y-2">
-                            <h3 className="font-oswald text-xl uppercase tracking-wide text-white">Tu Fotografía</h3>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 leading-relaxed px-2">
+                            <h3 className="font-oswald text-xl uppercase tracking-wide text-dash-text">Tu Fotografía</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-muted leading-relaxed px-2">
                                 Un avatar profesional aumenta tus ventas al dar confianza.
                             </p>
                         </div>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploading}
-                            className="flex items-center gap-2 bg-transparent hover:bg-zinc-900 text-white text-[10px] uppercase tracking-widest font-bold px-5 py-3 transition-all border border-zinc-700 w-full justify-center"
+                            className="flex items-center gap-2 bg-transparent hover:bg-dash-panel-alt text-dash-text text-[10px] uppercase tracking-widest font-bold px-5 py-3 transition-all border border-dash-border-alt w-full justify-center"
                         >
                             <Camera className="w-4 h-4" /> {uploading ? "Cargando..." : "Cambiar Foto"}
                         </button>
@@ -228,10 +228,10 @@ export default function ProfilePage() {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-zinc-200 font-bold px-6 py-4 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] text-xs uppercase tracking-widest"
+                        className="w-full flex items-center justify-center gap-2 bg-dash-text text-dash-bg hover:opacity-80 font-bold px-6 py-4 transition-all shadow-xl text-xs uppercase tracking-widest"
                     >
                         {saving ? (
-                            <span className="w-5 h-5 rounded-full border-2 border-zinc-300 border-t-black animate-spin" />
+                            <span className="w-5 h-5 rounded-full border-2 border-dash-border-alt border-t-dash-bg animate-spin" />
                         ) : (
                             <><Save className="w-4 h-4" /> Guardar Todos los Cambios</>
                         )}
@@ -241,26 +241,26 @@ export default function ProfilePage() {
                 {/* Form Settings - Right Column */}
                 <div className="md:col-span-2 space-y-6">
                     {/* Public Data */}
-                    <div className="bg-black border border-zinc-800 p-8 space-y-8">
-                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-white border-b border-zinc-800 pb-4">
-                            <span className="w-8 h-8 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-sm">1</span>
+                    <div className="bg-dash-panel border border-dash-border p-8 space-y-8">
+                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
+                            <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm">1</span>
                             Información Pública
                         </h2>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Alias o Nombre de Artista</label>
+                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Alias o Nombre de Artista</label>
                             <input
                                 type="text"
                                 name="full_name"
                                 value={profile.full_name}
                                 onChange={handleTextChange}
                                 placeholder="Ej: Heider - Maestro de Fades"
-                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta"
+                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
                             />
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 block">
+                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
                                 <Phone className="w-3.5 h-3.5" /> Número de Contacto
                             </label>
                             <input
@@ -269,33 +269,33 @@ export default function ProfilePage() {
                                 value={profile.phone}
                                 onChange={handleTextChange}
                                 placeholder="+57 300 000 0000"
-                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta"
+                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
                             />
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Biografía y Trayectoria</label>
+                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Biografía y Trayectoria</label>
                             <textarea
                                 name="bio"
                                 value={profile.bio}
                                 onChange={handleTextChange}
                                 rows={4}
                                 placeholder="Escribe un resumen de tu estilo, años de experiencia y qué te apasiona..."
-                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta resize-none"
+                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta resize-none"
                             />
                         </div>
                     </div>
 
                     {/* Schedule Engine JSONB (Solo Lectura) */}
-                    <div className="bg-black border border-zinc-800 p-8 space-y-8 opacity-60">
-                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-white border-b border-zinc-800 pb-4">
-                            <span className="w-8 h-8 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-sm"><Clock className="w-4 h-4" /></span>
+                    <div className="bg-dash-panel border border-dash-border p-8 space-y-8 opacity-60">
+                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
+                            <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm"><Clock className="w-4 h-4" /></span>
                             Horarios (Solo Lectura)
                         </h2>
 
                         {/* Work Days Picker */}
                         <div className="space-y-4">
-                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 block">
+                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
                                 <CalendarDays className="w-4 h-4" /> Días Laborables
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -305,8 +305,8 @@ export default function ProfilePage() {
                                         <div
                                             key={day.value}
                                             className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-colors cursor-default ${isSelected
-                                                    ? 'bg-white text-black border-white'
-                                                    : 'bg-black text-zinc-600 border-zinc-800'
+                                                    ? 'bg-dash-text text-dash-bg border-white'
+                                                    : 'bg-dash-panel text-dash-text-muted border-dash-border'
                                                 }`}
                                         >
                                             {day.label}
@@ -317,47 +317,47 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Hours grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-zinc-800">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-dash-border">
                             {/* General Shift */}
                             <div className="space-y-4">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 border-l-2 border-white pl-3">Jornada General</h4>
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-white pl-3">Jornada General</h4>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
+                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.startHour}
-                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
+                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
+                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.endHour}
-                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
+                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                             </div>
 
                             {/* Lunch Break */}
                             <div className="space-y-4">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 border-l-2 border-zinc-600 pl-3">Descanso / Almuerzo</h4>
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-dash-border-alt pl-3">Descanso / Almuerzo</h4>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Inicio (Hora Militar)</label>
+                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Inicio (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.lunchStart}
-                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
+                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Fin (Hora Militar)</label>
+                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Fin (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.lunchEnd}
-                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
+                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                             </div>

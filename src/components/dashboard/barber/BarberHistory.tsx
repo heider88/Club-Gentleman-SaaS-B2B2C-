@@ -130,65 +130,65 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-zinc-800 pb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-dash-border pb-6">
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <div className="flex bg-black border border-zinc-800 p-1">
+                    <div className="flex bg-dash-panel border border-dash-border p-1">
                         {(['daily', 'weekly', 'monthly'] as FilterType[]).map(f => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
+                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-dash-text text-dash-bg' : 'text-dash-text-muted hover:text-dash-text'}`}
                             >
                                 {f === 'daily' ? 'Diario' : f === 'weekly' ? 'Semanal' : 'Mensual'}
                             </button>
                         ))}
                     </div>
-                    <div className="flex bg-black border border-zinc-800 p-1">
-                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'completed' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}>Completados</button>
-                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'cancelled' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}>Cancelados</button>
+                    <div className="flex bg-dash-panel border border-dash-border p-1">
+                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'completed' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Completados</button>
+                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'cancelled' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Cancelados</button>
                     </div>
                 </div>
                 
                 <button 
                     onClick={handleDownloadPDF}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent hover:bg-zinc-900 border border-zinc-700 px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-all text-white"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent hover:bg-dash-panel-alt border border-dash-border-alt px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-all text-dash-text"
                 >
-                    <ArrowDownToLine className="w-4 h-4 text-zinc-400" /> Descargar PDF
+                    <ArrowDownToLine className="w-4 h-4 text-dash-text-soft" /> Descargar PDF
                 </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-black border border-zinc-800 p-6 relative group">
+                <div className="bg-dash-panel border border-dash-border p-6 relative group">
                     <div className="flex justify-between items-start mb-4">
-                        <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Cortes {apptStatus === 'completed' ? 'Completados' : 'Perdidos'}</span>
-                        <CheckCircle2 className="w-5 h-5 text-zinc-700" />
+                        <span className="text-dash-text-muted text-xs font-bold uppercase tracking-widest">Cortes {apptStatus === 'completed' ? 'Completados' : 'Perdidos'}</span>
+                        <CheckCircle2 className="w-5 h-5 text-dash-border-alt" />
                     </div>
-                    <h3 className="text-4xl font-oswald font-medium text-white">
+                    <h3 className="text-4xl font-oswald font-medium text-dash-text">
                         {loading ? '...' : totalAppointments}
                     </h3>
                 </div>
 
-                <div className="bg-black border border-zinc-800 p-6 relative group sm:col-span-2">
+                <div className="bg-dash-panel border border-dash-border p-6 relative group sm:col-span-2">
                     <div className="flex justify-between items-start mb-4">
-                        <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">
+                        <span className="text-dash-text-muted text-xs font-bold uppercase tracking-widest">
                             {apptStatus === 'completed' ? `Ganancia Neta (${commissionPercentage}%)` : 'Ingresos Perdidos'}
                         </span>
-                        <Banknote className="w-5 h-5 text-zinc-700" />
+                        <Banknote className="w-5 h-5 text-dash-border-alt" />
                     </div>
                     <div className="flex items-baseline gap-3">
-                        <h3 className={`text-5xl font-oswald font-medium ${apptStatus === 'completed' ? 'text-white' : 'text-zinc-500 line-through'}`}>
+                        <h3 className={`text-5xl font-oswald font-medium ${apptStatus === 'completed' ? 'text-dash-text' : 'text-dash-text-muted line-through'}`}>
                             {loading ? '...' : formatCurrency(apptStatus === 'completed' ? barberCut : totalRevenue)}
                         </h3>
                         {apptStatus === 'completed' && (
-                            <span className="text-xs font-bold uppercase tracking-widest text-zinc-600">De {formatCurrency(totalRevenue)} prod. total</span>
+                            <span className="text-xs font-bold uppercase tracking-widest text-dash-text-muted">De {formatCurrency(totalRevenue)} prod. total</span>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="border border-zinc-800 bg-black">
-                <div className="p-6 border-b border-zinc-800">
-                    <h3 className="font-oswald text-xl text-white uppercase tracking-wide">
+            <div className="border border-dash-border bg-dash-panel">
+                <div className="p-6 border-b border-dash-border">
+                    <h3 className="font-oswald text-xl text-dash-text uppercase tracking-wide">
                         Historial de Trabajo
                     </h3>
                 </div>
@@ -196,17 +196,17 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-zinc-900/50 border-b border-zinc-800">
-                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Fecha y Hora</th>
-                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Cliente</th>
-                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Servicio</th>
-                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap text-right">Valor</th>
+                            <tr className="bg-dash-panel-alt/50 border-b border-dash-border">
+                                <th className="p-4 text-[10px] font-bold text-dash-text-muted uppercase tracking-widest whitespace-nowrap">Fecha y Hora</th>
+                                <th className="p-4 text-[10px] font-bold text-dash-text-muted uppercase tracking-widest whitespace-nowrap">Cliente</th>
+                                <th className="p-4 text-[10px] font-bold text-dash-text-muted uppercase tracking-widest whitespace-nowrap">Servicio</th>
+                                <th className="p-4 text-[10px] font-bold text-dash-text-muted uppercase tracking-widest whitespace-nowrap text-right">Valor</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800">
+                        <tbody className="divide-y divide-dash-border">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={4} className="p-8 text-center text-zinc-600">
+                                    <td colSpan={4} className="p-8 text-center text-dash-text-muted">
                                         <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-bold">
                                             <Search className="w-4 h-4 animate-spin" /> Procesando historial...
                                         </div>
@@ -214,23 +214,23 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                                 </tr>
                             ) : appointments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="p-12 text-center text-zinc-500 font-jakarta text-sm">
+                                    <td colSpan={4} className="p-12 text-center text-dash-text-muted font-jakarta text-sm">
                                         Aún no hay registros en este periodo.
                                     </td>
                                 </tr>
                             ) : (
                                 appointments.map(appt => (
-                                    <tr key={appt.id} className="hover:bg-zinc-900/30 transition-colors group">
-                                        <td className="p-4 text-sm text-zinc-400 whitespace-nowrap font-oswald tracking-wide">
+                                    <tr key={appt.id} className="hover:bg-dash-panel-alt/30 transition-colors group">
+                                        <td className="p-4 text-sm text-dash-text-soft whitespace-nowrap font-oswald tracking-wide">
                                             {format(new Date(appt.start_time), "d MMM yyyy - HH:mm", { locale: es })}
                                         </td>
-                                        <td className="p-4 text-sm text-zinc-200 font-medium whitespace-nowrap">
+                                        <td className="p-4 text-sm text-dash-text font-medium whitespace-nowrap">
                                             {appt.customer_name}
                                         </td>
-                                        <td className="p-4 text-xs font-bold uppercase tracking-widest text-zinc-500 whitespace-nowrap">
+                                        <td className="p-4 text-xs font-bold uppercase tracking-widest text-dash-text-muted whitespace-nowrap">
                                             {appt.services?.name || 'N/A'}
                                         </td>
-                                        <td className="p-4 text-sm font-oswald text-white text-right whitespace-nowrap">
+                                        <td className="p-4 text-sm font-oswald text-dash-text text-right whitespace-nowrap">
                                             {formatCurrency(appt.services?.price || 0)}
                                         </td>
                                     </tr>
