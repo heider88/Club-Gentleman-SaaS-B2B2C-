@@ -30,6 +30,8 @@ interface CalendarViewProps {
 export function CalendarView({ barberId, date: initialDate, durationMinutes, onSelect }: CalendarViewProps) {
     const [slots, setSlots] = useState<TimeSlot[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const [retryCount, setRetryCount] = useState(0)
     const [selectedDate, setSelectedDate] = useState<Date>(initialDate || new Date())
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
@@ -65,29 +67,40 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
         async function preloadData() {
             setLoading(true);
+            setError(null);
             const supabase = createClient();
             
             // Calculamos el rango desde hoy hasta 14 días adelante
             const startRangeStr = startOfDay(new Date()).toISOString();
             const endRangeStr = endOfDay(addDays(new Date(), 14)).toISOString();
 
-            // Promise.all para ejecutar consultas concurrentes
-            const [profileRes, appointmentsRes, blocksRes] = await Promise.all([
-                supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
-                supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
-                supabase.from('availability_blocks').select('start_time, end_time, is_global').or(`barber_id.eq.${barberId},is_global.eq.true`).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
-            ]);
+            try {
+                // Promise.all para ejecutar consultas concurrentes
+                const [profileRes, appointmentsRes, blocksRes] = await Promise.all([
+                    supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
+                    supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
+                    supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
+                ]);
 
-            const settings = profileRes.data?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
-            
-            setScheduleSettings(settings);
-            setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
-            setAllBlocks(blocksRes.data || []);
-            setLoading(false);
+                if (profileRes.error) throw profileRes.error;
+                if (appointmentsRes.error) throw appointmentsRes.error;
+                if (blocksRes.error) throw blocksRes.error;
+
+                const settings = profileRes.data?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
+                
+                setScheduleSettings(settings as ScheduleSettings);
+                setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
+                setAllBlocks(blocksRes.data || []);
+            } catch (err: any) {
+                console.error("Error preloading data:", err);
+                setError(err.message || "Hubo un error al cargar las horas disponibles.");
+            } finally {
+                setLoading(false);
+            }
         }
 
         preloadData();
-    }, [barberId]);
+    }, [barberId, retryCount]);
 
     // 2. CALCULAR SLOTS (Síncrono e instantáneo cuando cambia la fecha)
     const calculateSlots = useCallback(() => {
@@ -167,6 +180,21 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
     if (loading) {
         return <div className="text-white/50 text-sm animate-pulse p-4 text-center">Calculando disponibilidad...</div>
+    }
+
+    if (error) {
+        return (
+            <div className="text-red-400 text-sm p-4 text-center border border-red-500/20 bg-red-500/10 rounded-2xl">
+                {error}
+                <br/>
+                <button 
+                    onClick={() => setRetryCount(c => c + 1)} 
+                    className="mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white"
+                >
+                    Reintentar
+                </button>
+            </div>
+        )
     }
 
     return (
