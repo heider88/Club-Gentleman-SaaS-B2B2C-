@@ -7,6 +7,8 @@ import { AppointmentCard } from "@/components/dashboard/AppointmentCard"
 import { InternalBookingModal } from "@/components/dashboard/InternalBookingModal"
 import { TeamRadar } from "@/components/dashboard/TeamRadar"
 
+import { DashboardTimeline } from "@/components/dashboard/DashboardTimeline"
+
 // Types helpers for nested query
 type AppointmentWithService = {
     id: string;
@@ -95,14 +97,14 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             {/* Header / Greetings */}
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-6">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-white">
-                        ¡Buenos días, <span className="text-primary">{barberName}</span>!
+                    <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-white uppercase">
+                        ¡Hola, <span className="text-zinc-500">{barberName}</span>!
                     </h1>
-                    <p className="text-muted-foreground flex items-center gap-2 font-medium mt-2">
-                        <CalendarDays className="w-5 h-5 text-white/50" />
-                        Hoy es {format(now, "EEEE, d 'de' MMMM yyyy", { locale: es })}
+                    <p className="text-zinc-400 font-jakarta flex items-center gap-2 text-sm mt-3 uppercase tracking-widest font-bold">
+                        <CalendarDays className="w-4 h-4 text-zinc-600" />
+                        {format(now, "EEEE, d 'de' MMMM yyyy", { locale: es })}
                     </p>
                 </div>
                 {/* Botón de Agendar Manual (Inyectando el Barber ID) */}
@@ -117,15 +119,15 @@ export default async function DashboardPage() {
             {/* Citas del Día */}
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-white/90">
-                        {userRole === 'admin' ? "Agenda General (Todas las citas)" : "Tu Agenda del Día"}
+                    <h2 className="font-oswald text-2xl font-medium text-white tracking-wide uppercase">
+                        {userRole === 'admin' ? "Agenda General" : "Línea de Tiempo"}
                     </h2>
-                    <div className="flex gap-3 text-sm">
-                        <span className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">
+                    <div className="flex gap-2">
+                        <span className="bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 text-xs font-bold uppercase tracking-widest">
                             {appointments.length} Total
                         </span>
                         {pendingCount > 0 && (
-                            <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(251,146,60,0.2)]">
+                            <span className="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                                 {pendingCount} Pendientes
                             </span>
                         )}
@@ -133,24 +135,18 @@ export default async function DashboardPage() {
                 </div>
 
                 {appointments.length === 0 ? (
-                    /* EMPTY STATE (Glassmorphism & Urban Dark UI) */
-                    <div className="relative overflow-hidden w-full h-[400px] flex flex-col items-center justify-center p-8 rounded-3xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_40px_rgba(0,0,0,0.1)] group">
-                        {/* Glow effect */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-primary/20 transition-all duration-700" />
-
-                        <CalendarX2 className="w-16 h-16 text-white/20 mb-4 transition-transform group-hover:scale-110 duration-500" />
-                        <h3 className="text-2xl font-bold text-white/90 mb-2 tracking-tight">Sin citas hoy</h3>
-                        <p className="text-white/50 text-center max-w-sm mb-6 leading-relaxed">
-                            Aún no hay clientes agendados para lo que queda de jornada. ¡Aprovecha para descansar o mejorar tu catálogo!
+                    /* EMPTY STATE (Luxury Industrial) */
+                    <div className="relative overflow-hidden w-full h-[300px] flex flex-col items-center justify-center p-8 border border-zinc-800 bg-black group">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-zinc-900 rounded-full blur-[80px] pointer-events-none transition-all duration-700" />
+                        <CalendarX2 className="w-12 h-12 text-zinc-700 mb-4 transition-transform group-hover:scale-110 duration-500 relative z-10" />
+                        <h3 className="font-oswald text-2xl font-medium text-zinc-300 tracking-wide uppercase relative z-10">Sin Citas Hoy</h3>
+                        <p className="text-zinc-600 text-sm mt-2 text-center max-w-xs relative z-10 font-jakarta">
+                            Aún no hay clientes agendados. ¡Aprovecha el tiempo para optimizar tus herramientas!
                         </p>
                     </div>
                 ) : (
-                    /* LISTADO DE CITAS */
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {appointments.map((appt) => (
-                            <AppointmentCard key={appt.id} appt={appt} userRole={userRole} />
-                        ))}
-                    </div>
+                    /* TIMELINE VIEW */
+                    <DashboardTimeline appointments={appointments} userRole={userRole} />
                 )}
             </section>
         </div>

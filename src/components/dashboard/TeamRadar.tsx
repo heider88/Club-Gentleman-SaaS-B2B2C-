@@ -98,30 +98,29 @@ export function TeamRadar({ currentUserId }: { currentUserId: string }) {
     if (loading || team.length === 0) return null
 
     return (
-        <section className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="flex items-center gap-2 mb-4">
-                <Users className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Radar del Equipo</h2>
+        <section className="mb-8 border-b border-zinc-800 pb-6">
+            <div className="flex items-center gap-2 mb-6">
+                <div className="w-1.5 h-4 bg-zinc-600"></div>
+                <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Radar del Equipo</h2>
             </div>
             
             {/* Scroll Horizontal para móviles */}
-            <div className="flex overflow-x-auto pb-4 gap-4 scrollbar-hide snap-x">
+            <div className="flex overflow-x-auto pb-2 gap-4 scrollbar-hide snap-x">
                 {team.map(member => (
-                    <div key={member.id} className="snap-start min-w-[220px] bg-black/40 backdrop-blur-sm border border-white/5 rounded-2xl p-3 flex items-center gap-3 shadow-lg">
-                        <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
+                    <div key={member.id} className="snap-start min-w-[200px] bg-black border border-zinc-800 p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
                             {member.avatarUrl ? (
-                                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
+                                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover grayscale" />
                             ) : (
-                                <span>🧔🏻‍♂️</span>
+                                <span className="grayscale opacity-50">🧔🏻‍♂️</span>
                             )}
                             {/* Indicador de estado flotante */}
-                            <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-black ${member.isAvailable ? 'bg-green-500' : 'bg-orange-500'}`} />
+                            <span className={`absolute -bottom-1 -right-1 w-3 h-3 border-2 border-black ${member.isAvailable ? 'bg-white' : 'bg-zinc-600'}`} />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-bold text-white truncate">{member.name}</span>
+                            <span className="text-xs font-bold font-oswald uppercase tracking-widest text-zinc-200 truncate">{member.name}</span>
                             <div className="flex items-center gap-1 mt-0.5">
-                                {member.isAvailable ? <CheckCircle2 className="w-3 h-3 text-green-400" /> : <Clock className="w-3 h-3 text-orange-400" />}
-                                <span className={`text-xs truncate ${member.isAvailable ? 'text-green-400/80' : 'text-orange-400/80'}`}>
+                                <span className={`text-[10px] uppercase font-bold tracking-wider truncate ${member.isAvailable ? 'text-zinc-400' : 'text-zinc-600'}`}>
                                     {member.statusText}
                                 </span>
                             </div>

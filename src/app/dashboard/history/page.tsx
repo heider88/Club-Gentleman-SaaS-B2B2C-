@@ -22,11 +22,11 @@ export default async function HistoryPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto pb-12">
-            <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white">
-                    Mi Historial y Producción
+            <header className="flex flex-col gap-2 border-b border-zinc-800 pb-8">
+                <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-white uppercase">
+                    Mi Historial
                 </h1>
-                <p className="text-muted-foreground font-medium">
+                <p className="text-zinc-500 font-jakarta text-sm uppercase tracking-widest font-bold">
                     Revisa los cortes que has completado y descarga tus comprobantes.
                 </p>
             </header>

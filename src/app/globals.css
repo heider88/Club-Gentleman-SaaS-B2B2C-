@@ -65,6 +65,9 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  --font-oswald: var(--font-oswald), sans-serif;
+  --font-jakarta: var(--font-jakarta), sans-serif;
 }
 
 @layer base {

@@ -130,109 +130,107 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-card/90 backdrop-blur-md border border-border p-2 rounded-2xl">
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <div className="flex p-1 bg-black/40 rounded-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-zinc-800 pb-6">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <div className="flex bg-black border border-zinc-800 p-1">
                         {(['daily', 'weekly', 'monthly'] as FilterType[]).map(f => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === f ? 'bg-primary text-primary-foreground shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}
                             >
                                 {f === 'daily' ? 'Diario' : f === 'weekly' ? 'Semanal' : 'Mensual'}
                             </button>
                         ))}
                     </div>
-                    <div className="flex p-1 bg-black/40 rounded-xl">
-                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${apptStatus === 'completed' ? 'bg-green-500/20 text-green-400 shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Completados</button>
-                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${apptStatus === 'cancelled' ? 'bg-red-500/20 text-red-400 shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Cancelados</button>
+                    <div className="flex bg-black border border-zinc-800 p-1">
+                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'completed' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}>Completados</button>
+                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'cancelled' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}>Cancelados</button>
                     </div>
                 </div>
                 
                 <button 
                     onClick={handleDownloadPDF}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-white"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent hover:bg-zinc-900 border border-zinc-700 px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-all text-white"
                 >
-                    <ArrowDownToLine className="w-4 h-4 text-primary" /> Descargar Certificado (PDF)
+                    <ArrowDownToLine className="w-4 h-4 text-zinc-400" /> Descargar PDF
                 </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
-                    <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Cortes Completados</span>
-                        <div className="p-2 bg-primary/20 rounded-xl"><CheckCircle2 className="w-5 h-5 text-primary" /></div>
+                <div className="bg-black border border-zinc-800 p-6 relative group">
+                    <div className="flex justify-between items-start mb-4">
+                        <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Cortes {apptStatus === 'completed' ? 'Completados' : 'Perdidos'}</span>
+                        <CheckCircle2 className="w-5 h-5 text-zinc-700" />
                     </div>
-                    <h3 className="text-3xl font-black text-white relative z-10">
+                    <h3 className="text-4xl font-oswald font-medium text-white">
                         {loading ? '...' : totalAppointments}
                     </h3>
                 </div>
 
-                <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group sm:col-span-2">
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all" />
-                    <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">
-                            {apptStatus === 'completed' ? `Tu Ganancia Neta (${commissionPercentage}%)` : 'Ingresos Perdidos'}
+                <div className="bg-black border border-zinc-800 p-6 relative group sm:col-span-2">
+                    <div className="flex justify-between items-start mb-4">
+                        <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">
+                            {apptStatus === 'completed' ? `Ganancia Neta (${commissionPercentage}%)` : 'Ingresos Perdidos'}
                         </span>
-                        <div className="p-2 bg-green-500/20 rounded-xl"><Banknote className="w-5 h-5 text-green-400" /></div>
+                        <Banknote className="w-5 h-5 text-zinc-700" />
                     </div>
-                    <div className="flex items-baseline gap-2 relative z-10">
-                        <h3 className={`text-4xl font-black ${apptStatus === 'completed' ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className="flex items-baseline gap-3">
+                        <h3 className={`text-5xl font-oswald font-medium ${apptStatus === 'completed' ? 'text-white' : 'text-zinc-500 line-through'}`}>
                             {loading ? '...' : formatCurrency(apptStatus === 'completed' ? barberCut : totalRevenue)}
                         </h3>
                         {apptStatus === 'completed' && (
-                            <span className="text-sm font-medium text-white/40 line-through decoration-white/20">De {formatCurrency(totalRevenue)} prod. total</span>
+                            <span className="text-xs font-bold uppercase tracking-widest text-zinc-600">De {formatCurrency(totalRevenue)} prod. total</span>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="bg-card/40 border border-border rounded-2xl overflow-hidden">
-                <div className="p-6 border-b border-white/5">
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <CalendarClock className="w-5 h-5 text-primary" /> Historial de Trabajo
+            <div className="border border-zinc-800 bg-black">
+                <div className="p-6 border-b border-zinc-800">
+                    <h3 className="font-oswald text-xl text-white uppercase tracking-wide">
+                        Historial de Trabajo
                     </h3>
                 </div>
                 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-black/40 border-b border-white/5">
-                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Fecha y Hora</th>
-                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Cliente</th>
-                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap">Servicio</th>
-                                <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider whitespace-nowrap text-right">Valor</th>
+                            <tr className="bg-zinc-900/50 border-b border-zinc-800">
+                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Fecha y Hora</th>
+                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Cliente</th>
+                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap">Servicio</th>
+                                <th className="p-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap text-right">Valor</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-zinc-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={4} className="p-8 text-center text-white/40">
-                                        <div className="flex items-center justify-center gap-2">
+                                    <td colSpan={4} className="p-8 text-center text-zinc-600">
+                                        <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-bold">
                                             <Search className="w-4 h-4 animate-spin" /> Procesando historial...
                                         </div>
                                     </td>
                                 </tr>
                             ) : appointments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="p-12 text-center text-white/40">
-                                        Aún no tienes cortes completados en este periodo.
+                                    <td colSpan={4} className="p-12 text-center text-zinc-500 font-jakarta text-sm">
+                                        Aún no hay registros en este periodo.
                                     </td>
                                 </tr>
                             ) : (
                                 appointments.map(appt => (
-                                    <tr key={appt.id} className="hover:bg-white/5 transition-colors">
-                                        <td className="p-4 text-sm text-white/80 whitespace-nowrap">
-                                            {format(new Date(appt.start_time), "d MMM yyyy - h:mm a", { locale: es })}
+                                    <tr key={appt.id} className="hover:bg-zinc-900/30 transition-colors group">
+                                        <td className="p-4 text-sm text-zinc-400 whitespace-nowrap font-oswald tracking-wide">
+                                            {format(new Date(appt.start_time), "d MMM yyyy - HH:mm", { locale: es })}
                                         </td>
-                                        <td className="p-4 text-sm text-white font-medium whitespace-nowrap">
+                                        <td className="p-4 text-sm text-zinc-200 font-medium whitespace-nowrap">
                                             {appt.customer_name}
                                         </td>
-                                        <td className="p-4 text-sm text-white/60 whitespace-nowrap">
+                                        <td className="p-4 text-xs font-bold uppercase tracking-widest text-zinc-500 whitespace-nowrap">
                                             {appt.services?.name || 'N/A'}
                                         </td>
-                                        <td className="p-4 text-sm font-bold text-green-400 text-right whitespace-nowrap">
+                                        <td className="p-4 text-sm font-oswald text-white text-right whitespace-nowrap">
                                             {formatCurrency(appt.services?.price || 0)}
                                         </td>
                                     </tr>

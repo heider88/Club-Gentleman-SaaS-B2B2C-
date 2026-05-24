@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Clock, Contact, Banknote, CheckCircle2, Ban, Phone, UserX } from "lucide-react"
-import { format } from "date-fns"
+import { CheckCircle2, Phone, UserX, MoreHorizontal, Scissors } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cancelAppointment } from "@/app/actions/appointments"
@@ -28,7 +27,9 @@ type AppointmentWithService = {
 export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithService, userRole: string }) {
     const [status, setStatus] = useState(appt.status)
     const [loading, setLoading] = useState(false)
+    const [showOptions, setShowOptions] = useState(false)
     const [showCancelModal, setShowCancelModal] = useState(false)
+    const optionsRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
     const router = useRouter()
 
@@ -38,21 +39,26 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
         return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
     }
 
-    const updateStatus = async (newStatus: 'completed' | 'cancelled') => {
-        const confirmMsg = newStatus === 'completed' 
-            ? '¿Marcar esta cita como completada?' 
-            : '¿Estás seguro de cancelar esta cita? Esto liberará el espacio en la agenda.'
-            
-        if (!window.confirm(confirmMsg)) return
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
+                setShowOptions(false)
+                setShowCancelModal(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
 
+    const updateStatus = async (newStatus: 'completed' | 'cancelled') => {
         setLoading(true)
+        setShowOptions(false)
+        setShowCancelModal(false)
         
         try {
             if (newStatus === 'cancelled') {
-                // Llama al Server Action blindado
                 await cancelAppointment(appt.id);
             } else {
-                // Actualiza como "completed" (permitido por RLS para el barbero o admin)
                 const { error } = await supabase
                     .from('appointments')
                     .update({ status: newStatus })
@@ -62,7 +68,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             }
 
             setStatus(newStatus)
-            toast.success(newStatus === 'completed' ? 'Cita completada exitosamente' : 'Cita cancelada')
+            toast.success(newStatus === 'completed' ? 'Corte finalizado' : 'Cita cancelada')
             router.refresh()
         } catch (err: any) {
             toast.error(err.message || "Error al actualizar la cita")
@@ -73,99 +79,103 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
 
     const isCompleted = status === 'completed'
     const isCancelled = status === 'cancelled'
-    const isPending = status === 'pending'
+    const isPending = status === 'pending' || status === 'confirmed'
 
-    if (isCancelled) return null // Opcional: no mostrar canceladas o mostrar grisáceas
+    if (isCancelled) return null
+
+    // Determine state colors based on luxury industrial palette
+    const cardBg = isCompleted ? 'bg-zinc-950/40 border-zinc-900/50' : 'bg-black border-zinc-800'
+    const textColor = isCompleted ? 'text-zinc-500' : 'text-zinc-100'
 
     return (
-        <div className={`relative rounded-2xl p-6 bg-card border hover:border-primary/40 backdrop-blur-sm bg-opacity-90 transition-all duration-300 shadow-[0_2px_15px_rgba(0,0,0,0.4)] flex flex-col h-full ${isCompleted ? 'border-primary/20 opacity-70 bg-primary/5' : 'border-white/10'}`}>
+        <div className={`relative rounded-none p-6 border transition-all duration-500 flex flex-col w-full group ${cardBg} ${isCompleted ? 'grayscale opacity-70 hover:opacity-100' : 'hover:border-zinc-500 hover:shadow-[0_10px_30px_rgba(255,255,255,0.02)]'}`}>
+            
+            {/* Loading overlay */}
             {loading && (
-                <div className="absolute inset-0 z-10 bg-black/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                    <span className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                <div className="absolute inset-0 z-20 bg-black/90 rounded-none flex items-center justify-center">
+                    <span className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin"></span>
                 </div>
             )}
             
+            {/* Header: Service & Options */}
             <div className="flex justify-between items-start mb-4">
-                <div className="bg-black/60 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-[15px]">{format(new Date(appt.start_time), 'h:mm a')}</span>
-                    <span className="text-white/30 px-1">-</span>
-                    <span className="text-white/50 text-[15px]">{format(new Date(appt.end_time), 'h:mm a')}</span>
-                </div>
-                {isPending && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.8)] animate-pulse" title="Pendiente" />
-                )}
-                {isCompleted && (
-                    <span title="Completada">
-                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                <div className="flex items-center gap-2">
+                    <Scissors className={`w-3.5 h-3.5 ${isCompleted ? 'text-zinc-600' : 'text-zinc-400'}`} />
+                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isCompleted ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                        {appt.services?.name || 'Servicio General'}
                     </span>
-                )}
-            </div>
+                </div>
+                
+                <div className="relative" ref={optionsRef}>
+                    <button 
+                        onClick={() => setShowOptions(!showOptions)}
+                        className={`p-1 rounded-none transition-colors ${showOptions ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}
+                    >
+                        <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                    
+                    {/* Dropdown Options */}
+                    {showOptions && isPending && !showCancelModal && (
+                        <div className="absolute right-0 top-8 w-48 bg-zinc-900 border border-zinc-700 shadow-2xl z-30 py-1 animate-in slide-in-from-top-2 fade-in duration-200">
+                            {appt.customer_phone && appt.customer_phone !== "N/A" && (
+                                <a href={`tel:${appt.customer_phone}`} className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-white hover:bg-zinc-800 flex items-center gap-3 transition-colors">
+                                    <Phone className="w-4 h-4" /> Llamar Cliente
+                                </a>
+                            )}
+                            <button onClick={() => setShowCancelModal(true)} className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-red-400 hover:text-red-300 hover:bg-red-950/30 flex items-center gap-3 transition-colors border-t border-zinc-800/50">
+                                <UserX className="w-4 h-4" /> Marcar No Asistió
+                            </button>
+                        </div>
+                    )}
 
-            <div className="mb-4 flex justify-between items-start">
-                <div>
-                    <h3 className="text-lg font-bold text-white/90 flex items-center gap-2">
-                        <Contact className="w-5 h-5 text-white/40" />
-                        {appt.customer_name}
-                    </h3>
-                    {appt.customer_phone && appt.customer_phone !== "N/A" && (
-                        <a href={`tel:${appt.customer_phone}`} className="flex items-center gap-1.5 text-xs font-medium text-white/40 hover:text-white/80 transition-colors ml-7 mt-1 tracking-wide w-fit">
-                            <Phone className="w-3 h-3" />
-                            {appt.customer_phone}
-                        </a>
+                    {/* Cancel Confirmation */}
+                    {showCancelModal && (
+                        <div className="absolute right-0 top-8 w-64 bg-black border border-zinc-700 shadow-2xl z-30 p-4 animate-in slide-in-from-top-2 fade-in duration-200">
+                            <p className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4 text-center leading-relaxed">¿El cliente no llegó?</p>
+                            <div className="flex gap-2">
+                                <button onClick={() => {setShowCancelModal(false); setShowOptions(false)}} className="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800">Volver</button>
+                                <button onClick={() => updateStatus('cancelled')} className="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-900 hover:bg-red-800 transition-colors border border-red-800">Confirmar</button>
+                            </div>
+                        </div>
                     )}
                 </div>
-                {isAdmin && appt.profiles?.full_name && (
-                    <div className="bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md text-right">
-                        <span className="block text-[9px] uppercase tracking-wider font-bold text-primary/60 mb-0.5">Barbero</span>
-                        <span className="block text-xs font-bold text-primary truncate max-w-[100px]">{appt.profiles.full_name.split(' ')[0]}</span>
-                    </div>
-                )}
             </div>
 
-            <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between mt-auto mb-4">
-                <div className="flex flex-col">
-                    <span className="text-xs text-white/40 uppercase font-bold tracking-wider mb-0.5">Servicio</span>
-                    <span className="text-sm font-semibold text-white/80">{appt.services?.name || 'Servicio Externo'}</span>
+            {/* Body: Customer & Price */}
+            <div className="flex justify-between items-end mb-6">
+                <div>
+                    <h3 className={`font-oswald text-3xl md:text-4xl font-medium tracking-tight uppercase ${textColor}`}>
+                        {appt.customer_name}
+                    </h3>
+                    {isAdmin && appt.profiles?.full_name && (
+                        <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-2 block border-l-2 border-zinc-700 pl-2">
+                            Barbero: <span className="text-zinc-300">{appt.profiles.full_name.split(' ')[0]}</span>
+                        </span>
+                    )}
                 </div>
-                <div className="flex flex-col items-end">
-                    <span className="text-xs text-white/40 uppercase font-bold tracking-wider mb-0.5">Monto</span>
-                    <span className="text-sm font-bold text-primary flex items-center gap-1">
-                        <Banknote className="w-3.5 h-3.5" />
+                
+                <div className="text-right">
+                    <span className={`font-oswald text-xl md:text-2xl ${isCompleted ? 'text-zinc-600' : 'text-white'}`}>
                         {formatCurrency(appt.services?.price || 0)}
                     </span>
                 </div>
             </div>
 
-            {isPending && (
-                <div className="flex items-center gap-2 pt-3 border-t border-white/5 relative">
+            {/* Actions */}
+            <div className="mt-auto">
+                {isPending ? (
                     <button 
                         onClick={() => updateStatus('completed')}
-                        className="flex-1 flex justify-center items-center gap-2 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/50 rounded-xl text-sm font-bold transition-all"
+                        className="w-full bg-white text-black hover:bg-zinc-200 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-[0.98] border border-transparent"
                     >
-                        <CheckCircle2 className="w-4 h-4" /> Completar
+                        Finalizar y Cobrar
                     </button>
-                    
-                    {/* Botón No Asistió */}
-                    <button 
-                        onClick={() => setShowCancelModal(true)}
-                        className="flex-1 flex justify-center items-center gap-2 py-2 bg-destructive/10 hover:bg-destructive/20 text-red-400 border border-destructive/20 hover:border-destructive/50 rounded-xl text-sm font-bold transition-all"
-                    >
-                        <UserX className="w-4 h-4" /> No Asistió
-                    </button>
-
-                    {/* Modal Mini Glassmorphism */}
-                    {showCancelModal && (
-                        <div className="absolute bottom-[110%] left-0 w-full bg-black/90 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl z-20 animate-in zoom-in-95 duration-200">
-                            <p className="text-sm text-white/90 font-medium mb-3 text-center">¿Seguro que el cliente no llegó?</p>
-                            <div className="flex gap-2">
-                                <button onClick={() => setShowCancelModal(false)} className="flex-1 py-1.5 text-xs text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors">Volver</button>
-                                <button onClick={() => { setShowCancelModal(false); updateStatus('cancelled'); }} className="flex-1 py-1.5 text-xs text-white bg-destructive hover:bg-red-600 rounded-lg font-bold transition-colors shadow-lg shadow-red-500/20">Sí, cancelar</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                ) : (
+                    <div className="w-full border border-zinc-800/50 bg-zinc-900/30 py-3 flex items-center justify-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
+                        <CheckCircle2 className="w-4 h-4" /> Completado
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

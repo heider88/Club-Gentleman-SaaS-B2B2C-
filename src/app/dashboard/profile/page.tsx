@@ -170,11 +170,11 @@ export default function ProfilePage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-            <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white">
+            <header className="flex flex-col gap-2 border-b border-zinc-800 pb-8">
+                <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-white uppercase">
                     Configuración de Perfil
                 </h1>
-                <p className="text-muted-foreground font-medium">
+                <p className="text-zinc-500 font-jakarta text-sm uppercase tracking-widest font-bold">
                     Personaliza cómo te verán tus clientes y cuáles son tus franjas laborales.
                 </p>
             </header>
@@ -182,30 +182,30 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Visual Settings - Left Column */}
                 <div className="md:col-span-1 space-y-6">
-                    <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex flex-col items-center text-center space-y-4 shadow-xl">
-                        <div className="relative w-40 h-40 rounded-full overflow-hidden bg-black/50 border-4 border-white/5 shadow-2xl">
+                    <div className="bg-black border border-zinc-800 p-8 flex flex-col items-center text-center space-y-6">
+                        <div className="relative w-40 h-40 overflow-hidden bg-zinc-900 border border-zinc-700">
                             {profile.avatar_url ? (
                                 <Image
                                     src={profile.avatar_url}
                                     alt="Avatar"
                                     fill
-                                    className="object-cover"
+                                    className="object-cover grayscale"
                                     unoptimized
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-5xl">
+                                <div className="absolute inset-0 flex items-center justify-center text-5xl grayscale opacity-50">
                                     🧑‍🎤
                                 </div>
                             )}
                             {uploading && (
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-                                    <span className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                                <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
+                                    <span className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-white animate-spin" />
                                 </div>
                             )}
                         </div>
-                        <div className="space-y-1">
-                            <h3 className="font-bold text-lg text-white">Tu Fotografía</h3>
-                            <p className="text-xs text-white/50 px-2 leading-relaxed">
+                        <div className="space-y-2">
+                            <h3 className="font-oswald text-xl uppercase tracking-wide text-white">Tu Fotografía</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 leading-relaxed px-2">
                                 Un avatar profesional aumenta tus ventas al dar confianza.
                             </p>
                         </div>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploading}
-                            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-semibold px-5 py-2.5 rounded-full transition-all border border-white/10 w-full justify-center"
+                            className="flex items-center gap-2 bg-transparent hover:bg-zinc-900 text-white text-[10px] uppercase tracking-widest font-bold px-5 py-3 transition-all border border-zinc-700 w-full justify-center"
                         >
                             <Camera className="w-4 h-4" /> {uploading ? "Cargando..." : "Cambiar Foto"}
                         </button>
@@ -228,12 +228,12 @@ export default function ProfilePage() {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-extrabold px-6 py-4 rounded-2xl hover:brightness-110 active:scale-95 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(var(--color-primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--color-primary),0.5)]"
+                        className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-zinc-200 font-bold px-6 py-4 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] text-xs uppercase tracking-widest"
                     >
                         {saving ? (
-                            <span className="w-5 h-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin" />
+                            <span className="w-5 h-5 rounded-full border-2 border-zinc-300 border-t-black animate-spin" />
                         ) : (
-                            <><Save className="w-5 h-5" /> Guardar Todos los Cambios</>
+                            <><Save className="w-4 h-4" /> Guardar Todos los Cambios</>
                         )}
                     </button>
                 </div>
@@ -241,26 +241,26 @@ export default function ProfilePage() {
                 {/* Form Settings - Right Column */}
                 <div className="md:col-span-2 space-y-6">
                     {/* Public Data */}
-                    <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-8 space-y-6 shadow-xl">
-                        <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                            <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">1</span>
+                    <div className="bg-black border border-zinc-800 p-8 space-y-8">
+                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-white border-b border-zinc-800 pb-4">
+                            <span className="w-8 h-8 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-sm">1</span>
                             Información Pública
                         </h2>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 block">Alias o Nombre de Artista</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Alias o Nombre de Artista</label>
                             <input
                                 type="text"
                                 name="full_name"
                                 value={profile.full_name}
                                 onChange={handleTextChange}
                                 placeholder="Ej: Heider - Maestro de Fades"
-                                className="w-full p-3.5 rounded-xl bg-black/50 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-white placeholder:text-white/20"
+                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 flex items-center gap-1 block">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 block">
                                 <Phone className="w-3.5 h-3.5" /> Número de Contacto
                             </label>
                             <input
@@ -269,33 +269,33 @@ export default function ProfilePage() {
                                 value={profile.phone}
                                 onChange={handleTextChange}
                                 placeholder="+57 300 000 0000"
-                                className="w-full p-3.5 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none transition-all text-white placeholder:text-white/20"
+                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 block">Biografía y Trayectoria</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Biografía y Trayectoria</label>
                             <textarea
                                 name="bio"
                                 value={profile.bio}
                                 onChange={handleTextChange}
-                                rows={3}
+                                rows={4}
                                 placeholder="Escribe un resumen de tu estilo, años de experiencia y qué te apasiona..."
-                                className="w-full p-3.5 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none transition-all text-white placeholder:text-white/20 resize-y"
+                                className="w-full p-4 bg-zinc-950 border border-zinc-800 focus:border-white focus:ring-0 outline-none transition-all text-white placeholder:text-zinc-700 text-sm font-jakarta resize-none"
                             />
                         </div>
                     </div>
 
                     {/* Schedule Engine JSONB (Solo Lectura) */}
-                    <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-8 space-y-8 shadow-xl opacity-75">
-                        <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                            <span className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><Clock className="w-4 h-4" /></span>
-                            Horarios de Atención (Asignados por el Administrador)
+                    <div className="bg-black border border-zinc-800 p-8 space-y-8 opacity-60">
+                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-white border-b border-zinc-800 pb-4">
+                            <span className="w-8 h-8 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-sm"><Clock className="w-4 h-4" /></span>
+                            Horarios (Solo Lectura)
                         </h2>
 
                         {/* Work Days Picker */}
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 block flex items-center gap-2">
+                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 block">
                                 <CalendarDays className="w-4 h-4" /> Días Laborables
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -304,9 +304,9 @@ export default function ProfilePage() {
                                     return (
                                         <div
                                             key={day.value}
-                                            className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors cursor-default ${isSelected
-                                                    ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(var(--color-primary),0.3)]'
-                                                    : 'bg-black/50 text-white/50 border-white/5'
+                                            className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-colors cursor-default ${isSelected
+                                                    ? 'bg-white text-black border-white'
+                                                    : 'bg-black text-zinc-600 border-zinc-800'
                                                 }`}
                                         >
                                             {day.label}
@@ -317,47 +317,47 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Hours grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-white/5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-zinc-800">
                             {/* General Shift */}
                             <div className="space-y-4">
-                                <h4 className="text-sm font-bold text-white/80 border-l-2 border-primary pl-2">Jornada General</h4>
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 border-l-2 border-white pl-3">Jornada General</h4>
 
-                                <div className="space-y-1">
-                                    <label className="text-xs text-white/50">Apertura (Hora Militar)</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.startHour}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
+                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs text-white/50">Cierre (Hora Militar)</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.endHour}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
+                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                             </div>
 
                             {/* Lunch Break */}
                             <div className="space-y-4">
-                                <h4 className="text-sm font-bold text-white/80 border-l-2 border-orange-500 pl-2">Descanso / Almuerzo</h4>
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 border-l-2 border-zinc-600 pl-3">Descanso / Almuerzo</h4>
 
-                                <div className="space-y-1">
-                                    <label className="text-xs text-white/50">Inicio (Hora Militar)</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Inicio (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.lunchStart}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
+                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs text-white/50">Fin (Hora Militar)</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">Fin (Hora Militar)</label>
                                     <input
                                         type="number" readOnly
                                         value={schedule.lunchEnd}
-                                        className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white/70 font-mono cursor-not-allowed"
+                                        className="w-full p-3 bg-zinc-950 border border-zinc-800 text-zinc-500 font-oswald text-lg cursor-not-allowed outline-none"
                                     />
                                 </div>
                             </div>
