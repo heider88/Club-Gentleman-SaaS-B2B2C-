@@ -119,12 +119,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                     <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-dash-text uppercase">
                         ¡Hola, <span className="text-dash-text-muted">{barberName}</span>!
                     </h1>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
+                    <div className="mt-4">
                         <DateNavigator currentDate={selectedDate} />
-                        <p className="text-dash-text-soft font-jakarta flex items-center gap-2 text-sm uppercase tracking-widest font-bold">
-                            <CalendarDays className="w-4 h-4 text-dash-text-muted" />
-                            {format(selectedDate, "EEEE, d 'de' MMMM yyyy", { locale: es })}
-                        </p>
                     </div>
                 </div>
                 {/* Botón de Agendar Manual */}
