@@ -27,10 +27,10 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
             description: item.description
         }))
 
-    if (!barberServices || barberServices.length === 0) return <div className="text-white/50 text-sm p-4">No hay servicios disponibles actualmente.</div>
+    if (!barberServices || barberServices.length === 0) return <div className="text-white/50 text-sm p-4 font-mono uppercase tracking-widest">No hay servicios disponibles.</div>
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0 border-t border-b border-white/20 py-2">
             {barberServices.map((service, idx) => (
                 <motion.button
                     initial={{ opacity: 0, y: 10 }}
@@ -38,19 +38,24 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
                     transition={{ delay: idx * 0.05 }}
                     key={service.id}
                     onClick={() => onSelect(service)}
-                    className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:bg-white/10 hover:border-primary/50 active:scale-95 min-h-[44px] transition-all group"
+                    className="w-full text-left py-5 px-4 bg-transparent hover:bg-[#6D3294]/20 border-b border-white/[0.05] last:border-b-0 group transition-all duration-300 relative overflow-hidden"
                 >
-                    <div className="flex justify-between items-start mb-1">
-                        <span className="font-bold text-base text-white group-hover:text-primary transition-colors">{service.name}</span>
-                        <span className="font-bold text-white">${service.price}</span>
+                    {/* Hover indicator line */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#6D3294] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <div className="flex justify-between items-baseline gap-4 mb-2">
+                        <span className="font-oswald text-xl uppercase tracking-wider text-white/90 group-hover:text-white transition-colors">{service.name}</span>
+                        <div className="flex-1 border-b-2 border-dotted border-white/10 group-hover:border-[#6D3294]/50 transition-colors mx-2 relative top-[-4px]"></div>
+                        <span className="font-mono text-lg font-bold text-white group-hover:text-pink-400 transition-colors">${service.price}</span>
                     </div>
+                    
                     {service.description && (
-                        <p className="text-sm text-white/60 mb-2 line-clamp-2">{service.description}</p>
+                        <p className="text-sm font-jakarta text-white/50 mb-3 line-clamp-2 pr-16 group-hover:text-white/70 transition-colors">{service.description}</p>
                     )}
-                    <div className="flex items-center text-xs text-white/50 gap-2">
-                        <span className="flex items-center gap-1 font-medium group-hover:text-white/80 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                            {service.duration} mins
+                    
+                    <div className="flex items-center">
+                        <span className="inline-block border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-mono text-white/60 uppercase tracking-widest group-hover:border-[#6D3294]/50 group-hover:text-white/90 transition-colors">
+                            {service.duration} MINUTOS
                         </span>
                     </div>
                 </motion.button>

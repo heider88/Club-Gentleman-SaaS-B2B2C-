@@ -126,7 +126,6 @@ export default async function LandingPage() {
 
       </header>
 
-      {/* Main Content Area */}
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-16 relative z-10 w-full">
 
         {/* Content Centrado */}
@@ -250,6 +249,29 @@ export default async function LandingPage() {
         {/* Portfolio Section */}
         <GallerySection initialPhotos={initialPhotos} />
       </div>
+
+      {/* Monolithic Footer */}
+      <footer className="relative w-full bg-black border-t border-white/[0.05] overflow-hidden pt-20 pb-8 flex flex-col items-center">
+        {/* Sutil brillo superior de neón */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#6D3294]/50 to-transparent" />
+        
+        <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6 mb-16 relative z-10">
+          <p className="font-mono text-white/30 text-xs tracking-[0.3em] uppercase">Est. 2017 © Todos los derechos reservados</p>
+          <a href="#" className="font-oswald text-white/50 hover:text-white uppercase tracking-[0.2em] text-sm flex items-center gap-2 transition-colors border border-white/10 hover:border-white/30 px-6 py-2 rounded-full">
+            <ChevronUp className="w-4 h-4" /> Volver Arriba
+          </a>
+        </div>
+
+        {/* Typographic Monument */}
+        <div className="w-full text-center relative z-10 px-4">
+          <h2 className="font-oswald font-black leading-none text-[15vw] tracking-tighter text-transparent" style={{ WebkitTextStroke: '2px rgba(255,255,255,0.08)' }}>
+            GENTLEMAN
+          </h2>
+        </div>
+        
+        {/* Glow de fondo para el texto */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[#6D3294]/20 blur-[120px] pointer-events-none -z-0" />
+      </footer>
     </main>
     </>
   )

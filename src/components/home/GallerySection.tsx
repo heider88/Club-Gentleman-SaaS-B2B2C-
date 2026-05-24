@@ -8,44 +8,57 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
     const [showPortfolio, setShowPortfolio] = useState(true)
 
     return (
-        <section id="galeria" className="w-full pt-10 pb-20 scroll-mt-24">
-          <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
-            <div className="flex items-center gap-3">
-              <Image
-                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2' ry='2'/><circle cx='9' cy='9' r='2'/><path d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/></svg>"
-                alt="Portfolio"
-                width={28}
-                height={28}
-                className="drop-shadow-md"
-              />
-              <h2 className="text-3xl font-black text-white uppercase tracking-wider">Nuestro Trabajo</h2>
+        <section id="galeria" className="w-full pt-20 pb-20 scroll-mt-24 relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6">
+          <span className="absolute top-10 right-10 text-[120px] text-white/[0.02] font-oswald select-none pointer-events-none tracking-tighter hidden md:block">ARCHIVE</span>
+          
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 border-b-2 border-[#6D3294] pb-6 relative z-10">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-black text-white/90 uppercase tracking-widest">Lookbook</h2>
+              <p className="text-white/50 font-oswald tracking-[0.2em] mt-2 uppercase text-sm">Nuestro Archivo Visual</p>
             </div>
             <button
               onClick={() => setShowPortfolio(!showPortfolio)}
-              className="text-sm font-bold bg-white/5 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-xl transition-all flex items-center gap-2"
+              className="mt-6 md:mt-0 text-xs font-bold uppercase tracking-[0.2em] bg-transparent hover:bg-white text-white hover:text-black border border-white/20 hover:border-white px-6 py-3 transition-all duration-300 flex items-center gap-3"
             >
-              {showPortfolio ? 'Ver menos' : 'Cargar más'}
-              <ChevronUp className={`w-4 h-4 transition-transform ${showPortfolio ? '' : 'rotate-180'}`} />
+              {showPortfolio ? 'Cerrar Archivo' : 'Explorar'}
+              <ChevronUp className={`w-4 h-4 transition-transform duration-500 ${showPortfolio ? '' : 'rotate-180'}`} />
             </button>
           </div>
 
-          <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 overflow-hidden transition-all duration-1000 ease-in-out ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-            {initialPhotos.map((src, i) => (
-              <div key={i} className="aspect-square relative rounded-2xl overflow-hidden bg-black/20 border border-white/10 group cursor-pointer shadow-xl">
-                <Image
-                  src={src}
-                  alt={`Trabajo de barbería ${i + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  unoptimized
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#6D3294]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
-                  <span className="text-white font-bold opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
-                    Trabajo #{i + 1}
-                  </span>
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 sm:gap-2 overflow-hidden transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            {initialPhotos.map((src, i) => {
+              // Create irregular masonry-like pattern
+              const isLarge = i % 5 === 0;
+              const isWide = i % 7 === 0;
+              
+              return (
+                <div 
+                  key={i} 
+                  className={`relative overflow-hidden bg-black group cursor-pointer border border-white/[0.05] 
+                  ${isLarge ? 'md:row-span-2 md:col-span-2 h-[400px] md:h-auto aspect-[3/4] md:aspect-auto' : 
+                    isWide ? 'md:col-span-2 h-[300px]' : 'h-[300px]'}`}
+                >
+                  <Image
+                    src={src}
+                    alt={`Trabajo de barbería ${i + 1}`}
+                    fill
+                    className="object-cover grayscale opacity-60 group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[800ms] ease-out"
+                    unoptimized
+                  />
+                  
+                  {/* Brutalist Overlay Info */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                      <div>
+                        <p className="text-[#6D3294] font-bold text-[10px] tracking-[0.3em] uppercase mb-1">GENTLEMAN CUT</p>
+                        <h3 className="text-white font-oswald text-2xl uppercase tracking-wider leading-none">Style.{(i + 1).toString().padStart(2, '0')}</h3>
+                      </div>
+                      <span className="text-white/30 font-mono text-sm">2026</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
     )
