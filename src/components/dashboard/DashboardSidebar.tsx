@@ -33,7 +33,7 @@ export function DashboardSidebar({ role }: { role: string }) {
     }
 
     return (
-        <aside className="fixed bottom-0 left-0 right-0 h-16 bg-dash-panel border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:w-64 md:border-t-0 md:border-r flex md:flex-col justify-around md:justify-start md:p-8 md:space-y-12">
+        <aside className="fixed bottom-0 left-0 right-0 h-16 bg-dash-panel border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:w-64 md:border-t-0 md:border-r flex md:flex-col justify-between md:justify-start md:p-8 md:space-y-12">
             <div className="hidden md:block">
                 <h2 className="font-oswald text-2xl font-medium tracking-tight leading-none text-dash-text uppercase">
                     CLUB GENTLEMAN
@@ -43,7 +43,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                 </div>
             </div>
 
-            <nav className="flex md:flex-col w-full justify-around md:justify-start md:space-y-1 md:mb-auto relative">
+            <nav className="flex overflow-x-auto scrollbar-hide flex-nowrap md:flex-col w-full md:justify-start md:space-y-1 md:mb-auto relative items-center md:items-stretch px-2 md:px-0">
                 {NAV_ITEMS.map((item) => {
                     const isActive = pathname === item.href
                     const Icon = item.icon
@@ -53,7 +53,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                             href={item.href}
                             prefetch={true}
                             className={cn(
-                                "flex flex-col md:flex-row items-center justify-center md:justify-start md:px-4 md:py-3.5 transition-all gap-1 md:gap-4 relative group",
+                                "flex flex-col md:flex-row items-center justify-center md:justify-start px-4 md:px-4 py-3 md:py-3.5 transition-all gap-1 md:gap-4 relative group min-w-[64px] shrink-0",
                                 isActive
                                     ? "text-dash-text"
                                     : "text-dash-text-muted hover:text-dash-text-soft"
@@ -61,27 +61,25 @@ export function DashboardSidebar({ role }: { role: string }) {
                         >
                             {isActive && <span className="hidden md:block absolute left-0 w-1 h-full bg-dash-text"></span>}
                             <Icon className="w-5 h-5 md:w-4 md:h-4" />
-                            <span className="text-[9px] md:text-xs font-bold uppercase tracking-widest">{item.label}</span>
+                            <span className="text-[8px] md:text-[9px] lg:text-xs font-bold uppercase tracking-widest hidden md:block whitespace-nowrap">{item.label}</span>
                         </Link>
                     )
                 })}
                 
                 {/* Controles: Theme y Logout */}
-                <div className="flex flex-col gap-2 mt-auto md:mt-8 w-full">
-                    {/* Botón de Cerrar Sesión (Móvil y Desktop) */}
+                <div className="flex flex-row md:flex-col items-center gap-2 mt-0 md:mt-8 ml-auto md:ml-0 w-auto md:w-full shrink-0 pr-2 md:pr-0 border-l md:border-l-0 border-dash-border pl-2 md:pl-0">
+                    <div className="hidden md:flex w-full px-4 py-2">
+                        <ThemeToggle />
+                    </div>
+                    {/* Botón de Cerrar Sesión */}
                     <button
                         onClick={handleSignOut}
-                        className="flex flex-col md:flex-row items-center justify-center md:justify-start md:px-4 md:py-3.5 transition-all gap-1 md:gap-4 text-red-500/70 hover:text-red-500 group relative w-full"
+                        className="flex flex-col md:flex-row items-center justify-center md:justify-start px-4 md:px-4 py-3 md:py-3.5 transition-all gap-1 md:gap-4 text-red-500/70 hover:text-red-500 group relative w-full"
                     >
                         <span className="hidden md:block absolute left-0 w-0 h-full bg-red-500 transition-all group-hover:w-1"></span>
                         <LogOut className="w-5 h-5 md:w-4 md:h-4" />
-                        <span className="text-[9px] md:text-xs font-bold uppercase tracking-widest">Salir</span>
+                        <span className="text-[8px] md:text-[9px] lg:text-xs font-bold uppercase tracking-widest hidden md:block">Salir</span>
                     </button>
-                    
-                    {/* Botón de Tema (Móvil y Desktop) */}
-                    <div className="flex w-full md:px-4 md:py-2">
-                        <ThemeToggle />
-                    </div>
                 </div>
             </nav>
         </aside>
