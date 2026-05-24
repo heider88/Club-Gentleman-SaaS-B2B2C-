@@ -49,18 +49,11 @@ export default async function LandingPage() {
 
   return (
     <>
-      {/* Fondo Atmosférico "Midnight Velvet" */}
-      <div className="fixed inset-0 bg-black -z-20" />
+      {/* Fondo Fijo Degradado Restaurado */}
+      <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none" />
       
-      {/* Destellos radiales suaves simulando luz indirecta */}
-      <div className="fixed inset-0 opacity-40 -z-10 pointer-events-none" 
-           style={{
-             background: 'radial-gradient(circle at 50% -20%, rgba(109, 50, 148, 0.4) 0%, transparent 60%), radial-gradient(circle at 100% 80%, rgba(109, 50, 148, 0.15) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(0, 0, 0, 1) 0%, transparent 50%)'
-           }} 
-      />
-      
-      {/* Ruido SVG para textura táctil "Grainy" */}
-      <div className="fixed inset-0 opacity-[0.03] mix-blend-overlay -z-10 pointer-events-none"
+      {/* Mantenemos solo el Ruido SVG sutil para darle una textura premium al degradado */}
+      <div className="fixed inset-0 opacity-[0.04] mix-blend-overlay -z-10 pointer-events-none"
            style={{
              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
            }}
