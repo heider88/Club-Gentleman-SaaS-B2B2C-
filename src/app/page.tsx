@@ -58,8 +58,8 @@ export default async function LandingPage() {
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
         <div className="flex flex-col items-center gap-6 border-b border-white/20 pb-8">
           <div className="space-y-6 flex flex-col items-center text-center">
-            {/* Logo Centrado (Tamaño doble) */}
-            <div className="relative w-[95vw] sm:w-[56rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
+            {/* Logo Centrado (Tamaño doble, reducido 20%) */}
+            <div className="relative w-[76vw] sm:w-[45rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
               <Image
                 src="/lojito.png"
                 alt="Club Gentleman For Men Logo"

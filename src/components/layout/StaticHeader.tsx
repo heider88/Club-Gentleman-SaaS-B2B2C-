@@ -76,7 +76,7 @@ export function StaticHeader() {
                         }
                     }}
                 >
-                    <div className="relative w-24 h-12 lg:w-28 lg:h-14 overflow-hidden flex items-center justify-center">
+                    <div className="relative w-20 h-10 lg:w-[90px] lg:h-[45px] overflow-hidden flex items-center justify-center">
                         <Image
                             src="/scissors-logo.svg"
                             alt="Logo Club Gentleman"
