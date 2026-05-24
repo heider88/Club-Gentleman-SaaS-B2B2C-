@@ -75,7 +75,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             const [profileRes, appointmentsRes, blocksRes] = await Promise.all([
                 supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
                 supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
-                supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
+                supabase.from('availability_blocks').select('start_time, end_time, is_global').or(`barber_id.eq.${barberId},is_global.eq.true`).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
             ]);
 
             const settings = profileRes.data?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };

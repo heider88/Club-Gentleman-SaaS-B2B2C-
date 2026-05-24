@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { CalendarClock } from "lucide-react"
+import { ScheduleManager } from "@/components/dashboard/admin/ScheduleManager"
 
 export default async function SchedulesPage() {
     const supabase = await createClient()
@@ -25,6 +26,13 @@ export default async function SchedulesPage() {
         .eq('role', 'barber')
         .order('full_name', { ascending: true })
 
+    // Fetch future availability blocks
+    const { data: blocks } = await supabase
+        .from('availability_blocks')
+        .select('id, barber_id, start_time, end_time, reason, is_global, profiles(full_name)')
+        .gte('end_time', new Date().toISOString())
+        .order('start_time', { ascending: true })
+
     return (
         <div className="space-y-12 animate-in fade-in duration-700 max-w-6xl mx-auto pb-20">
             {/* Header */}
@@ -41,19 +49,7 @@ export default async function SchedulesPage() {
                 </div>
             </header>
 
-            {/* Construcción del módulo */}
-            <div className="w-full min-h-[400px] border border-dash-border bg-dash-panel/30 flex items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-50"></div>
-                <div className="text-center relative z-10 p-8">
-                    <span className="text-[100px] md:text-[140px] font-oswald font-black text-dash-text/[0.03] block leading-none pointer-events-none select-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">SYSTEM</span>
-                    <h3 className="font-oswald text-2xl uppercase tracking-widest text-dash-text mt-4 relative z-10">
-                        Configuración de Horario de Tienda y Bloqueos
-                    </h3>
-                    <p className="text-dash-text-soft font-jakarta text-sm mt-2 max-w-lg mx-auto relative z-10">
-                        Aquí se implementará el formulario estilo dossier para establecer las horas de apertura de todo el local, cerrar en festivos, y asignar permisos específicos a los barberos bloqueando sus agendas libremente.
-                    </p>
-                </div>
-            </div>
+            <ScheduleManager barbers={barbers || []} existingBlocks={blocks || []} />
         </div>
     )
 }

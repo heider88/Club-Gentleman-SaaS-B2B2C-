@@ -93,7 +93,30 @@ export async function deleteEmployee(userId: string) {
     }
 }
 
-// -- NUEVO: Gestión de Servicios del Barbero saltando RLS --
+// -- NUEVO: Gestión de Bloqueos de Agenda y Horario de Tienda --
+
+export async function createAvailabilityBlock(payload: { barber_id: string | null, start_time: string, end_time: string, reason: string | null, is_global: boolean }) {
+    await requireAdmin();
+    const adminClient = createAdminClient();
+    
+    // Si es global, forzamos barber_id a nulo para que aplique a toda la tienda (si la lógica BD lo soporta así, o creamos un flag)
+    const { data, error } = await adminClient.from('availability_blocks').insert([payload]).select().single();
+    
+    if (error) return { error: error.message };
+    revalidatePath('/dashboard/admin/schedules');
+    return { success: true, data };
+}
+
+export async function deleteAvailabilityBlock(blockId: string) {
+    await requireAdmin();
+    const adminClient = createAdminClient();
+    
+    const { error } = await adminClient.from('availability_blocks').delete().eq('id', blockId);
+    
+    if (error) return { error: error.message };
+    revalidatePath('/dashboard/admin/schedules');
+    return { success: true };
+}
 
 export async function manageBarberService(action: 'add' | 'delete' | 'update', payload: any) {
     await requireAdmin();
