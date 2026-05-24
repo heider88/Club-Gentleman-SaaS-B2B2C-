@@ -3,7 +3,7 @@ import { Star, MapPin, Clock, Instagram, Facebook, ChevronUp } from "lucide-reac
 import dynamic from "next/dynamic"
 import Image from "next/image"
 
-const BookingWizard = dynamic(() => import("@/components/booking/BookingWizard"), { ssr: false })
+const BookingWizard = dynamic(() => import("@/components/booking/BookingWizard"))
 const BarbersList = dynamic(() => import("@/components/home/BarbersList"))
 const GallerySection = dynamic(() => import("@/components/home/GallerySection").then(mod => mod.GallerySection))
 
