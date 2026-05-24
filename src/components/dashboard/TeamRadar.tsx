@@ -43,7 +43,7 @@ export function TeamRadar({ currentUserId }: { currentUserId: string }) {
                 .select('barber_id, start_time, end_time')
                 .gte('start_time', todayStart)
                 .lte('start_time', todayEnd)
-                .in('status', ['pending', 'in_progress'])
+                .in('status', ['pending', 'confirmed'])
 
             // 3. Mapear estado
             const mappedTeam = barbers.map(barber => {
