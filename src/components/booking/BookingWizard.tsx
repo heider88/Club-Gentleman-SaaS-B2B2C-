@@ -67,7 +67,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
 
             {/* Step 1: Barber */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 1 ? 'w-[300px] sm:w-[350px]' : 'w-[200px]'}`}>
+            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-[300px] sm:w-[350px]' : 'w-[200px]'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 1 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 1 ? <Check className="w-5 h-5" /> : 1}
@@ -102,7 +102,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 2: Service */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 2 ? 'w-[300px] sm:w-[350px]' : step > 2 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 2 ? 'w-[300px] sm:w-[350px]' : step > 2 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 2 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 2 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 2 ? <Check className="w-5 h-5" /> : 2}
@@ -142,7 +142,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 3: Time Slot */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 3 ? 'w-[300px] sm:w-[350px]' : step > 3 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 3 ? 'w-[300px] sm:w-[350px]' : step > 3 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 3 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 3 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 3 ? <Check className="w-5 h-5" /> : 3}
@@ -183,7 +183,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 4: Contact Form */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-700 ease-in-out ${step === 4 ? 'w-[300px] sm:w-[350px]' : step > 4 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 4 ? 'w-[300px] sm:w-[350px]' : step > 4 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 4 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 4 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 4 ? <Check className="w-5 h-5" /> : 4}

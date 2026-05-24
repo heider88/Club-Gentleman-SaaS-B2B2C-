@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useMemo, useRef } from "react"
+import { useEffect, useState, useMemo, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { format, isAfter, isBefore, addMinutes, startOfDay, endOfDay, isSameDay, addDays } from "date-fns"
 import { es } from "date-fns/locale"
@@ -10,6 +10,14 @@ import { cn } from "@/lib/utils"
 interface TimeSlot {
     time: string;
     available: boolean;
+}
+
+interface ScheduleSettings {
+    startHour: number;
+    endHour: number;
+    lunchStart: number;
+    lunchEnd: number;
+    workDays: number[];
 }
 
 interface CalendarViewProps {
@@ -25,6 +33,11 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
     const [selectedDate, setSelectedDate] = useState<Date>(initialDate || new Date())
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+    // Preloaded Data State
+    const [scheduleSettings, setScheduleSettings] = useState<ScheduleSettings | null>(null)
+    const [allAppointments, setAllAppointments] = useState<any[]>([])
+    const [allBlocks, setAllBlocks] = useState<any[]>([])
+
     const scrollLeft = () => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' })
@@ -37,7 +50,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         }
     }
 
-    // Fechas siguientes
+    // Fechas siguientes (14 días)
     const days = useMemo(() => {
         const daysArr = []
         for (let i = 0; i < 14; i++) {
@@ -46,109 +59,111 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         return daysArr
     }, [])
 
+    // 1. PRE-CARGAR TODOS LOS DATOS (Solo se ejecuta 1 vez cuando el componente monta o cambia el barbero)
     useEffect(() => {
-        if (!barberId || !selectedDate) return;
+        if (!barberId) return;
 
-        async function fetchAvailability() {
+        async function preloadData() {
             setLoading(true);
             const supabase = createClient();
+            
+            // Calculamos el rango desde hoy hasta 14 días adelante
+            const startRangeStr = startOfDay(new Date()).toISOString();
+            const endRangeStr = endOfDay(addDays(new Date(), 14)).toISOString();
 
-            // 1. Fetch barber profile for schedule settings
-            const { data: profile } = await supabase.from('profiles').select('schedule_settings').eq('id', barberId).single();
-            const settings = profile?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
+            // Promise.all para ejecutar consultas concurrentes
+            const [profileRes, appointmentsRes, blocksRes] = await Promise.all([
+                supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
+                supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
+                supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
+            ]);
 
-            // 2. Fetch existing appointments
-            const startStr = startOfDay(selectedDate).toISOString();
-            const endStr = endOfDay(selectedDate).toISOString();
-
-            const { data: appointmentsRes } = await supabase.from('appointments')
-                .select('start_time, end_time, status')
-                .eq('barber_id', barberId)
-                .gte('start_time', startStr)
-                .lte('start_time', endStr);
-
-            // 3. Fetch availability blocks
-            const { data: blocksRes } = await supabase.from('availability_blocks')
-                .select('start_time, end_time')
-                .eq('barber_id', barberId)
-                .gte('start_time', startStr)
-                .lte('start_time', endStr);
-
-            const activeAppointments = (appointmentsRes || []).filter(a => a.status !== 'cancelled')
-            const blocks = blocksRes || [];
-
-            // Helper to check collision
-            const isColliding = (slotStart: Date, slotEnd: Date) => {
-                // Check lunch
-                const lunchStart = new Date(selectedDate);
-                lunchStart.setHours(settings.lunchStart, 0, 0, 0);
-                const lunchEnd = new Date(selectedDate);
-                lunchEnd.setHours(settings.lunchEnd, 0, 0, 0);
-
-                if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true; // Colisiona con almuerzo
-
-                // Check appointments
-                for (const appt of activeAppointments) {
-                    const apptStart = new Date(appt.start_time);
-                    const apptEnd = new Date(appt.end_time);
-                    if (isBefore(slotStart, apptEnd) && isAfter(slotEnd, apptStart)) return true;
-                }
-
-                // Check blocks
-                for (const block of blocks) {
-                    const blkStart = new Date(block.start_time);
-                    const blkEnd = new Date(block.end_time);
-                    if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
-                }
-
-                // Check if in past (if today)
-                if (isSameDay(selectedDate, new Date()) && isBefore(slotStart, new Date())) return true;
-
-                return false;
-            }
-
-            // Generate slots
-            let current = new Date(selectedDate);
-            current.setHours(settings.startHour, 0, 0, 0);
-            const endTime = new Date(selectedDate);
-            endTime.setHours(settings.endHour, 0, 0, 0);
-
-            const dayOfWeek = selectedDate.getDay(); // 0 is Sunday
-            // if day not in workdays, no slots
-            if (!settings.workDays.includes(dayOfWeek)) {
-                setSlots([]);
-                setLoading(false);
-                return;
-            }
-
-            const generatedSlots: TimeSlot[] = [];
-            while (isBefore(current, endTime) || current.getTime() === endTime.getTime()) {
-                const slotStart = new Date(current);
-                const slotEnd = addMinutes(current, durationMinutes);
-
-                // If adding duration passes the end of the day, mark unavailable or stop
-                if (isAfter(slotEnd, endTime)) {
-                    break;
-                }
-
-                // format time e.g., '09:00 AM'
-                const timeStr = format(slotStart, 'h:mm a');
-
-                generatedSlots.push({
-                    time: timeStr,
-                    available: !isColliding(slotStart, slotEnd)
-                })
-
-                // advance by 15 mins to maximize schedule packing
-                current = addMinutes(current, 15);
-            }
-
-            setSlots(generatedSlots)
-            setLoading(false)
+            const settings = profileRes.data?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
+            
+            setScheduleSettings(settings);
+            setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
+            setAllBlocks(blocksRes.data || []);
+            setLoading(false);
         }
 
-        fetchAvailability()
-    }, [barberId, selectedDate, durationMinutes])
+        preloadData();
+    }, [barberId]);
+
+    // 2. CALCULAR SLOTS (Síncrono e instantáneo cuando cambia la fecha)
+    const calculateSlots = useCallback(() => {
+        if (!scheduleSettings || !selectedDate) return;
+
+        // Filtrar datos pre-cargados solo para el día seleccionado
+        const dayAppointments = allAppointments.filter(a => isSameDay(new Date(a.start_time), selectedDate));
+        const dayBlocks = allBlocks.filter(b => isSameDay(new Date(b.start_time), selectedDate));
+
+        const isColliding = (slotStart: Date, slotEnd: Date) => {
+            // Check lunch
+            const lunchStart = new Date(selectedDate);
+            lunchStart.setHours(scheduleSettings.lunchStart, 0, 0, 0);
+            const lunchEnd = new Date(selectedDate);
+            lunchEnd.setHours(scheduleSettings.lunchEnd, 0, 0, 0);
+
+            if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
+
+            // Check appointments
+            for (const appt of dayAppointments) {
+                const apptStart = new Date(appt.start_time);
+                const apptEnd = new Date(appt.end_time);
+                if (isBefore(slotStart, apptEnd) && isAfter(slotEnd, apptStart)) return true;
+            }
+
+            // Check blocks
+            for (const block of dayBlocks) {
+                const blkStart = new Date(block.start_time);
+                const blkEnd = new Date(block.end_time);
+                if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
+            }
+
+            // Check if in past (if today)
+            if (isSameDay(selectedDate, new Date()) && isBefore(slotStart, new Date())) return true;
+
+            return false;
+        }
+
+        let current = new Date(selectedDate);
+        current.setHours(scheduleSettings.startHour, 0, 0, 0);
+        const endTime = new Date(selectedDate);
+        endTime.setHours(scheduleSettings.endHour, 0, 0, 0);
+
+        const dayOfWeek = selectedDate.getDay();
+        if (!scheduleSettings.workDays.includes(dayOfWeek)) {
+            setSlots([]);
+            return;
+        }
+
+        const generatedSlots: TimeSlot[] = [];
+        while (isBefore(current, endTime) || current.getTime() === endTime.getTime()) {
+            const slotStart = new Date(current);
+            const slotEnd = addMinutes(current, durationMinutes);
+
+            if (isAfter(slotEnd, endTime)) {
+                break;
+            }
+
+            const timeStr = format(slotStart, 'h:mm a');
+            generatedSlots.push({
+                time: timeStr,
+                available: !isColliding(slotStart, slotEnd)
+            })
+
+            current = addMinutes(current, 15);
+        }
+
+        setSlots(generatedSlots)
+    }, [selectedDate, durationMinutes, scheduleSettings, allAppointments, allBlocks]);
+
+    useEffect(() => {
+        if (!loading && scheduleSettings) {
+            // We use setTimeout to defer state update to next tick to avoid cascading renders warning
+            setTimeout(() => calculateSlots(), 0);
+        }
+    }, [selectedDate, loading, calculateSlots, scheduleSettings]);
 
     if (loading) {
         return <div className="text-white/50 text-sm animate-pulse p-4 text-center">Calculando disponibilidad...</div>
