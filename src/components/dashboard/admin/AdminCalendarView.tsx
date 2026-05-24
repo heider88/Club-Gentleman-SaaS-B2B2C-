@@ -32,7 +32,7 @@ type BarberColumn = {
     appointments: AppointmentWithService[];
 }
 
-export function AdminCalendarView({ appointments, userRole, selectedDate = new Date() }: { appointments: AppointmentWithService[], userRole: string, selectedDate?: Date }) {
+export function AdminCalendarView({ appointments, userRole, selectedDate = new Date(), barbersList = [] }: { appointments: AppointmentWithService[], userRole: string, selectedDate?: Date, barbersList?: any[] }) {
     const [selectedAppt, setSelectedAppt] = useState<AppointmentWithService | null>(null)
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -45,6 +45,20 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
         const colors = ['bg-pink-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'bg-indigo-500', 'bg-cyan-500'];
         let colorIdx = 0;
         
+        // Primero poblamos con la lista completa de barberos que viene del servidor
+        barbersList.forEach(b => {
+            if (!map.has(b.id)) {
+                map.set(b.id, {
+                    id: b.id,
+                    name: b.full_name || 'Barbero',
+                    avatar: b.avatar_url || '',
+                    color: colors[colorIdx % colors.length]
+                });
+                colorIdx++;
+            }
+        });
+
+        // Fallback por si hay citas de un barbero que no vino en barbersList (eliminado o inactivo)
         appointments.forEach(appt => {
             if (!appt.barber_id || map.has(appt.barber_id)) return;
             map.set(appt.barber_id, {
@@ -56,7 +70,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
             colorIdx++;
         });
         return Array.from(map.values());
-    }, [appointments]);
+    }, [appointments, barbersList]);
 
     // Initial state: all barbers selected
     const [selectedBarbers, setSelectedBarbers] = useState<string[]>(allBarbers.map(b => b.id));
@@ -153,9 +167,10 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
     // Renderizado según la vista
     const renderDailyView = () => {
-        if (barberColumns.length === 0) {
+        if (filteredAppointments.length === 0) {
             return (
-                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1">
+                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1 flex flex-col items-center justify-center">
+                    <p className="font-oswald text-4xl text-dash-text-soft/20 uppercase font-black mb-4">00</p>
                     <p className="font-oswald text-2xl text-dash-text-soft uppercase">Agenda Vacía</p>
                     <p className="text-xs font-bold uppercase tracking-widest text-dash-text-muted mt-2">No hay citas registradas para este día.</p>
                 </div>
@@ -263,7 +278,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
         if (filteredAppointments.length === 0) {
             return (
-                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1">
+                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1 flex flex-col items-center justify-center">
+                    <p className="font-oswald text-4xl text-dash-text-soft/20 uppercase font-black mb-4">00</p>
                     <p className="font-oswald text-2xl text-dash-text-soft uppercase">Agenda Vacía</p>
                     <p className="text-xs font-bold uppercase tracking-widest text-dash-text-muted mt-2">No hay citas registradas para esta semana.</p>
                 </div>
