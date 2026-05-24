@@ -32,6 +32,7 @@ interface AppointmentRecord {
     id: string
     start_time: string
     customer_name: string
+    customer_phone?: string
     barber_id: string
     status: string
     profiles: { full_name: string } | null
@@ -62,7 +63,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
 
             const { data, error } = await supabase
                 .from('appointments')
-                .select('id, start_time, customer_name, barber_id, status, profiles(full_name), services(name, price, duration_minutes)')
+                .select('id, start_time, customer_name, customer_phone, barber_id, status, profiles(full_name), services(name, price, duration_minutes)')
                 .gte('start_time', startDate.toISOString())
                 .lte('start_time', endDate.toISOString())
 
