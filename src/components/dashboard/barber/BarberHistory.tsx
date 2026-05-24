@@ -26,6 +26,7 @@ interface AppointmentRecord {
 export function BarberHistory({ barberId, barberName, commissionPercentage }: { barberId: string, barberName: string, commissionPercentage: number }) {
     const supabase = createClient()
     const [filter, setFilter] = useState<FilterType>('daily')
+    const [apptStatus, setApptStatus] = useState<'completed' | 'cancelled'>('completed')
     const [appointments, setAppointments] = useState<AppointmentRecord[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -62,7 +63,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                     services(name, price)
                 `)
                 .eq('barber_id', barberId)
-                .eq('status', 'completed')
+                .eq('status', apptStatus)
                 .gte('start_time', startStr)
                 .lte('start_time', endStr)
                 .order('start_time', { ascending: false })
@@ -76,7 +77,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         }
         
         fetchHistoryData()
-    }, [filter, barberId, supabase])
+    }, [filter, apptStatus, barberId, supabase])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
@@ -130,16 +131,22 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-card/90 backdrop-blur-md border border-border p-2 rounded-2xl">
-                <div className="flex w-full sm:w-auto p-1 bg-black/40 rounded-xl">
-                    {(['daily', 'weekly', 'monthly'] as FilterType[]).map(f => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === f ? 'bg-primary text-primary-foreground shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-                        >
-                            {f === 'daily' ? 'Diario' : f === 'weekly' ? 'Semanal' : 'Mensual'}
-                        </button>
-                    ))}
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="flex p-1 bg-black/40 rounded-xl">
+                        {(['daily', 'weekly', 'monthly'] as FilterType[]).map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setFilter(f)}
+                                className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === f ? 'bg-primary text-primary-foreground shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+                            >
+                                {f === 'daily' ? 'Diario' : f === 'weekly' ? 'Semanal' : 'Mensual'}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex p-1 bg-black/40 rounded-xl">
+                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${apptStatus === 'completed' ? 'bg-green-500/20 text-green-400 shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Completados</button>
+                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${apptStatus === 'cancelled' ? 'bg-red-500/20 text-red-400 shadow-md' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Cancelados</button>
+                    </div>
                 </div>
                 
                 <button 
@@ -165,14 +172,18 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                 <div className="bg-card border border-white/5 rounded-2xl p-6 relative overflow-hidden group sm:col-span-2">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all" />
                     <div className="flex justify-between items-start mb-2 relative z-10">
-                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">Tu Ganancia Neta ({commissionPercentage}%)</span>
+                        <span className="text-white/60 text-sm font-bold uppercase tracking-wider">
+                            {apptStatus === 'completed' ? `Tu Ganancia Neta (${commissionPercentage}%)` : 'Ingresos Perdidos'}
+                        </span>
                         <div className="p-2 bg-green-500/20 rounded-xl"><Banknote className="w-5 h-5 text-green-400" /></div>
                     </div>
                     <div className="flex items-baseline gap-2 relative z-10">
-                        <h3 className="text-4xl font-black text-green-400">
-                            {loading ? '...' : formatCurrency(barberCut)}
+                        <h3 className={`text-4xl font-black ${apptStatus === 'completed' ? 'text-green-400' : 'text-red-400'}`}>
+                            {loading ? '...' : formatCurrency(apptStatus === 'completed' ? barberCut : totalRevenue)}
                         </h3>
-                        <span className="text-sm font-medium text-white/40 line-through decoration-white/20">De {formatCurrency(totalRevenue)} prod. total</span>
+                        {apptStatus === 'completed' && (
+                            <span className="text-sm font-medium text-white/40 line-through decoration-white/20">De {formatCurrency(totalRevenue)} prod. total</span>
+                        )}
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Clock, Contact, Banknote, CheckCircle2, Ban, Phone } from "lucide-react"
+import { Clock, Contact, Banknote, CheckCircle2, Ban, Phone, UserX } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -28,6 +28,7 @@ type AppointmentWithService = {
 export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithService, userRole: string }) {
     const [status, setStatus] = useState(appt.status)
     const [loading, setLoading] = useState(false)
+    const [showCancelModal, setShowCancelModal] = useState(false)
     const supabase = createClient()
     const router = useRouter()
 
@@ -137,21 +138,31 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             </div>
 
             {isPending && (
-                <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+                <div className="flex items-center gap-2 pt-3 border-t border-white/5 relative">
                     <button 
                         onClick={() => updateStatus('completed')}
                         className="flex-1 flex justify-center items-center gap-2 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/50 rounded-xl text-sm font-bold transition-all"
                     >
                         <CheckCircle2 className="w-4 h-4" /> Completar
                     </button>
-                    {isAdmin && (
-                        <button 
-                            onClick={() => updateStatus('cancelled')}
-                            className="flex justify-center items-center p-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/20 hover:border-destructive/50 rounded-xl transition-all"
-                            title="Cancelar cita (Solo Admin)"
-                        >
-                            <Ban className="w-4 h-4" />
-                        </button>
+                    
+                    {/* Botón No Asistió */}
+                    <button 
+                        onClick={() => setShowCancelModal(true)}
+                        className="flex-1 flex justify-center items-center gap-2 py-2 bg-destructive/10 hover:bg-destructive/20 text-red-400 border border-destructive/20 hover:border-destructive/50 rounded-xl text-sm font-bold transition-all"
+                    >
+                        <UserX className="w-4 h-4" /> No Asistió
+                    </button>
+
+                    {/* Modal Mini Glassmorphism */}
+                    {showCancelModal && (
+                        <div className="absolute bottom-[110%] left-0 w-full bg-black/90 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl z-20 animate-in zoom-in-95 duration-200">
+                            <p className="text-sm text-white/90 font-medium mb-3 text-center">¿Seguro que el cliente no llegó?</p>
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowCancelModal(false)} className="flex-1 py-1.5 text-xs text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors">Volver</button>
+                                <button onClick={() => { setShowCancelModal(false); updateStatus('cancelled'); }} className="flex-1 py-1.5 text-xs text-white bg-destructive hover:bg-red-600 rounded-lg font-bold transition-colors shadow-lg shadow-red-500/20">Sí, cancelar</button>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}

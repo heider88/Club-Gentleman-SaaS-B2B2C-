@@ -5,6 +5,7 @@ import { es } from "date-fns/locale"
 import { CalendarX2, CalendarDays } from "lucide-react"
 import { AppointmentCard } from "@/components/dashboard/AppointmentCard"
 import { InternalBookingModal } from "@/components/dashboard/InternalBookingModal"
+import { TeamRadar } from "@/components/dashboard/TeamRadar"
 
 // Types helpers for nested query
 type AppointmentWithService = {
@@ -109,6 +110,9 @@ export default async function DashboardPage() {
                     <InternalBookingModal barberId={user.id} />
                 )}
             </header>
+
+            {/* Radar del Equipo (Solo visible para barberos que quieren ver a sus compañeros o admin) */}
+            <TeamRadar currentUserId={user.id} />
 
             {/* Citas del Día */}
             <section className="space-y-6">
