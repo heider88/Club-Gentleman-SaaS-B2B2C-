@@ -31,7 +31,7 @@ type BarberColumn = {
     appointments: AppointmentWithService[];
 }
 
-export function AdminCalendarView({ appointments, userRole }: { appointments: AppointmentWithService[], userRole: string }) {
+export function AdminCalendarView({ appointments, userRole, selectedDate = new Date() }: { appointments: AppointmentWithService[], userRole: string, selectedDate?: Date }) {
     const [selectedAppt, setSelectedAppt] = useState<AppointmentWithService | null>(null)
 
     // 1. Calcular el rango horario dinámico basado en las citas del día
@@ -79,7 +79,7 @@ export function AdminCalendarView({ appointments, userRole }: { appointments: Ap
 
     // Generar los "ticks" de tiempo (cada 30 min)
     const timeSlots = []
-    const baseDate = startOfDay(new Date())
+    const baseDate = startOfDay(selectedDate)
     for (let h = startHour; h <= endHour; h++) {
         timeSlots.push(addMinutes(baseDate, h * 60))
         if (h < endHour) {
