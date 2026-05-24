@@ -133,30 +133,43 @@ export default async function LandingPage() {
         <div className="w-full max-w-4xl mx-auto space-y-12">
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-black text-white/90 uppercase tracking-widest">Sobre Nosotros</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-white/90 uppercase tracking-widest relative z-10">
+              <span className="absolute -top-12 -left-10 text-[120px] text-white/[0.03] select-none pointer-events-none tracking-tighter hidden md:block">01</span>
+              Sobre Nosotros
+            </h2>
             <div>
-              <span className="inline-block border border-white/10 border-t-white/20 bg-black/40 backdrop-blur-xl text-white/80 text-[10px] font-black px-4 py-2 rounded-full mb-8 tracking-[0.2em] uppercase shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+              <span className="inline-block border border-white/10 border-t-white/20 bg-black/40 backdrop-blur-xl text-white/80 text-[10px] font-black px-4 py-2 rounded-full mb-8 tracking-[0.2em] uppercase shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-10">
                 La Experiencia
               </span>
             </div>
 
-            <div className="text-white/70 space-y-6 text-[15px] leading-relaxed max-w-2xl font-medium">
-              <p>
-                <strong className="text-white">GENTLEMAN | Barbería & Club</strong> para Hombres con más de 7 años de experiencia.
-                No somos solo una barbería. En GENTLEMAN, cada visita es una experiencia.
-                Aquí, los cortes de alta precisión se combinan con un espacio pensado para el hombre moderno: un club donde el estilo, el cuidado personal y la actitud se encuentran.
-              </p>
+            <div className="relative z-10 flex flex-col md:flex-row gap-10 md:gap-16">
+              {/* Drop Cap & Intro */}
+              <div className="text-white/70 text-lg leading-relaxed font-medium md:w-1/2">
+                <p className="first-letter:text-7xl first-letter:font-oswald first-letter:text-[#6D3294] first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-line:uppercase first-line:tracking-widest">
+                  GENTLEMAN | Barbería & Club para Hombres con más de 7 años de experiencia.
+                  No somos solo una barbería. En GENTLEMAN, cada visita es una experiencia inmersiva.
+                  Aquí, los cortes de alta precisión se combinan con un espacio pensado para el hombre moderno.
+                </p>
+              </div>
 
-              <p>Descubrí nuestra selección de artículos para hombres:</p>
-              <ul className="list-disc pl-6 space-y-1 text-white/90">
-                <li>Productos de cuidado masculino</li>
-                <li>Camisetas, gorras, relojes y joyas</li>
-                <li>Ceras, aceites, fragancias exclusivas</li>
-              </ul>
-
-              <p>Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero.</p>
-
-              <p className="font-bold text-white pt-2">GENTLEMAN - Más que estilo, una actitud de caballeros.</p>
+              {/* List & Pull Quote */}
+              <div className="md:w-1/2 border-l border-white/[0.05] pl-0 md:pl-10 space-y-8 flex flex-col justify-center">
+                <div>
+                  <p className="text-white/50 text-sm uppercase tracking-widest font-bold mb-4">Descubrí nuestra selección:</p>
+                  <ul className="space-y-3 text-white/80 font-medium text-[15px]">
+                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Productos de cuidado masculino</li>
+                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Camisetas, gorras, relojes y joyas</li>
+                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Ceras, aceites, fragancias exclusivas</li>
+                  </ul>
+                </div>
+                
+                <blockquote className="border-l-2 border-pink-500 pl-6 py-2">
+                  <p className="text-xl md:text-2xl font-oswald text-white/90 italic tracking-wide">
+                    "Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero."
+                  </p>
+                </blockquote>
+              </div>
             </div>
           </div>
 
@@ -181,10 +194,14 @@ export default async function LandingPage() {
         <BarbersList barbers={barbers} />
 
         {/* Location Section */}
-        <section id="ubicacion" className="w-full max-w-screen-xl mx-auto pt-10">
-          <div className="flex items-center gap-3 mb-6">
-            <MapPin className="w-8 h-8 text-pink-400 drop-shadow-md" />
-            <h2 className="text-3xl font-black text-white uppercase tracking-wider">Ubicación</h2>
+        <section id="ubicacion" className="w-full max-w-screen-xl mx-auto pt-20 relative">
+          <span className="absolute -top-6 right-0 text-[100px] text-white/[0.03] font-oswald select-none pointer-events-none tracking-tighter hidden md:block text-right">FIND US</span>
+          
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12 relative z-10">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-black text-white/90 uppercase tracking-widest">Ubicación</h2>
+              <div className="w-20 h-1 bg-[#6D3294] mt-6"></div>
+            </div>
           </div>
 
           <div className="flex flex-col md:flex-row gap-8 items-center bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">

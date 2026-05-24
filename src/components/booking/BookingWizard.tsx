@@ -61,10 +61,13 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
     return (
         <div
             ref={scrollContainerRef}
-            className="w-full relative py-2 overflow-x-auto pb-8 snap-x snap-mandatory flex items-start gap-4"
+            className="w-full relative py-2 overflow-x-auto pb-8 snap-x snap-mandatory flex items-start gap-4 group/wizard"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
+            
+            {/* Spotlight magnético dinámico en el wizard */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#6D3294]/0 via-pink-500/5 to-[#6D3294]/0 opacity-0 group-hover/wizard:opacity-100 transition-opacity duration-1000 pointer-events-none -z-10" />
 
             {/* Step 1: Barber */}
             <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-[300px] sm:w-[350px]' : 'w-[200px]'}`}>
