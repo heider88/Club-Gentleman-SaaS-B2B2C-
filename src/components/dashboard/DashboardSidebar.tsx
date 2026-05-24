@@ -39,7 +39,7 @@ export function DashboardSidebar({ role }: { role: string }) {
         router.refresh()
     }
 
-    const isFinanzasActive = pathname === "/dashboard/admin/finanzas";
+    const isFinanzasActive = pathname === "/dashboard/reports";
     const currentTab = searchParams.get('tab') || 'ventas-resumen';
 
     return (
@@ -144,7 +144,7 @@ export function DashboardSidebar({ role }: { role: string }) {
 
                             {/* Versión Móvil del Botón Padre */}
                             <Link
-                                href="/dashboard/admin/finanzas"
+                                href="/dashboard/reports"
                                 className={cn(
                                     "flex md:hidden flex-col items-center justify-center px-4 py-3 transition-all gap-1 relative group min-w-[64px] shrink-0",
                                     isFinanzasActive ? "text-dash-text" : "text-dash-text-muted"
@@ -171,7 +171,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                                     ].map(sub => (
                                         <Link 
                                             key={sub.tab} 
-                                            href={`/dashboard/admin/finanzas?tab=${sub.tab}`}
+                                            href={`/dashboard/reports?tab=${sub.tab}`}
                                             className={cn(
                                                 "text-[9px] font-bold uppercase tracking-widest py-1.5 px-3 rounded-md transition-all relative flex items-center group",
                                                 isFinanzasActive && currentTab === sub.tab 
@@ -196,7 +196,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                                     ].map(sub => (
                                         <Link 
                                             key={sub.tab} 
-                                            href={`/dashboard/admin/finanzas?tab=${sub.tab}`}
+                                            href={`/dashboard/reports?tab=${sub.tab}`}
                                             className={cn(
                                                 "text-[9px] font-bold uppercase tracking-widest py-1.5 px-3 rounded-md transition-all relative flex items-center group",
                                                 isFinanzasActive && currentTab === sub.tab 
@@ -219,7 +219,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                                     ].map(sub => (
                                         <Link 
                                             key={sub.tab} 
-                                            href={`/dashboard/admin/finanzas?tab=${sub.tab}`}
+                                            href={`/dashboard/reports?tab=${sub.tab}`}
                                             className={cn(
                                                 "text-[9px] font-bold uppercase tracking-widest py-1.5 px-3 rounded-md transition-all relative flex items-center group",
                                                 isFinanzasActive && currentTab === sub.tab 
