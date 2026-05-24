@@ -10,7 +10,7 @@ type Customer = {
     lastVisit: string;
 }
 
-export function CustomersList({ barberId }: { barberId: string }) {
+export function CustomersList({ barberId, isAdmin = false }: { barberId?: string, isAdmin?: boolean }) {
     const [searchTerm, setSearchTerm] = useState("")
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(true)
@@ -20,13 +20,17 @@ export function CustomersList({ barberId }: { barberId: string }) {
         async function fetchCustomers() {
             setLoading(true)
             
-            // Traemos todas las citas completadas de este barbero
-            const { data, error } = await supabase
+            let query = supabase
                 .from('appointments')
                 .select('customer_name, customer_phone, start_time')
-                .eq('barber_id', barberId)
                 .eq('status', 'completed')
-                .order('start_time', { ascending: false })
+                .order('start_time', { ascending: false });
+                
+            if (!isAdmin && barberId) {
+                query = query.eq('barber_id', barberId);
+            }
+
+            const { data, error } = await query;
 
             if (!error && data) {
                 // Agrupar por teléfono o nombre
@@ -57,7 +61,7 @@ export function CustomersList({ barberId }: { barberId: string }) {
         }
         
         fetchCustomers()
-    }, [barberId, supabase])
+    }, [barberId, isAdmin, supabase])
 
     const filtered = customers.filter(c => 
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -70,7 +74,7 @@ export function CustomersList({ barberId }: { barberId: string }) {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b-2 border-dash-text pb-6">
                 <div className="flex-1">
                     <h1 className="font-oswald text-6xl md:text-7xl font-black text-dash-text uppercase tracking-tighter leading-none">
-                        Dossier<br/><span className="text-dash-text-muted">Clientes</span>
+                        {isAdmin ? 'Directorio' : 'Dossier'}<br/><span className="text-dash-text-muted">Clientes</span>
                     </h1>
                 </div>
                 

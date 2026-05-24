@@ -33,7 +33,7 @@ type AppointmentWithService = {
     } | null;
 }
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ date?: string, view?: string }> }) {
     // 1. Iniciar cliente seguro del Server
     const supabase = await createClient()
 
@@ -73,9 +73,38 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     const startStr = startOfDay(selectedDate).toISOString()
     const endStr = endOfDay(selectedDate).toISOString()
 
-    // 5. Consulta Supabase con Joins y Ordenamiento vía RLS Segura
-    // OJO: Si eres 'admin', esta RLS en BD ahora te permitirá ver TODAS las citas si lo configuras así,
-    // pero por ahora filtramos por el barber_id para ver la agenda propia o la general si removemos el eq()
+    // 5. Consulta Supabase
+    // OJO: Si eres 'admin', mostramos las citas de TODOS los barberos.
+    // Además, el admin puede tener un filtro extra `view` para día/semana/mes.
+    const view = params.view || 'daily';
+    let queryStart = startStr;
+    let queryEnd = endStr;
+
+    if (userRole === 'admin') {
+        if (view === 'weekly') {
+            // Asume que la semana empieza el lunes (1)
+            const d = new Date(selectedDate);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+            const monday = new Date(d.setDate(diff));
+            monday.setHours(0,0,0,0);
+            
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23,59,59,999);
+            
+            queryStart = monday.toISOString();
+            queryEnd = sunday.toISOString();
+        } else if (view === 'monthly') {
+            const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+            const lastDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+            lastDay.setHours(23,59,59,999);
+            
+            queryStart = firstDay.toISOString();
+            queryEnd = lastDay.toISOString();
+        }
+    }
+
     let query = supabase
         .from('appointments')
         .select(`
@@ -96,8 +125,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 price
             )
         `)
-        .gte('start_time', startStr)
-        .lte('start_time', endStr)
+        .gte('start_time', queryStart)
+        .lte('start_time', queryEnd)
         .neq('status', 'cancelled')
         .order('start_time', { ascending: true })
         
