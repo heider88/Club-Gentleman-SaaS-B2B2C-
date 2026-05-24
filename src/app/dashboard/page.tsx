@@ -9,6 +9,8 @@ import { TeamRadar } from "@/components/dashboard/TeamRadar"
 
 import { DashboardTimeline } from "@/components/dashboard/DashboardTimeline"
 
+import { AdminCalendarView } from "@/components/dashboard/admin/AdminCalendarView"
+
 // Types helpers for nested query
 type AppointmentWithService = {
     id: string;
@@ -17,6 +19,11 @@ type AppointmentWithService = {
     customer_name: string;
     customer_phone: string;
     status: string;
+    barber_id: string;
+    profiles?: {
+        full_name: string;
+        avatar_url: string | null;
+    } | null;
     services: {
         name: string;
         duration_minutes: number;
@@ -64,7 +71,8 @@ export default async function DashboardPage() {
             status,
             barber_id,
             profiles (
-                full_name
+                full_name,
+                avatar_url
             ),
             services (
                 name,
@@ -144,6 +152,8 @@ export default async function DashboardPage() {
                             Aún no hay clientes agendados. ¡Aprovecha el tiempo para optimizar tus herramientas!
                         </p>
                     </div>
+                ) : userRole === 'admin' ? (
+                    <AdminCalendarView appointments={appointments} userRole={userRole} />
                 ) : (
                     /* TIMELINE VIEW */
                     <DashboardTimeline appointments={appointments} userRole={userRole} />
