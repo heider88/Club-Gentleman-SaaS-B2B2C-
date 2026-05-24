@@ -49,14 +49,30 @@ export default async function LandingPage() {
 
   return (
     <>
-      {/* Fondo Fijo Degradado a nivel de raíz para no ser recortado por overflow-hidden */}
-      <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-10 pointer-events-none" />
+      {/* Fondo Atmosférico "Midnight Velvet" */}
+      <div className="fixed inset-0 bg-black -z-20" />
+      
+      {/* Destellos radiales suaves simulando luz indirecta */}
+      <div className="fixed inset-0 opacity-40 -z-10 pointer-events-none" 
+           style={{
+             background: 'radial-gradient(circle at 50% -20%, rgba(109, 50, 148, 0.4) 0%, transparent 60%), radial-gradient(circle at 100% 80%, rgba(109, 50, 148, 0.15) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(0, 0, 0, 1) 0%, transparent 50%)'
+           }} 
+      />
+      
+      {/* Ruido SVG para textura táctil "Grainy" */}
+      <div className="fixed inset-0 opacity-[0.03] mix-blend-overlay -z-10 pointer-events-none"
+           style={{
+             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+           }}
+      />
 
       <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
         {/* Header Section */}
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
-        <div className="flex flex-col items-center gap-6 border-b border-white/20 pb-8">
+        <div className="flex flex-col items-center gap-6 border-b border-white/[0.08] pb-12 relative">
+          {/* Sombra de luz para el header */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 blur-[100px] pointer-events-none -z-10" />
           <div className="space-y-6 flex flex-col items-center text-center">
             {/* Logo Centrado (Tamaño doble, reducido 20%) */}
             <div className="relative w-[76vw] sm:w-[45rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
@@ -86,16 +102,16 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-3 w-full sm:w-auto mt-2">
-            <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
+          <div className="flex flex-col items-center gap-4 w-full sm:w-auto mt-4">
+            <span className="bg-black/40 backdrop-blur-xl border border-white/10 border-t-white/20 text-white/90 text-xs font-black px-6 py-2 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
               Barbería
             </span>
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-3">
               <a
                 href="https://www.facebook.com/profile.php?id=100065179103783"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-11 h-11 flex items-center justify-center border border-white/20 bg-white/5 backdrop-blur-md rounded-full hover:bg-[#1877F2] hover:border-[#1877F2] transition-all text-white/80 hover:text-white active:scale-95"
+                className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(24,119,242,0.3)] active:scale-95"
                 title="Facebook"
               >
                 <Facebook className="w-5 h-5" />
@@ -104,10 +120,11 @@ export default async function LandingPage() {
                 href="https://www.instagram.com/club_gentlemanbarber?igsh=cGcwd3F0YXEzb2hl&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-11 h-11 flex items-center justify-center border border-white/20 bg-white/5 backdrop-blur-md rounded-full hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:border-transparent transition-all text-white/80 hover:text-white active:scale-95"
+                className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-pink-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group active:scale-95 overflow-hidden relative"
                 title="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-yellow-400/20 via-pink-500/20 to-purple-500/20 transition-opacity" />
+                <Instagram className="w-5 h-5 relative z-10" />
               </a>
             </div>
           </div>
@@ -123,14 +140,14 @@ export default async function LandingPage() {
         <div className="w-full max-w-4xl mx-auto space-y-12">
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-black text-white uppercase tracking-wider">Sobre Nosotros</h2>
+            <h2 className="text-3xl font-black text-white/90 uppercase tracking-widest">Sobre Nosotros</h2>
             <div>
-              <span className="inline-block border border-white/20 bg-white/5 backdrop-blur-md text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-                Barbería
+              <span className="inline-block border border-white/10 border-t-white/20 bg-black/40 backdrop-blur-xl text-white/80 text-[10px] font-black px-4 py-2 rounded-full mb-8 tracking-[0.2em] uppercase shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                La Experiencia
               </span>
             </div>
 
-            <div className="text-white/80 space-y-4 text-[15px] leading-relaxed max-w-2xl font-medium">
+            <div className="text-white/70 space-y-6 text-[15px] leading-relaxed max-w-2xl font-medium">
               <p>
                 <strong className="text-white">GENTLEMAN | Barbería & Club</strong> para Hombres con más de 7 años de experiencia.
                 No somos solo una barbería. En GENTLEMAN, cada visita es una experiencia.
@@ -150,12 +167,18 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <hr className="border-white/20" />
+          <hr className="border-white/[0.05]" />
 
           {/* Booking Flow */}
-          <div className="relative mt-8 scroll-mt-32" id="booking-section">
-            <div className="backdrop-blur-md bg-white/5 border border-white/10 text-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-full max-w-screen-xl mx-auto">
-              <h2 className="text-2xl font-black text-white mb-6">Reserva tu cita</h2>
+          <div className="relative mt-12 scroll-mt-32" id="booking-section">
+            {/* Glow del formulario */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 blur-[120px] pointer-events-none -z-10" />
+            
+            <div className="backdrop-blur-xl bg-black/40 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
+              {/* Highlight superior sutil */}
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              
+              <h2 className="text-2xl md:text-3xl font-black text-white mb-8 tracking-wide">Reserva tu cita</h2>
               <BookingWizard barbers={barbers} services={services} />
             </div>
           </div>
@@ -171,17 +194,21 @@ export default async function LandingPage() {
             <h2 className="text-3xl font-black text-white uppercase tracking-wider">Ubicación</h2>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/20 backdrop-blur-md border border-white/5 rounded-3xl p-6 sm:p-10 shadow-2xl">
-            <div className="flex-1 space-y-4 text-white/80">
-              <p className="text-lg">Nos encontramos ubicados en una zona central de fácil acceso para brindarte la mejor atención y comodidad.</p>
-              <p className="text-2xl font-black text-white">Cll 72 sur #14-80 Bogotá</p>
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            {/* Sutil glow de ubicación */}
+            <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none -z-10" />
+            
+            <div className="flex-1 space-y-4 text-white/70">
+              <p className="text-lg leading-relaxed">Nos encontramos ubicados en una zona central de fácil acceso para brindarte la mejor atención y comodidad.</p>
+              <p className="text-2xl md:text-3xl font-black text-white/90">Cll 72 sur #14-80 Bogotá</p>
               <a
                 href="https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-pink-400 font-bold hover:text-white hover:underline transition-colors mt-2 inline-flex items-center gap-2"
+                className="text-[#6D3294] hover:text-pink-400 font-bold hover:underline transition-colors mt-4 inline-flex items-center gap-2 group"
               >
-                Ver dirección en G. Maps 📍
+                Ver dirección en G. Maps 
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </a>
             </div>
 
@@ -190,7 +217,7 @@ export default async function LandingPage() {
               href="https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full md:w-[400px] h-64 bg-black/60 rounded-2xl overflow-hidden relative grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:shadow-[0_0_30px_rgba(217,70,239,0.3)] transition-all duration-500 border border-white/10 group cursor-pointer block"
+              className="w-full md:w-[400px] h-64 bg-black/80 rounded-2xl overflow-hidden relative grayscale opacity-60 hover:grayscale-0 hover:opacity-100 hover:shadow-[0_0_40px_rgba(109,50,148,0.3)] transition-all duration-700 border border-white/10 group cursor-pointer block"
             >
               <Image
                 src="/shop.jpg"
