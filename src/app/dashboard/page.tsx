@@ -57,9 +57,16 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     // 4. Fechas exactas del "Día Seleccionado"
     const params = await searchParams;
     let selectedDate = new Date();
+    
+    // Convert to timezone-independent local string YYYY-MM-DD
+    const yyyy = selectedDate.getFullYear();
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(selectedDate.getDate()).padStart(2, '0');
+    let dateStr = `${yyyy}-${mm}-${dd}`;
+
     if (params.date) {
-        // Parse date param as 'YYYY-MM-DD' ignoring timezone offsets locally
-        const [year, month, day] = params.date.split('-').map(Number);
+        dateStr = params.date;
+        const [year, month, day] = dateStr.split('-').map(Number);
         selectedDate = new Date(year, month - 1, day);
     }
     
@@ -120,7 +127,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                         ¡Hola, <span className="text-dash-text-muted">{barberName}</span>!
                     </h1>
                     <div className="mt-4">
-                        <DateNavigator currentDate={selectedDate} />
+                        <DateNavigator currentDateStr={dateStr} />
                     </div>
                 </div>
                 {/* Botón de Agendar Manual */}

@@ -6,11 +6,15 @@ import { ChevronLeft, ChevronRight, CalendarDays, Loader2 } from "lucide-react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useTransition } from "react"
 
-export function DateNavigator({ currentDate }: { currentDate: Date }) {
+export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [isPending, startTransition] = useTransition()
+
+    // Usar la fecha del string ajustando el offset local para evitar desfasajes de zona horaria
+    const [year, month, day] = currentDateStr.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
 
     const handlePrevDay = () => {
         const newDate = subDays(currentDate, 1)
