@@ -105,61 +105,86 @@ export function CustomersList({ barberId, isAdmin = false }: { barberId?: string
                     <p className="text-dash-text-soft font-jakarta mt-2 relative z-10 text-center max-w-sm">No se encontraron registros de clientes completados en tu historial.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-dash-border border border-dash-border">
+                <div className="flex flex-col gap-2">
+                    {/* Encabezado de la lista */}
+                    <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 border-b-2 border-dash-border text-[10px] font-bold uppercase tracking-[0.2em] text-dash-text-muted">
+                        <div className="col-span-4">Cliente</div>
+                        <div className="col-span-3">Contacto</div>
+                        <div className="col-span-2 text-center">Última Visita</div>
+                        <div className="col-span-1 text-center">Cortes</div>
+                        <div className="col-span-2 text-right">Acciones</div>
+                    </div>
+
                     {filtered.map((customer, i) => (
                         <div 
                             key={i} 
-                            className="group relative bg-dash-bg hover:bg-dash-panel transition-all duration-500 overflow-hidden p-6 md:p-8 flex flex-col min-h-[240px] animate-in fade-in slide-in-from-bottom-8"
+                            className="group relative bg-transparent border-b border-dash-border/50 hover:bg-dash-panel/30 transition-all duration-300 p-4 md:px-6 md:py-5 flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center animate-in fade-in slide-in-from-bottom-4 overflow-hidden"
                             style={{ 
-                                animationDelay: `${i * 50}ms`,
+                                animationDelay: `${i * 30}ms`,
                                 animationFillMode: 'both' 
                             }}
                         >
-                            {/* Watermark Gigante */}
-                            <span className="absolute -bottom-6 -right-6 text-[160px] font-oswald font-black text-dash-text/[0.02] group-hover:text-dash-text/[0.05] leading-none select-none pointer-events-none transition-colors duration-500 z-0">
+                            {/* Hover accent line */}
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+
+                            {/* Watermark Numérica (Opcional, sutil en lista) */}
+                            <span className="absolute right-10 top-1/2 -translate-y-1/2 text-[80px] font-oswald font-black text-dash-text/[0.02] group-hover:text-dash-text/[0.04] leading-none select-none pointer-events-none transition-colors duration-500 z-0 hidden md:block">
                                 {customer.totalCuts.toString().padStart(2, '0')}
                             </span>
-                            
-                            {/* Top info */}
-                            <div className="flex justify-between items-start relative z-10 mb-8">
-                                <div className="pr-4">
-                                    <h3 className="font-oswald text-2xl md:text-3xl font-medium text-dash-text tracking-wide uppercase leading-tight group-hover:text-primary transition-colors">
-                                        {customer.name}
-                                    </h3>
-                                    <p className="font-jakarta text-xs text-dash-text-soft mt-2 flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-dash-text-muted/50 group-hover:bg-primary transition-colors"></span>
-                                        Última Visita: <span className="text-dash-text font-medium">{customer.lastVisit}</span>
-                                    </p>
-                                </div>
-                                <div className="text-right shrink-0">
-                                    <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-muted block mb-1">Cortes</span>
-                                    <span className="font-oswald text-3xl text-dash-text leading-none group-hover:text-primary transition-colors">{customer.totalCuts}</span>
-                                </div>
+
+                            {/* Cliente */}
+                            <div className="md:col-span-4 w-full relative z-10">
+                                <span className="md:hidden text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-muted block mb-1">Cliente</span>
+                                <h3 className="font-oswald text-xl md:text-2xl font-medium text-dash-text tracking-wide uppercase leading-tight group-hover:text-primary transition-colors">
+                                    {customer.name}
+                                </h3>
                             </div>
 
-                            {/* Actions Footer */}
-                            <div className="relative z-10 mt-auto pt-4 border-t border-dash-border/30 flex items-center justify-between">
+                            {/* Contacto */}
+                            <div className="md:col-span-3 w-full relative z-10">
+                                <span className="md:hidden text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-muted block mb-1">Contacto</span>
                                 {customer.phone !== "N/A" ? (
-                                    <>
-                                        <div className="font-jakarta text-sm text-dash-text font-medium tracking-wide">
-                                            {customer.phone}
-                                        </div>
-                                        <div className="flex gap-1 md:opacity-0 md:translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                                            <a href={`https://wa.me/${customer.phone.replace('+', '')}`} target="_blank" rel="noreferrer" className="w-10 h-10 flex items-center justify-center bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm" title="WhatsApp">
-                                                <MessageCircle className="w-4 h-4" />
-                                            </a>
-                                            <a href={`tel:${customer.phone}`} className="w-10 h-10 flex items-center justify-center bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm" title="Llamar">
-                                                <Phone className="w-4 h-4" />
-                                            </a>
-                                        </div>
-                                    </>
+                                    <div className="font-mono text-sm text-dash-text font-medium tracking-wide">
+                                        {customer.phone}
+                                    </div>
                                 ) : (
-                                    <span className="font-jakarta text-sm text-dash-text-muted italic">Sin teléfono registrado</span>
+                                    <span className="font-jakarta text-xs text-dash-text-muted italic">No registrado</span>
                                 )}
                             </div>
-                            
-                            {/* Acento lateral brutalista */}
-                            <div className="absolute top-0 left-0 w-1 h-0 bg-primary group-hover:h-full transition-all duration-500 ease-out z-20"></div>
+
+                            {/* Última Visita */}
+                            <div className="md:col-span-2 w-full md:text-center relative z-10">
+                                <span className="md:hidden text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-muted block mb-1">Última Visita</span>
+                                <span className="font-mono text-xs text-dash-text-soft">
+                                    {customer.lastVisit}
+                                </span>
+                            </div>
+
+                            {/* Cortes Totales */}
+                            <div className="md:col-span-1 w-full md:text-center relative z-10">
+                                <span className="md:hidden text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-muted block mb-1">Cortes Totales</span>
+                                <span className="font-oswald text-2xl text-dash-text leading-none group-hover:text-primary transition-colors">
+                                    {customer.totalCuts}
+                                </span>
+                            </div>
+
+                            {/* Acciones */}
+                            <div className="md:col-span-2 w-full md:text-right relative z-10 mt-4 md:mt-0">
+                                {customer.phone !== "N/A" ? (
+                                    <div className="flex gap-2 md:justify-end">
+                                        <a href={`https://wa.me/${customer.phone.replace('+', '')}`} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-2 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest" title="WhatsApp">
+                                            <MessageCircle className="w-4 h-4" /> <span className="md:hidden">WhatsApp</span>
+                                        </a>
+                                        <a href={`tel:${customer.phone}`} className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-2 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest" title="Llamar">
+                                            <Phone className="w-4 h-4" /> <span className="md:hidden">Llamar</span>
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div className="md:text-right">
+                                        <span className="inline-block border border-dash-border-alt bg-dash-panel/50 px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-dash-text-muted">Inaccesible</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
