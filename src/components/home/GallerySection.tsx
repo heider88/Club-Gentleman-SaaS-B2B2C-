@@ -29,14 +29,14 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
             {initialPhotos.map((src, i) => {
               // Create irregular masonry-like pattern
               const isLarge = i % 5 === 0;
-              const isWide = i % 7 === 0;
+              const isWide = i % 7 === 0 && !isLarge;
               
               return (
                 <div 
                   key={i} 
                   className={`relative overflow-hidden bg-black group cursor-pointer border border-white/[0.05] 
-                  ${isLarge ? 'md:row-span-2 md:col-span-2 h-[400px] md:h-auto aspect-[3/4] md:aspect-auto' : 
-                    isWide ? 'md:col-span-2 h-[300px]' : 'h-[300px]'}`}
+                  ${isLarge ? 'md:row-span-2 md:col-span-2 aspect-[3/4] md:aspect-[4/5]' : 
+                    isWide ? 'md:col-span-2 aspect-video md:aspect-[21/9]' : 'aspect-square'}`}
                 >
                   <Image
                     src={src}
