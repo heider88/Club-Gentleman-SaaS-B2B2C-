@@ -37,22 +37,29 @@ export function DashboardSidebar({ role }: { role: string }) {
     return (
         <>
             {/* Botón flotante para reabrir el sidebar (solo Desktop) */}
-            {isCollapsed && (
+            <div className={cn(
+                "hidden md:flex fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                isCollapsed ? "left-0" : "-left-16"
+            )}>
                 <button 
                     onClick={() => setIsCollapsed(false)}
-                    className="hidden md:flex fixed top-4 left-4 z-50 p-2 bg-dash-panel border border-dash-border hover:border-dash-text text-dash-text-soft hover:text-dash-text rounded-lg shadow-xl transition-all"
+                    className="flex items-center justify-center w-8 h-24 bg-dash-text hover:bg-primary text-dash-bg rounded-r-2xl shadow-[5px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 group"
                     title="Abrir menú"
                 >
-                    <PanelLeftOpen className="w-5 h-5" />
+                    <div className="flex flex-col gap-1.5 items-center group-hover:scale-110 transition-transform">
+                        <div className="w-1 h-1 rounded-full bg-current"></div>
+                        <div className="w-1 h-1 rounded-full bg-current"></div>
+                        <div className="w-1 h-1 rounded-full bg-current"></div>
+                    </div>
                 </button>
-            )}
+            </div>
 
             <aside className={cn(
-                "fixed bottom-0 left-0 right-0 h-16 bg-dash-panel border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:border-t-0 md:border-r flex md:flex-col justify-between md:justify-start md:p-6 transition-all duration-300 ease-in-out overflow-hidden",
-                isCollapsed ? "md:w-0 md:p-0 md:opacity-0 md:border-r-0" : "md:w-64"
+                "fixed bottom-0 left-0 right-0 h-16 bg-dash-panel border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:border-t-0 md:border-r flex md:flex-col justify-between md:justify-start md:p-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden",
+                isCollapsed ? "md:w-0 md:p-0 md:opacity-0 md:border-r-0 md:translate-x-[-100%]" : "md:w-64 md:translate-x-0"
             )}>
-                <div className="hidden md:flex justify-between items-start mb-12">
-                    <div className={cn("transition-opacity duration-200", isCollapsed ? "opacity-0" : "opacity-100")}>
+                <div className="hidden md:flex justify-between items-start mb-12 relative group/header">
+                    <div className={cn("transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
                         <h2 className="font-oswald text-2xl font-medium tracking-tight leading-none text-dash-text uppercase whitespace-nowrap">
                             GENTLEMAN
                         </h2>
@@ -62,10 +69,10 @@ export function DashboardSidebar({ role }: { role: string }) {
                     </div>
                     <button 
                         onClick={() => setIsCollapsed(true)}
-                        className="text-dash-text-muted hover:text-dash-text transition-colors p-1"
+                        className="absolute right-0 top-0 w-8 h-8 flex items-center justify-center bg-transparent border border-dash-border hover:bg-dash-text hover:border-dash-text text-dash-text-muted hover:text-dash-bg rounded-full transition-all duration-300 opacity-0 group-hover/header:opacity-100 -translate-x-4 group-hover/header:translate-x-0"
                         title="Ocultar menú"
                     >
-                        <PanelLeftClose className="w-5 h-5" />
+                        <PanelLeftClose className="w-4 h-4" />
                     </button>
                 </div>
 
