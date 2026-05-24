@@ -272,18 +272,25 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
         return (
             <div className="relative border border-dash-border bg-dash-panel flex flex-col flex-1 overflow-hidden">
-                {/* Cabecera de Días */}
-                <div className="flex border-b border-dash-border bg-dash-bg z-20 sticky top-0">
-                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border flex items-end justify-end pb-2 pr-2">
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-dash-text-soft">Hora</span>
+                {/* Cabecera de Días (Editorial) */}
+                <div className="flex border-b-2 border-dash-border bg-dash-bg z-20 sticky top-0">
+                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border flex items-end justify-end pb-2 pr-2 bg-dash-panel">
+                        <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Hora</span>
                     </div>
                     <div className="flex-1 flex overflow-x-auto scrollbar-hide">
-                        {daysOfWeek.map((day, i) => (
-                            <div key={i} className="flex-1 min-w-[150px] p-4 flex flex-col items-center justify-center border-r border-dash-border last:border-r-0">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-dash-text-muted">{format(day, 'EEEE', { locale: es })}</span>
-                                <span className="font-oswald text-xl text-dash-text">{format(day, 'd MMM', { locale: es })}</span>
-                            </div>
-                        ))}
+                        {daysOfWeek.map((day, i) => {
+                            const isToday = isSameDay(day, new Date());
+                            return (
+                                <div key={i} className={`flex-1 min-w-[150px] p-4 flex flex-col items-center justify-center border-r border-dash-border last:border-r-0 ${isToday ? 'bg-dash-text/5' : ''}`}>
+                                    <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isToday ? 'text-primary' : 'text-dash-text-muted'}`}>
+                                        {format(day, 'EEEE', { locale: es })}
+                                    </span>
+                                    <span className={`font-oswald text-2xl tracking-tight ${isToday ? 'text-dash-text font-black' : 'text-dash-text-soft'}`}>
+                                        {format(day, 'd MMM', { locale: es })}
+                                    </span>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -303,13 +310,10 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                     <div className="flex-1 flex relative min-w-max">
                         {daysOfWeek.map((day, i) => {
                             const dayAppts = filteredAppointments.filter(a => isSameDay(new Date(a.start_time), day));
-                            
-                            // Simple collision strategy: divide width by number of concurrent appts
-                            // For a better visual, we just offset them a bit if they collide, or place them side by side
-                            // Here we will do side by side for overlapping
+                            const isToday = isSameDay(day, new Date());
                             
                             return (
-                                <div key={i} className="flex-1 min-w-[150px] border-r border-dash-border/30 relative">
+                                <div key={i} className={`flex-1 min-w-[150px] border-r border-dash-border/30 relative ${isToday ? 'bg-white/[0.02]' : ''}`}>
                                     {dayAppts.map((appt, idx) => {
                                         const barberInfo = allBarbers.find(b => b.id === appt.barber_id);
                                         const colorClass = barberInfo?.color || 'bg-dash-text';
@@ -319,7 +323,6 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                         const height = calculateHeight(duration);
                                         const isSelected = selectedAppt?.id === appt.id;
 
-                                        // Find overlapping appointments to calculate width and left offset
                                         const overlaps = dayAppts.filter(a => {
                                             const s1 = new Date(appt.start_time).getTime();
                                             const e1 = new Date(appt.end_time).getTime();
@@ -339,23 +342,27 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                                 key={appt.id}
                                                 onClick={() => setSelectedAppt(appt)}
                                                 className={`absolute border p-2 cursor-pointer transition-all duration-300 overflow-hidden group hover:z-20
-                                                    bg-dash-panel border-dash-border hover:border-dash-text
-                                                    ${isSelected ? 'ring-2 ring-dash-text z-30' : 'z-10'}
+                                                    bg-black/60 backdrop-blur-md border-dash-border hover:border-dash-text shadow-[0_4px_10px_rgba(0,0,0,0.5)]
+                                                    ${isSelected ? 'ring-1 ring-dash-text z-30' : 'z-10'}
                                                 `}
                                                 style={{ top: `${top}px`, height: `${height}px`, width: widthStr, left: leftStr }}
                                             >
-                                                <div className={`absolute top-0 left-0 w-1 h-full ${colorClass}`}></div>
+                                                {/* Colored glowing accent line */}
+                                                <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} shadow-[0_0_10px_currentColor] opacity-80 group-hover:opacity-100`}></div>
                                                 <div className="flex flex-col h-full pl-2">
-                                                    <span className="font-oswald text-[10px] text-dash-text-soft leading-tight">
+                                                    <span className="font-mono text-[9px] text-dash-text-soft leading-tight tracking-widest">
                                                         {format(new Date(appt.start_time), 'HH:mm')}
                                                     </span>
-                                                    <h4 className="font-oswald text-xs uppercase truncate text-dash-text leading-tight mt-0.5">
+                                                    <h4 className="font-oswald text-[11px] uppercase truncate text-dash-text leading-tight mt-1 tracking-wide">
                                                         {appt.customer_name}
                                                     </h4>
                                                     {height >= 60 && (
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-dash-text-muted truncate mt-1">
-                                                            {appt.profiles?.full_name?.split(' ')[0] || 'Barbero'}
-                                                        </p>
+                                                        <div className="mt-auto flex items-center gap-1.5">
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${colorClass}`} />
+                                                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-dash-text-soft truncate">
+                                                                {barberInfo?.name.split(' ')[0] || 'PRO'}
+                                                            </p>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
@@ -389,14 +396,14 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
             <div className="relative border border-dash-border bg-dash-panel flex flex-col flex-1 overflow-hidden">
                 <div className="grid grid-cols-7 border-b border-dash-border bg-dash-bg">
                     {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
-                        <div key={day} className="p-3 text-center border-r border-dash-border last:border-r-0">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-dash-text-muted">{day}</span>
+                        <div key={day} className="p-3 text-center border-r border-dash-border last:border-r-0 bg-dash-panel/50">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-dash-text-muted">{day}</span>
                         </div>
                     ))}
                 </div>
                 <div className="grid grid-cols-7 auto-rows-fr flex-1 bg-dash-bg gap-px border-t border-dash-border/30" style={{ backgroundColor: 'var(--dash-border)' }}>
                     {days.map((day, idx) => {
-                        if (!day) return <div key={`pad-${idx}`} className="bg-dash-panel/30"></div>;
+                        if (!day) return <div key={`pad-${idx}`} className="bg-dash-bg/50"></div>;
 
                         const dayAppts = filteredAppointments.filter(a => isSameDay(new Date(a.start_time), day));
                         
@@ -417,25 +424,31 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                     params.set('view', 'daily')
                                     router.push(`${pathname}?${params.toString()}`)
                                 }}
-                                className={`bg-dash-panel p-2 flex flex-col gap-1 cursor-pointer hover:bg-dash-panel-alt transition-colors group relative ${isToday ? 'ring-inset ring-1 ring-dash-text' : ''}`}
+                                className={`bg-dash-panel p-2 flex flex-col gap-2 cursor-pointer hover:bg-white/[0.05] transition-colors group relative overflow-hidden ${isToday ? 'bg-dash-text/[0.02]' : ''}`}
                             >
-                                <span className={`text-sm font-oswald mb-1 ${isToday ? 'text-dash-text font-black' : 'text-dash-text-soft'}`}>
+                                <span className={`absolute -bottom-4 -right-2 text-[60px] font-oswald font-black leading-none opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none ${isToday ? 'text-dash-text opacity-10' : 'text-white'}`}>
                                     {format(day, 'd')}
                                 </span>
                                 
-                                <div className="flex flex-col gap-1 overflow-y-auto scrollbar-hide flex-1">
+                                <span className={`text-sm font-oswald relative z-10 ${isToday ? 'text-dash-text font-black' : 'text-dash-text-soft'}`}>
+                                    {format(day, 'd')}
+                                </span>
+                                
+                                <div className="flex flex-col gap-1 overflow-y-auto scrollbar-hide flex-1 relative z-10 mt-2">
                                     {Object.entries(counts).map(([bId, count]) => {
                                         const barber = allBarbers.find(b => b.id === bId);
                                         if(!barber) return null;
                                         return (
-                                            <div key={bId} className={`flex items-center justify-between px-1.5 py-0.5 ${barber.color}/20 border border-${barber.color.replace('bg-', '')}/30 rounded-sm`}>
-                                                <span className={`text-[9px] font-bold uppercase tracking-widest text-${barber.color.replace('bg-', '')}`}>{barber.name.split(' ')[0]}</span>
-                                                <span className="text-[10px] font-black text-dash-text">{count}</span>
+                                            <div key={bId} className="flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${barber.color} shadow-[0_0_8px_currentColor] opacity-80`} />
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-dash-text-muted hidden sm:block">{barber.name.split(' ')[0]}</span>
+                                                <span className="text-[10px] font-mono font-bold text-dash-text ml-auto">{count}</span>
                                             </div>
                                         )
                                     })}
                                 </div>
                                 <div className="absolute inset-0 border border-transparent group-hover:border-dash-border-alt pointer-events-none transition-colors"></div>
+                                {isToday && <div className="absolute top-0 left-0 w-full h-0.5 bg-dash-text"></div>}
                             </div>
                         )
                     })}
@@ -451,39 +464,39 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                 
                 {/* Barber Filter Pills */}
                 <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-dash-text-muted mr-2">Filtro:</span>
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-muted mr-3">Team Filter:</span>
                     {allBarbers.map(barber => {
                         const isSelected = selectedBarbers.includes(barber.id);
                         return (
                             <button 
                                 key={barber.id}
                                 onClick={() => toggleBarber(barber.id)}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-none border-b-2 transition-all duration-300 group
                                     ${isSelected 
-                                        ? `bg-dash-panel-alt border-dash-border text-dash-text` 
-                                        : `bg-transparent border-dash-border/30 text-dash-text-muted opacity-50 hover:opacity-100 grayscale hover:grayscale-0`
+                                        ? `border-dash-text bg-dash-panel-alt/50 text-dash-text` 
+                                        : `border-transparent bg-transparent text-dash-text-soft opacity-40 hover:opacity-100 hover:border-dash-border grayscale hover:grayscale-0`
                                     }`}
                             >
-                                <div className={`w-2 h-2 rounded-full ${barber.color} shadow-[0_0_8px_currentColor]`} />
+                                <div className={`w-1.5 h-1.5 rounded-full ${barber.color} ${isSelected ? 'shadow-[0_0_10px_currentColor] animate-pulse' : ''}`} />
                                 {barber.avatar ? (
-                                    <img src={barber.avatar} alt="avatar" className="w-5 h-5 rounded-full object-cover" />
+                                    <img src={barber.avatar} alt="avatar" className="w-5 h-5 object-cover rounded-none" />
                                 ) : (
-                                    <div className="w-5 h-5 rounded-full bg-dash-bg flex items-center justify-center text-[8px]">🧑</div>
+                                    <div className="w-5 h-5 bg-dash-bg flex items-center justify-center text-[8px] font-mono border border-dash-border">B</div>
                                 )}
-                                <span className="text-xs font-bold uppercase tracking-wider">{barber.name.split(' ')[0]}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{barber.name.split(' ')[0]}</span>
                             </button>
                         )
                     })}
                 </div>
 
-                {/* View Switcher */}
-                <div className="flex bg-dash-bg border border-dash-border p-1 rounded-xl">
+                {/* View Switcher Brutalista */}
+                <div className="flex bg-black/40 border border-dash-border/50 p-1 rounded-none">
                     {['daily', 'weekly', 'monthly'].map(v => (
                         <button
                             key={v}
                             onClick={() => setView(v)}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
-                                view === v ? 'bg-dash-text text-dash-bg shadow-md' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel-alt'
+                            className={`px-6 py-2 text-[10px] font-bold uppercase tracking-[0.2em] rounded-none transition-all ${
+                                view === v ? 'bg-dash-text text-dash-bg shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel-alt'
                             }`}
                         >
                             {v === 'daily' ? 'Diario' : v === 'weekly' ? 'Semanal' : 'Mensual'}
