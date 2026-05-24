@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { SalesReports } from "@/components/dashboard/admin/SalesReports"
+import { BusinessDashboard } from "@/components/dashboard/admin/business/BusinessDashboard"
 
 export default async function ReportsPage() {
     const supabase = await createClient()
@@ -19,7 +19,7 @@ export default async function ReportsPage() {
         redirect("/dashboard")
     }
 
-    // Obtener la lista de barberos para el filtro
+    // Obtener la lista de barberos
     const { data: barbers } = await supabase
         .from('profiles')
         .select('id, full_name, commission_percentage')
@@ -27,17 +27,16 @@ export default async function ReportsPage() {
         .order('full_name', { ascending: true })
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-7xl mx-auto pb-12">
-            <header className="flex flex-col gap-2 border-b border-white/5 pb-6">
-                <h1 className="text-3xl font-extrabold tracking-tight text-dash-text">
-                    Reportes Financieros
-                </h1>
-                <p className="text-muted-foreground font-medium">
-                    Analiza los ingresos generados por los servicios completados en tu barbería.
-                </p>
+        <div className="space-y-8 animate-in fade-in duration-700 max-w-[1400px] mx-auto pb-12">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b-2 border-dash-text pb-6">
+                <div className="flex-1">
+                    <h1 className="font-oswald text-6xl md:text-7xl font-black text-dash-text uppercase tracking-tighter leading-none">
+                        Business<br/><span className="text-dash-text-muted">Analytics</span>
+                    </h1>
+                </div>
             </header>
 
-            <SalesReports barbers={barbers || []} />
+            <BusinessDashboard barbers={barbers || []} defaultTab="ventas-resumen" />
         </div>
     )
 }
