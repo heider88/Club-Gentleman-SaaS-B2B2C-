@@ -1,11 +1,9 @@
 import { createClient } from "@/lib/supabase/server"
 import { Star, MapPin, Clock, Instagram, Facebook, ChevronUp } from "lucide-react"
-import dynamic from "next/dynamic"
+import BookingWizard from "@/components/booking/BookingWizard"
+import BarbersList from "@/components/home/BarbersList"
+import { GallerySection } from "@/components/home/GallerySection"
 import Image from "next/image"
-
-const BookingWizard = dynamic(() => import("@/components/booking/BookingWizard"))
-const BarbersList = dynamic(() => import("@/components/home/BarbersList"))
-const GallerySection = dynamic(() => import("@/components/home/GallerySection").then(mod => mod.GallerySection))
 
 // Revalidar caché de la Landing Page cada 1 hora (3600 segundos) automáticamente,
 // y también de forma inmediata cuando el Admin suba una foto desde el panel.
