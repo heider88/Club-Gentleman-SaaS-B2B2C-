@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { CheckCircle2, Phone, UserX, MoreHorizontal, Scissors } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { cancelAppointment } from "@/app/actions/appointments"
+import { updateAppointmentStatus } from "@/app/actions/appointments"
 
 type AppointmentWithService = {
     id: string;
@@ -59,16 +59,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
         setShowCancelModal(false)
         
         try {
-            if (newStatus === 'cancelled') {
-                await cancelAppointment(appt.id);
-            } else {
-                const { error } = await supabase
-                    .from('appointments')
-                    .update({ status: newStatus })
-                    .eq('id', appt.id)
-
-                if (error) throw new Error(error.message);
-            }
+            await updateAppointmentStatus(appt.id, newStatus);
 
             setStatus(newStatus)
             toast.success(newStatus === 'completed' ? 'Corte finalizado' : 'Cita cancelada')
