@@ -78,7 +78,11 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         fetchAppointments()
     }, [timeRange, supabase])
 
+    // Calculate global stats for the persistent header
     const completedAppts = appointments.filter(a => a.status === 'completed')
+    const totalGlobalRevenue = completedAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
+    const totalGlobalServices = completedAppts.length
+    const averageGlobalTicket = totalGlobalServices > 0 ? Math.round(totalGlobalRevenue / totalGlobalServices) : 0
 
     // VENTAS - RESUMEN
     const renderVentasResumen = () => {
@@ -91,34 +95,14 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8 flex flex-col items-start gap-4">
-                        <div className="w-12 h-12 bg-emerald-500/10 flex items-center justify-center rounded-full border border-emerald-500/30">
-                            <Banknote className="w-6 h-6 text-emerald-500" />
-                        </div>
-                        <div>
-                            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Ingresos Brutos</span>
-                            <p className="font-mono text-4xl text-emerald-400 font-bold mt-1">${totalRevenue.toLocaleString()}</p>
-                        </div>
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                        <Banknote className="w-8 h-8 text-white/50" />
                     </div>
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8 flex flex-col items-start gap-4">
-                        <div className="w-12 h-12 bg-primary/10 flex items-center justify-center rounded-full border border-primary/30">
-                            <Scissors className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Servicios Prestados</span>
-                            <p className="font-oswald text-4xl text-dash-text font-bold mt-1">{totalServices}</p>
-                        </div>
-                    </div>
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8 flex flex-col items-start gap-4">
-                        <div className="w-12 h-12 bg-cyan-500/10 flex items-center justify-center rounded-full border border-cyan-500/30">
-                            <ArrowDownToLine className="w-6 h-6 text-cyan-500" />
-                        </div>
-                        <div>
-                            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Ticket Promedio</span>
-                            <p className="font-mono text-4xl text-cyan-400 font-bold mt-1">${totalServices > 0 ? Math.round(totalRevenue / totalServices).toLocaleString() : 0}</p>
-                        </div>
-                    </div>
+                    <h3 className="font-oswald text-2xl uppercase tracking-widest text-dash-text mb-2">Visión Financiera Integral</h3>
+                    <p className="text-dash-text-soft font-jakarta max-w-lg text-sm">
+                        Utiliza las pestañas superiores para desglosar tus ingresos por servicio o revisar las comisiones generadas por tu equipo de profesionales en el periodo seleccionado.
+                    </p>
                 </div>
             </div>
         )
@@ -568,7 +552,43 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             </div>
 
             {/* Contenedor Gráficos / Data */}
-            <div className="relative pt-4">
+            <div className="relative pt-4 space-y-6">
+                
+                {/* GLOBAL FIXED FINANCIAL SUMMARY - Opción A */}
+                {!loading && (
+                    <div className="grid grid-cols-3 gap-4 md:gap-6 animate-in fade-in duration-500">
+                        <div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 border-t-emerald-500/40 p-4 md:p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+                            <div>
+                                <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Ingresos Brutos</span>
+                                <p className="font-mono text-xl md:text-3xl text-emerald-400 font-black mt-1 leading-none">${totalGlobalRevenue.toLocaleString()}</p>
+                            </div>
+                            <div className="hidden md:flex w-10 h-10 bg-emerald-500/10 items-center justify-center rounded-full border border-emerald-500/30">
+                                <Banknote className="w-5 h-5 text-emerald-500" />
+                            </div>
+                        </div>
+
+                        <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-4 md:p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+                            <div>
+                                <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Servicios Listos</span>
+                                <p className="font-mono text-xl md:text-3xl text-dash-text font-bold mt-1 leading-none">{totalGlobalServices}</p>
+                            </div>
+                            <div className="hidden md:flex w-10 h-10 bg-white/5 items-center justify-center rounded-full border border-white/10">
+                                <Scissors className="w-5 h-5 text-white/70" />
+                            </div>
+                        </div>
+
+                        <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-4 md:p-6 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+                            <div>
+                                <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Ticket Prom.</span>
+                                <p className="font-mono text-xl md:text-3xl text-cyan-400 font-bold mt-1 leading-none">${averageGlobalTicket.toLocaleString()}</p>
+                            </div>
+                            <div className="hidden md:flex w-10 h-10 bg-cyan-500/10 items-center justify-center rounded-full border border-cyan-500/30">
+                                <ArrowDownToLine className="w-5 h-5 text-cyan-500" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {renderContent()}
             </div>
         </div>
