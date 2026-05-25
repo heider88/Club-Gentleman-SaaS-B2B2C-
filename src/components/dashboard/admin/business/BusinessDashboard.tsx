@@ -653,7 +653,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                     </div>
                 )
             case 'reservas-colaborador':
-                return renderVentasComisiones() // Reusing the layout roughly 
+                return renderReservasColaboradores();
 
             case 'clientes-retencion':
                 return (
@@ -671,34 +671,178 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         }
     }
 
-    // Helper for reusing a view
-    function renderVentasComisiones() {
-        const commData = barbers.map(barber => {
-            const barberAppts = appointments.filter(a => a.barber_id === barber.id && a.status !== 'cancelled')
+    // RESERVAS - COLABORADORES (ANALÍTICA EMPRESARIAL DE RENDIMIENTO)
+    const renderReservasColaboradores = () => {
+        const validAppts = appointments.filter(a => a.status !== 'cancelled')
+        const totalReservations = validAppts.length
+        
+        // Calculate data per collaborator
+        const collaboratorData = barbers.map(barber => {
+            const barberAppts = validAppts.filter(a => a.barber_id === barber.id)
+            const count = barberAppts.length
             return {
-                name: barber.full_name,
-                Citas: barberAppts.length
+                id: barber.id,
+                name: barber.full_name || 'Sin Nombre',
+                count: count,
+                percentage: totalReservations > 0 ? Number(((count / totalReservations) * 100).toFixed(1)) : 0
             }
-        }).sort((a,b) => b.Citas - a.Citas)
+        }).filter(c => c.count > 0).sort((a,b) => b.count - a.count) // Only show active barbers, sort by most reservations
+
+        const totalCollaborators = collaboratorData.length
+        const average = totalCollaborators > 0 ? Math.round(totalReservations / totalCollaborators) : 0
+
+        let topCollaborator = collaboratorData.length > 0 ? collaboratorData[0] : { name: '-', count: 0 }
+        let lowestCollaborator = collaboratorData.length > 0 ? collaboratorData[collaboratorData.length - 1] : { name: '-', count: 0 }
+
+        // Process data for table (add performance metric)
+        const tableData = collaboratorData.map(c => {
+            const diff = c.count - average
+            return {
+                ...c,
+                performance: diff,
+                initials: c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+            }
+        })
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8">
-                    <h3 className="font-oswald text-xl uppercase tracking-widest text-dash-text mb-8">Carga de Trabajo por Colaborador</h3>
-                    <div className="h-[400px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={commData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                                <XAxis type="number" stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace' }} />
-                                <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.9)', fontSize: 11, fontFamily: 'monospace' }} />
-                                <Tooltip 
-                                    contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '0', fontFamily: 'monospace' }}
-                                    itemStyle={{ color: '#0ea5e9' }}
-                                    cursor={{fill: 'rgba(255,255,255,0.02)'}}
-                                />
-                                <Bar dataKey="Citas" fill="#0ea5e9" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                {/* 1. KPIs SUPERIORES */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Reservas Totales</span>
+                            <div className="p-2 bg-white/5 rounded-xl"><CalendarDays className="w-4 h-4 text-white/50" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-3xl font-black font-mono text-dash-text">{totalReservations}</span>
+                            <span className="text-xs font-medium text-dash-text-soft">{totalCollaborators} activos</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)] border-l-4 border-l-[#A78BFA]/50">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft truncate pr-2">Mejor Colaborador</span>
+                            <div className="p-2 bg-[#A78BFA]/10 rounded-xl"><TrendingUp className="w-4 h-4 text-[#A78BFA]" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xl font-bold text-dash-text truncate">{topCollaborator.name}</span>
+                            <span className="text-sm font-semibold font-mono text-[#A78BFA] shrink-0">{topCollaborator.count}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft truncate pr-2">Menor Rendimiento</span>
+                            <div className="p-2 bg-white/5 rounded-xl"><TrendingDown className="w-4 h-4 text-white/40" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xl font-bold text-dash-text truncate">{lowestCollaborator.name}</span>
+                            <span className="text-sm font-semibold font-mono text-dash-text-soft shrink-0">{lowestCollaborator.count}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Promedio Individual</span>
+                            <div className="p-2 bg-blue-500/10 rounded-xl"><Activity className="w-4 h-4 text-blue-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-dash-text">{average}</span>
+                    </div>
+                </div>
+
+                {/* 2. GRÁFICO HORIZONTAL */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[400px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-6">Distribución de reservas por colaborador</h3>
+                    <div className="flex-1 w-full relative">
+                        {collaboratorData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={collaboratorData} layout="vertical" margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
+                                    <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'monospace' }} />
+                                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: 500 }} />
+                                    <Tooltip 
+                                        cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                    <Bar dataKey="count" fill="#A78BFA" radius={[0, 6, 6, 0]} animationDuration={800} maxBarSize={35} name="Reservas" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos suficientes</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* 3. TABLA RANKING */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <div className="p-6 border-b border-white/10">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Clasificación de Colaboradores</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 w-16">Pos.</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Colaborador</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-center">Reservas</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-center">% Partic.</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Actuación</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {tableData.map((collab, i) => {
+                                    // Medals for top 3
+                                    let rankDisplay = <span className="text-sm font-bold text-white/30">{i + 1}</span>;
+                                    if (i === 0) rankDisplay = <span className="text-xl">🥇</span>;
+                                    else if (i === 1) rankDisplay = <span className="text-xl">🥈</span>;
+                                    else if (i === 2) rankDisplay = <span className="text-xl">🥉</span>;
+
+                                    // Badge color logic based on percentage (High > 30%, Medium > 15%, Low <= 15%)
+                                    // Custom colors adapted to dark mode
+                                    let badgeClass = "bg-white/5 text-white/50 border border-white/10";
+                                    if (collab.percentage >= 30) badgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                                    else if (collab.percentage >= 15) badgeClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+                                    else badgeClass = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
+
+                                    return (
+                                        <tr key={collab.id} className="hover:bg-white/[0.02] transition-colors group">
+                                            <td className="px-6 py-4">{rankDisplay}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-[#A78BFA]/20 border border-[#A78BFA]/30 flex items-center justify-center text-[#A78BFA] font-bold text-sm shrink-0">
+                                                        {collab.initials}
+                                                    </div>
+                                                    <span className="text-sm font-bold text-dash-text">{collab.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="text-lg font-black font-mono text-dash-text">{collab.count}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold font-mono ${badgeClass}`}>
+                                                    {collab.percentage}%
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {collab.performance === 0 ? (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-mono bg-white/5 text-white/50 border border-white/10">
+                                                        En promedio
+                                                    </span>
+                                                ) : collab.performance > 0 ? (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        +{collab.performance} vs prom
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-red-500/10 text-red-400 border border-red-500/20">
+                                                        {collab.performance} vs prom
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
