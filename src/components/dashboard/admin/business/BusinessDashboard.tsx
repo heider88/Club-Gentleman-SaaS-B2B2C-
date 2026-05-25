@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
-import { Banknote, FileDown, Scissors, CheckCircle2, CalendarDays, Users, Star, ArrowDownToLine, Clock, CalendarX2 } from "lucide-react"
+import { Banknote, FileDown, Scissors, CheckCircle2, CalendarDays, Users, Star, ArrowDownToLine, Clock, CalendarX2, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, TrendingDown } from "lucide-react"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -19,7 +19,10 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend
+  Legend,
+  LineChart,
+  Line,
+  ReferenceLine
 } from 'recharts'
 
 interface Barber {
@@ -203,15 +206,16 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         )
     }
 
-    // RESERVAS - DIAS
+    // RESERVAS - DIAS (ANALÍTICA AVANZADA)
     const renderReservasDias = () => {
-        const daysMap = { 'Lun':0, 'Mar':0, 'Mié':0, 'Jue':0, 'Vie':0, 'Sáb':0, 'Dom':0 }
+        const daysMap: Record<string, number> = { 'Lun':0, 'Mar':0, 'Mié':0, 'Jue':0, 'Vie':0, 'Sáb':0, 'Dom':0 }
+        const fullDayNames: Record<string, string> = { 'Lun': 'Lunes', 'Mar': 'Martes', 'Mié': 'Miércoles', 'Jue': 'Jueves', 'Vie': 'Viernes', 'Sáb': 'Sábado', 'Dom': 'Domingo' }
         
-        appointments.filter(a => a.status !== 'cancelled').forEach(a => {
+        const validAppts = appointments.filter(a => a.status !== 'cancelled')
+        
+        validAppts.forEach(a => {
             const dayName = format(new Date(a.start_time), 'EEE', { locale: es })
-            // Normalize day name to match our keys, adjusting for date-fns output
             let key = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-            // Quick mapping for date-fns outputs
             if(key === 'Dom') daysMap['Dom']++;
             else if(key === 'Lun') daysMap['Lun']++;
             else if(key === 'Mar') daysMap['Mar']++;
@@ -221,26 +225,185 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             else if(key === 'Sáb' || key === 'Sab') daysMap['Sáb']++;
         })
 
-        const chartData = Object.entries(daysMap).map(([day, count]) => ({ day, count }))
+        const totalReservations = validAppts.length
+        const totalDays = 7
+        const average = totalReservations > 0 ? (totalReservations / totalDays) : 0
+
+        let bestDay = { name: '-', count: -1 }
+        let worstDay = { name: '-', count: 999999 }
+
+        const chartData = Object.entries(daysMap).map(([shortDay, count], index, array) => {
+            if (count > bestDay.count) bestDay = { name: fullDayNames[shortDay], count }
+            // Only consider worst day if it's not 0 or if all are 0 (to avoid days we are closed)
+            if (count < worstDay.count && count >= 0) worstDay = { name: fullDayNames[shortDay], count }
+
+            const prevCount = index === 0 ? 0 : array[index - 1][1]
+            let trend = 0
+            if (prevCount > 0) trend = Math.round(((count - prevCount) / prevCount) * 100)
+            else if (count > 0) trend = 100
+            
+            return {
+                day: shortDay,
+                fullName: fullDayNames[shortDay],
+                count,
+                average: Number(average.toFixed(1)),
+                vsAverage: count - average,
+                trend
+            }
+        })
+
+        if (worstDay.count === 999999) worstDay = { name: '-', count: 0 }
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8">
-                    <h3 className="font-oswald text-xl uppercase tracking-widest text-dash-text mb-8">Volumen por Día de la Semana</h3>
-                    <div className="h-[400px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="day" stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace' }} />
-                                <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'monospace' }} />
-                                <Tooltip 
-                                    contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '0', fontFamily: 'monospace' }}
-                                    itemStyle={{ color: '#8b5cf6' }}
-                                    cursor={{fill: 'rgba(255,255,255,0.02)'}}
-                                />
-                                <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Citas" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                {/* 1. KPIs SUPERIORES */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Reservas Totales</span>
+                            <div className="p-2 bg-white/5 rounded-xl"><CalendarDays className="w-4 h-4 text-white/50" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-dash-text">{totalReservations}</span>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Día Más Fuerte</span>
+                            <div className="p-2 bg-emerald-500/10 rounded-xl"><TrendingUp className="w-4 h-4 text-emerald-500" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-dash-text">{bestDay.name}</span>
+                            <span className="text-sm font-semibold font-mono text-emerald-400">{bestDay.count}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Día Más Débil</span>
+                            <div className="p-2 bg-red-500/10 rounded-xl"><TrendingDown className="w-4 h-4 text-red-500" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-dash-text">{worstDay.name}</span>
+                            <span className="text-sm font-semibold font-mono text-red-400">{worstDay.count}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Promedio Diario</span>
+                            <div className="p-2 bg-blue-500/10 rounded-xl"><Activity className="w-4 h-4 text-blue-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-dash-text">{average.toFixed(1)}</span>
+                    </div>
+                </div>
+
+                {/* 2. GRÁFICOS (BARRAS Y TENDENCIA) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Gráfico de Barras */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-4">Análisis de Volumen</h3>
+                        <div className="flex-1 w-full relative">
+                            {totalReservations > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 500 }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                                        <Tooltip 
+                                            cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <Bar dataKey="count" fill="#2BC48A" radius={[6, 6, 0, 0]} animationDuration={800} maxBarSize={45} name="Reservas" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos suficientes</div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Gráfico de Tendencia (Línea + Promedio) */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-4">Tendencia vs Promedio</h3>
+                        <div className="flex-1 w-full relative">
+                            {totalReservations > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 500 }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <ReferenceLine y={average} stroke="#3b82f6" strokeDasharray="6 6" label={{ position: 'top', value: 'Promedio', fill: '#3b82f6', fontSize: 10, fontWeight: 600 }} />
+                                        <Line type="monotone" dataKey="count" stroke="#2BC48A" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#111' }} activeDot={{ r: 6 }} animationDuration={800} name="Real" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos suficientes</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. TABLA DETALLADA */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <div className="p-6 border-b border-white/10">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Desglose por Día</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Día</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Cantidad</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Vs. Promedio</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Tendencia (Día Ant.)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {chartData.map((stat, i) => (
+                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm font-medium text-dash-text">{stat.fullName}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm font-bold font-mono text-dash-text">{stat.count}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {stat.vsAverage === 0 ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-white/5 text-white/50 border border-white/10">
+                                                    Igual
+                                                </span>
+                                            ) : stat.vsAverage > 0 ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                    +{stat.vsAverage.toFixed(1)}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-white/5 text-white/50 border border-white/10">
+                                                    {stat.vsAverage.toFixed(1)}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {stat.trend === 0 ? (
+                                                <span className="inline-flex items-center gap-1 text-sm font-medium font-mono text-white/50">
+                                                    - 0%
+                                                </span>
+                                            ) : stat.trend > 0 ? (
+                                                <span className="inline-flex items-center gap-1 text-sm font-medium font-mono text-emerald-400">
+                                                    <ArrowUpRight className="w-4 h-4" /> {stat.trend}%
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 text-sm font-medium font-mono text-red-400">
+                                                    <ArrowDownRight className="w-4 h-4" /> {Math.abs(stat.trend)}%
+                                                </span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
