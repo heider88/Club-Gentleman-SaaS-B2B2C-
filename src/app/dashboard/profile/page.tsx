@@ -180,119 +180,115 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
             <header className="flex flex-col gap-2 border-b border-dash-border pb-8">
                 <h1 className="font-oswald text-4xl md:text-5xl font-medium tracking-tight text-dash-text uppercase">
-                    Configuración de Perfil
+                    {role === 'admin' ? 'Configuración de la Barbería' : 'Configuración de Perfil'}
                 </h1>
                 <p className="text-dash-text-muted font-jakarta text-sm uppercase tracking-widest font-bold">
-                    Personaliza cómo te verán tus clientes y cuáles son tus franjas laborales.
+                    {role === 'admin' 
+                        ? 'Administra los días y horarios de apertura de tu local, así como los descansos de tu equipo.' 
+                        : 'Personaliza cómo te verán tus clientes en la aplicación y sube tu mejor foto de perfil.'}
                 </p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Visual Settings - Left Column */}
-                <div className="md:col-span-1 space-y-6">
-                    <div className="bg-dash-panel border border-dash-border p-8 flex flex-col items-center text-center space-y-6">
-                        <div className="relative w-40 h-40 overflow-hidden bg-dash-panel-alt border border-dash-border-alt">
-                            {profile.avatar_url ? (
-                                <Image
-                                    src={profile.avatar_url}
-                                    alt="Avatar"
-                                    fill
-                                    className="object-cover grayscale"
-                                    unoptimized
+            <div className={`grid grid-cols-1 ${role === 'admin' ? '' : 'md:grid-cols-3'} gap-8`}>
+                
+                {/* 1. SECCIÓN DE BARBERO: Visual Settings (Solo visible si NO es admin) */}
+                {role !== 'admin' && (
+                    <div className="md:col-span-1 space-y-6">
+                        <div className="bg-dash-panel border border-dash-border p-8 flex flex-col items-center text-center space-y-6">
+                            <div className="relative w-40 h-40 overflow-hidden bg-dash-panel-alt border border-dash-border-alt">
+                                {profile.avatar_url ? (
+                                    <Image
+                                        src={profile.avatar_url}
+                                        alt="Avatar"
+                                        fill
+                                        className="object-cover grayscale"
+                                        unoptimized
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-5xl grayscale opacity-50">
+                                        🧑‍🎤
+                                    </div>
+                                )}
+                                {uploading && (
+                                    <div className="absolute inset-0 bg-dash-panel/80 flex items-center justify-center">
+                                        <span className="w-8 h-8 rounded-full border-2 border-dash-border-alt border-t-white animate-spin" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="font-oswald text-xl uppercase tracking-wide text-dash-text">Tu Fotografía</h3>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-muted leading-relaxed px-2">
+                                    Un avatar profesional aumenta tus ventas al dar confianza.
+                                </p>
+                            </div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                ref={fileInputRef}
+                                className="hidden"
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploading}
+                                className="flex items-center gap-2 bg-transparent hover:bg-dash-panel-alt text-dash-text text-[10px] uppercase tracking-widest font-bold px-5 py-3 transition-all border border-dash-border-alt w-full justify-center"
+                            >
+                                <Camera className="w-4 h-4" /> {uploading ? "Cargando..." : "Cambiar Foto"}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2. SECCIÓN PRINCIPAL DE FORMULARIOS */}
+                <div className={`${role === 'admin' ? 'max-w-2xl mx-auto w-full' : 'md:col-span-2'} space-y-6`}>
+                    
+                    {/* Información Pública (Solo visible si NO es admin) */}
+                    {role !== 'admin' && (
+                        <div className="bg-dash-panel border border-dash-border p-8 space-y-8">
+                            <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
+                                <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm">1</span>
+                                Información Pública
+                            </h2>
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Alias o Nombre de Artista</label>
+                                <input
+                                    type="text"
+                                    name="full_name"
+                                    value={profile.full_name}
+                                    onChange={handleTextChange}
+                                    placeholder="Ej: Heider - Maestro de Fades"
+                                    className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
                                 />
-                            ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-5xl grayscale opacity-50">
-                                    🧑‍🎤
-                                </div>
-                            )}
-                            {uploading && (
-                                <div className="absolute inset-0 bg-dash-panel/80 flex items-center justify-center">
-                                    <span className="w-8 h-8 rounded-full border-2 border-dash-border-alt border-t-white animate-spin" />
-                                </div>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="font-oswald text-xl uppercase tracking-wide text-dash-text">Tu Fotografía</h3>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-muted leading-relaxed px-2">
-                                Un avatar profesional aumenta tus ventas al dar confianza.
-                            </p>
-                        </div>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            ref={fileInputRef}
-                            className="hidden"
-                        />
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploading}
-                            className="flex items-center gap-2 bg-transparent hover:bg-dash-panel-alt text-dash-text text-[10px] uppercase tracking-widest font-bold px-5 py-3 transition-all border border-dash-border-alt w-full justify-center"
-                        >
-                            <Camera className="w-4 h-4" /> {uploading ? "Cargando..." : "Cambiar Foto"}
-                        </button>
-                    </div>
+                            </div>
 
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="w-full flex items-center justify-center gap-2 bg-dash-text text-dash-bg hover:opacity-80 font-bold px-6 py-4 transition-all shadow-xl text-xs uppercase tracking-widest"
-                    >
-                        {saving ? (
-                            <span className="w-5 h-5 rounded-full border-2 border-dash-border-alt border-t-dash-bg animate-spin" />
-                        ) : (
-                            <><Save className="w-4 h-4" /> Guardar Todos los Cambios</>
-                        )}
-                    </button>
-                </div>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
+                                    <Phone className="w-3.5 h-3.5" /> Número de Contacto
+                                </label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={profile.phone}
+                                    onChange={handleTextChange}
+                                    placeholder="+57 300 000 0000"
+                                    className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
+                                />
+                            </div>
 
-                {/* Form Settings - Right Column */}
-                <div className="md:col-span-2 space-y-6">
-                    {/* Public Data */}
-                    <div className="bg-dash-panel border border-dash-border p-8 space-y-8">
-                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
-                            <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm">1</span>
-                            Información Pública
-                        </h2>
-
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Alias o Nombre de Artista</label>
-                            <input
-                                type="text"
-                                name="full_name"
-                                value={profile.full_name}
-                                onChange={handleTextChange}
-                                placeholder="Ej: Heider - Maestro de Fades"
-                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
-                            />
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Biografía y Trayectoria</label>
+                                <textarea
+                                    name="bio"
+                                    value={profile.bio}
+                                    onChange={handleTextChange}
+                                    rows={4}
+                                    placeholder="Escribe un resumen de tu estilo, años de experiencia y qué te apasiona..."
+                                    className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta resize-none"
+                                />
+                            </div>
                         </div>
-
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
-                                <Phone className="w-3.5 h-3.5" /> Número de Contacto
-                            </label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={profile.phone}
-                                onChange={handleTextChange}
-                                placeholder="+57 300 000 0000"
-                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta"
-                            />
-                        </div>
-
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest block">Biografía y Trayectoria</label>
-                            <textarea
-                                name="bio"
-                                value={profile.bio}
-                                onChange={handleTextChange}
-                                rows={4}
-                                placeholder="Escribe un resumen de tu estilo, años de experiencia y qué te apasiona..."
-                                className="w-full p-4 bg-dash-bg border border-dash-border focus:border-dash-border-alt focus:ring-0 outline-none transition-all text-dash-text placeholder:text-dash-text-soft text-sm font-jakarta resize-none"
-                            />
-                        </div>
-                    </div>
+                    )}
 
                     {/* Schedule Engine JSONB (Solo Admin) */}
                     {role === 'admin' && (
@@ -389,6 +385,21 @@ export default function ProfilePage() {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* BOTÓN DE GUARDAR GLOBAL (Para ambos roles, movido al final o centrado según el rol) */}
+            <div className={`pt-8 border-t border-dash-border ${role === 'admin' ? 'max-w-2xl mx-auto' : ''}`}>
+                <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 bg-dash-text text-dash-bg hover:opacity-80 font-bold px-6 py-4 transition-all shadow-xl text-xs uppercase tracking-widest"
+                >
+                    {saving ? (
+                        <span className="w-5 h-5 rounded-full border-2 border-dash-border-alt border-t-dash-bg animate-spin" />
+                    ) : (
+                        <><Save className="w-4 h-4" /> {role === 'admin' ? 'Guardar Horarios de la Tienda' : 'Guardar Información Pública'}</>
+                    )}
+                </button>
             </div>
         </div>
     )
