@@ -145,13 +145,15 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             <div className="mt-auto relative">
                 {isPending ? (
                     <div className="flex gap-2 relative">
-                        <button 
-                            onClick={() => setShowCancelModal(true)}
-                            className="flex-[0.3] bg-red-950/20 text-red-500 hover:bg-red-950/50 hover:text-red-400 py-3 flex items-center justify-center font-bold transition-all duration-300 shadow-xl active:scale-[0.98] border border-red-500/20 hover:border-red-500/50"
-                            title="Marcar Inasistencia"
-                        >
-                            <UserX className="w-5 h-5" />
-                        </button>
+                        {isAdmin && (
+                            <button 
+                                onClick={() => setShowCancelModal(true)}
+                                className="flex-[0.3] bg-red-950/20 text-red-500 hover:bg-red-950/50 hover:text-red-400 py-3 flex items-center justify-center font-bold transition-all duration-300 shadow-xl active:scale-[0.98] border border-red-500/20 hover:border-red-500/50"
+                                title="Marcar Inasistencia"
+                            >
+                                <UserX className="w-5 h-5" />
+                            </button>
+                        )}
                         <button 
                             onClick={() => updateStatus('completed')}
                             className="flex-1 bg-dash-text text-dash-bg hover:opacity-80 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-[0.98] border border-transparent"
@@ -160,7 +162,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                         </button>
 
                         {/* Cancel Confirmation Popup */}
-                        {showCancelModal && (
+                        {showCancelModal && isAdmin && (
                             <div ref={cancelModalRef} className="absolute bottom-full mb-2 left-0 right-0 bg-dash-panel border border-red-900/50 shadow-[0_0_30px_rgba(0,0,0,0.8)] z-40 p-4 animate-in slide-in-from-bottom-2 fade-in duration-200">
                                 <p className="text-xs font-bold uppercase tracking-widest text-dash-text-soft mb-4 text-center leading-relaxed">¿Confirmar que el cliente no asistió?</p>
                                 <div className="flex gap-2">

@@ -16,7 +16,11 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
         if (error) throw new Error(error.message);
         return { success: true };
     } else {
-        // Barber can only update their OWN appointments
+        // Barber can only update their OWN appointments, and CANNOT cancel them
+        if (newStatus === 'cancelled') {
+            throw new Error("Acceso Denegado: Solo el Administrador puede cancelar citas.");
+        }
+
         // Let's verify ownership first using admin client
         const { data: appt, error: fetchError } = await adminClient
             .from('appointments')
