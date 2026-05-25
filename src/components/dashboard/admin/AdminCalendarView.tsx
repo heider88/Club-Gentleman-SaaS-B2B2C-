@@ -59,11 +59,17 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
         });
 
         // Fallback por si hay citas de un barbero que no vino en barbersList (eliminado o inactivo)
+        // PERO excluimos estrictamente si sabemos que es Admin o si el nombre contiene "GENTLEMAN"
         appointments.forEach(appt => {
             if (!appt.barber_id || map.has(appt.barber_id)) return;
+            const fallbackName = appt.profiles?.full_name || 'Barbero';
+            
+            // Security check: Ignore "GENTLEMAN" admin account from showing up as a barber column
+            if (fallbackName.toUpperCase().includes('GENTLEMAN') || fallbackName.toUpperCase() === 'ADMIN') return;
+
             map.set(appt.barber_id, {
                 id: appt.barber_id,
-                name: appt.profiles?.full_name || 'Barbero',
+                name: fallbackName,
                 avatar: appt.profiles?.avatar_url || '',
                 color: colors[colorIdx % colors.length]
             });

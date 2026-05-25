@@ -78,7 +78,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
     }
 
     const isCompleted = status === 'completed'
-    const isCancelled = status === 'cancelled'
+    const isCancelled = status === 'cancelled' || (appt.services?.price || 0) === 0
     const isPending = status === 'pending' || status === 'confirmed'
 
     if (isCancelled) return null

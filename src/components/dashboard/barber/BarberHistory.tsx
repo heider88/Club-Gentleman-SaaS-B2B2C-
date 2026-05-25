@@ -71,7 +71,9 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
             if (error) {
                 toast.error("Error al cargar el historial", { description: error.message })
             } else {
-                setAppointments((data as any) || [])
+                // Remove zero-peso/no-service appointments from the view completely, treating them as void/cancelled implicitly
+                const validAppointments = (data as any || []).filter((a: any) => (a.services?.price || 0) > 0);
+                setAppointments(validAppointments)
             }
             setLoading(false)
         }

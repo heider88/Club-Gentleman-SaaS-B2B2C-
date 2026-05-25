@@ -341,7 +341,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         let totalSalesGenerated = 0;
 
         const comisionesData = barbers.map(barber => {
-            const barberAppts = completedAppts.filter(a => a.barber_id === barber.id)
+            const barberAppts = completedAppts.filter(a => a.barber_id === barber.id && (a.services?.price || 0) > 0)
             let totalRevenue = 0
             barberAppts.forEach(a => totalRevenue += (a.services?.price || 0))
             const commPercent = barber.commission_percentage || 50
@@ -361,7 +361,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                 storeKeeps,
                 initials: (barber.full_name || 'SN').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
             }
-        }).filter(d => d.totalRevenue > 0).sort((a,b) => b.payout - a.payout)
+        }).sort((a,b) => b.payout - a.payout) // Always show all barbers, even if payout is 0
 
         let topEarner = comisionesData.length > 0 ? comisionesData[0] : { barber: '-', payout: 0 }
         let lowestEarner = comisionesData.length > 0 ? comisionesData[comisionesData.length - 1] : { barber: '-', payout: 0 }
@@ -962,7 +962,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         
         // Calculate data per collaborator
         const collaboratorData = barbers.map(barber => {
-            const barberAppts = validAppts.filter(a => a.barber_id === barber.id)
+            const barberAppts = validAppts.filter(a => a.barber_id === barber.id && (a.services?.price || 0) > 0)
             const count = barberAppts.length
             return {
                 id: barber.id,
@@ -970,7 +970,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                 count: count,
                 percentage: totalReservations > 0 ? Number(((count / totalReservations) * 100).toFixed(1)) : 0
             }
-        }).filter(c => c.count > 0).sort((a,b) => b.count - a.count) // Only show active barbers, sort by most reservations
+        }).sort((a,b) => b.count - a.count) // Show ALL barbers (even with 0), sorted by reservations
 
         const totalCollaborators = collaboratorData.length
         const average = totalCollaborators > 0 ? Math.round(totalReservations / totalCollaborators) : 0
