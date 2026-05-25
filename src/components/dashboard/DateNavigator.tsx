@@ -20,17 +20,29 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
 
     const handlePrevDay = () => {
         let newDate = currentDate;
-        if (view === 'weekly') newDate = subWeeks(currentDate, 1)
-        else if (view === 'monthly') newDate = subMonths(currentDate, 1)
-        else newDate = subDays(currentDate, 1)
+        if (view === 'weekly') {
+            // Ir exactamente 7 días atrás para mantener la consistencia de la semana
+            newDate = subDays(currentDate, 7);
+        } else if (view === 'monthly') {
+            // Ir exactamente al primer día del mes anterior para evitar saltos raros
+            newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        } else {
+            newDate = subDays(currentDate, 1);
+        }
         navigateToDate(newDate)
     }
 
     const handleNextDay = () => {
         let newDate = currentDate;
-        if (view === 'weekly') newDate = addWeeks(currentDate, 1)
-        else if (view === 'monthly') newDate = addMonths(currentDate, 1)
-        else newDate = addDays(currentDate, 1)
+        if (view === 'weekly') {
+            // Ir exactamente 7 días adelante
+            newDate = addDays(currentDate, 7);
+        } else if (view === 'monthly') {
+            // Ir exactamente al primer día del siguiente mes
+            newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        } else {
+            newDate = addDays(currentDate, 1);
+        }
         navigateToDate(newDate)
     }
 
