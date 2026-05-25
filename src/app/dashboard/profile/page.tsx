@@ -39,6 +39,7 @@ export default function ProfilePage() {
     const [uploading, setUploading] = useState(false)
     const [userId, setUserId] = useState<string | null>(null)
 
+    const [role, setRole] = useState<'admin' | 'barber'>('barber')
     const [profile, setProfile] = useState({
         full_name: "",
         bio: "",
@@ -58,11 +59,12 @@ export default function ProfilePage() {
                 setUserId(user.id)
                 const { data } = await supabase
                     .from('profiles')
-                    .select('full_name, bio, phone, avatar_url, schedule_settings')
+                    .select('full_name, bio, phone, avatar_url, schedule_settings, role')
                     .eq('id', user.id)
                     .single()
 
                 if (data) {
+                    setRole(data.role || 'barber')
                     setProfile({
                         full_name: data.full_name || "",
                         bio: data.bio || "",
@@ -141,14 +143,20 @@ export default function ProfilePage() {
         if (!userId) return
 
         setSaving(true)
+        
+        const updateData: any = {
+            full_name: profile.full_name,
+            bio: profile.bio,
+            phone: profile.phone
+        }
+
+        if (role === 'admin') {
+            updateData.schedule_settings = schedule
+        }
+
         const { error } = await supabase
             .from('profiles')
-            .update({
-                full_name: profile.full_name,
-                bio: profile.bio,
-                phone: profile.phone
-                // Nota: schedule_settings eliminado porque solo el Admin puede actualizar horarios
-            })
+            .update(updateData)
             .eq('id', userId)
 
         if (error) {
@@ -286,84 +294,100 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    {/* Schedule Engine JSONB (Solo Lectura) */}
-                    <div className="bg-dash-panel border border-dash-border p-8 space-y-8 opacity-60">
-                        <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
-                            <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm"><Clock className="w-4 h-4" /></span>
-                            Horarios (Solo Lectura)
-                        </h2>
+                    {/* Schedule Engine JSONB (Solo Admin) */}
+                    {role === 'admin' && (
+                        <div className="bg-dash-panel border border-dash-border p-8 space-y-8 relative overflow-hidden group hover:border-dash-border-alt transition-colors">
+                            {/* Decorative element */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-dash-text/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                            
+                            <h2 className="font-oswald text-2xl uppercase tracking-wide flex items-center gap-3 text-dash-text border-b border-dash-border pb-4">
+                                <span className="w-8 h-8 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-sm"><Clock className="w-4 h-4" /></span>
+                                Horarios Generales de la Tienda
+                            </h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft leading-relaxed">
+                                Estos horarios se aplicarán a toda la barbería y determinarán qué días y a qué horas los clientes pueden reservar citas con los colaboradores.
+                            </p>
 
-                        {/* Work Days Picker */}
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
-                                <CalendarDays className="w-4 h-4" /> Días Laborables
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                {DAYS_MAP.map(day => {
-                                    const isSelected = schedule.workDays.includes(day.value)
-                                    return (
-                                        <div
-                                            key={day.value}
-                                            className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-colors cursor-default ${isSelected
-                                                    ? 'bg-dash-text text-dash-bg border-white'
-                                                    : 'bg-dash-panel text-dash-text-muted border-dash-border'
-                                                }`}
-                                        >
-                                            {day.label}
-                                        </div>
-                                    )
-                                })}
+                            {/* Work Days Picker */}
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-bold text-dash-text-muted uppercase tracking-widest flex items-center gap-2 block">
+                                    <CalendarDays className="w-4 h-4" /> Días de Operación
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    {DAYS_MAP.map(day => {
+                                        const isSelected = schedule.workDays.includes(day.value)
+                                        return (
+                                            <button
+                                                key={day.value}
+                                                onClick={() => toggleWorkDay(day.value)}
+                                                className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-colors ${isSelected
+                                                        ? 'bg-dash-text text-dash-bg border-white shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+                                                        : 'bg-dash-panel text-dash-text-muted border-dash-border hover:border-dash-border-alt hover:text-dash-text-soft'
+                                                    }`}
+                                            >
+                                                {day.label}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Hours grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-dash-border">
+                                {/* General Shift */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-white pl-3">Jornada General</h4>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
+                                        <input
+                                            type="number" 
+                                            min="0" max="23"
+                                            value={schedule.startHour}
+                                            onChange={e => setSchedule(s => ({ ...s, startHour: parseInt(e.target.value) || 0 }))}
+                                            className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text font-oswald text-lg outline-none focus:border-white/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
+                                        <input
+                                            type="number"
+                                            min="1" max="24"
+                                            value={schedule.endHour}
+                                            onChange={e => setSchedule(s => ({ ...s, endHour: parseInt(e.target.value) || 0 }))}
+                                            className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text font-oswald text-lg outline-none focus:border-white/50 transition-colors"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Lunch Break */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-red-500/80 border-l-2 border-red-500/50 pl-3">Descanso de Barberos</h4>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Inicio Almuerzo (Hora)</label>
+                                        <input
+                                            type="number"
+                                            min="0" max="23"
+                                            value={schedule.lunchStart}
+                                            onChange={e => setSchedule(s => ({ ...s, lunchStart: parseInt(e.target.value) || 0 }))}
+                                            className="w-full p-3 bg-dash-bg border border-dash-border focus:border-red-500/50 text-dash-text font-oswald text-lg outline-none transition-colors"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Fin Almuerzo (Hora)</label>
+                                        <input
+                                            type="number"
+                                            min="1" max="24"
+                                            value={schedule.lunchEnd}
+                                            onChange={e => setSchedule(s => ({ ...s, lunchEnd: parseInt(e.target.value) || 0 }))}
+                                            className="w-full p-3 bg-dash-bg border border-dash-border focus:border-red-500/50 text-dash-text font-oswald text-lg outline-none transition-colors"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        {/* Hours grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-dash-border">
-                            {/* General Shift */}
-                            <div className="space-y-4">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-white pl-3">Jornada General</h4>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
-                                    <input
-                                        type="number" readOnly
-                                        value={schedule.startHour}
-                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
-                                    <input
-                                        type="number" readOnly
-                                        value={schedule.endHour}
-                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Lunch Break */}
-                            <div className="space-y-4">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-dash-border-alt pl-3">Descanso / Almuerzo</h4>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Inicio (Hora Militar)</label>
-                                    <input
-                                        type="number" readOnly
-                                        value={schedule.lunchStart}
-                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Fin (Hora Militar)</label>
-                                    <input
-                                        type="number" readOnly
-                                        value={schedule.lunchEnd}
-                                        className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text-muted font-oswald text-lg cursor-not-allowed outline-none"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

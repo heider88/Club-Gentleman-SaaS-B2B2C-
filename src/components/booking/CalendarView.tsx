@@ -76,17 +76,19 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
             try {
                 // Promise.all para ejecutar consultas concurrentes
-                const [profileRes, appointmentsRes, blocksRes] = await Promise.all([
-                    supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
+                // 1. Obtener horario GLOBAL (del Admin)
+                const [adminRes, appointmentsRes, blocksRes] = await Promise.all([
+                    supabase.from('profiles').select('schedule_settings').eq('role', 'admin').limit(1).single(),
                     supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
                     supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
                 ]);
 
-                if (profileRes.error) throw profileRes.error;
+                // Fallback de seguridad extrema: Si el admin borró su cuenta o no tiene horario, usar uno por defecto a prueba de fallos
+                const defaultFallbackSettings: ScheduleSettings = { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
+                const settings = adminRes.data?.schedule_settings || defaultFallbackSettings;
+
                 if (appointmentsRes.error) throw appointmentsRes.error;
                 if (blocksRes.error) throw blocksRes.error;
-
-                const settings = profileRes.data?.schedule_settings || { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
                 
                 setScheduleSettings(settings as ScheduleSettings);
                 setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
