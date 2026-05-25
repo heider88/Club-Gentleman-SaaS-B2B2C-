@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
-import { Banknote, FileDown, Scissors, CheckCircle2, CalendarDays, Users, Star, ArrowDownToLine, Clock, CalendarX2, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, TrendingDown } from "lucide-react"
+import { Banknote, FileDown, Scissors, CheckCircle2, CalendarDays, Users, Star, ArrowDownToLine, Clock, CalendarX2, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, TrendingDown, Wallet, Landmark, Receipt, CircleDollarSign } from "lucide-react"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -152,8 +152,194 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         )
     }
 
-    // VENTAS - COMISIONES
+    // VENTAS - CAJA (RESUMEN DE EFECTIVO)
+    const renderResumenEfectivo = () => {
+        let grossSales = 0;
+        let totalCommissions = 0;
+        const expenses = 0; // Fixed as requested for now
+
+        barbers.forEach(b => {
+            const appts = completedAppts.filter(a => a.barber_id === b.id)
+            let sales = 0;
+            appts.forEach(a => sales += (a.services?.price || 0))
+            grossSales += sales;
+            totalCommissions += (sales * (b.commission_percentage || 50)) / 100
+        })
+
+        const netProfit = grossSales - totalCommissions - expenses;
+        const profitMargin = grossSales > 0 ? ((netProfit / grossSales) * 100).toFixed(2) : '0.00';
+
+        const donutData = [
+            { name: 'Ganancia Neta', value: netProfit, color: '#3B82F6' },
+            { name: 'Comisiones', value: totalCommissions, color: '#34D399' }
+        ].filter(d => d.value > 0)
+
+        const barData = [
+            { name: 'Ingresos', value: grossSales, color: '#10b981' },
+            { name: 'Egresos', value: totalCommissions + expenses, color: '#ef4444' },
+            { name: 'Utilidad Neta', value: netProfit, color: '#3B82F6' }
+        ]
+
+        return (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* KPIs */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Dinero en Caja</span>
+                            <div className="p-2 bg-blue-500/10 rounded-xl"><Wallet className="w-4 h-4 text-blue-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-dash-text">${grossSales.toLocaleString()}</span>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Ventas Brutas</span>
+                            <div className="p-2 bg-emerald-500/10 rounded-xl"><Landmark className="w-4 h-4 text-emerald-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-emerald-400">${grossSales.toLocaleString()}</span>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Comisiones Totales</span>
+                            <div className="p-2 bg-[#34D399]/10 rounded-xl"><CircleDollarSign className="w-4 h-4 text-[#34D399]" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-[#34D399]">${totalCommissions.toLocaleString()}</span>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Gastos Totales</span>
+                            <div className="p-2 bg-red-500/10 rounded-xl"><Receipt className="w-4 h-4 text-red-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-red-400">${expenses.toLocaleString()}</span>
+                    </div>
+                </div>
+
+                {/* GRÁFICOS */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Donut Chart */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-4">Resumen de Efectivo</h3>
+                        <div className="flex-1 w-full relative">
+                            {grossSales > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie 
+                                            data={donutData} 
+                                            innerRadius="65%" 
+                                            outerRadius="90%" 
+                                            paddingAngle={3} 
+                                            dataKey="value" 
+                                            stroke="none"
+                                        >
+                                            {donutData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            formatter={(value: any) => `$${Number(value).toLocaleString()}`}
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: '500', color: '#9ca3af' }}/>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin flujos registrados</div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Bar Chart */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Flujo Financiero</h3>
+                            <span className="text-xs font-bold px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full font-mono">Margen: {profitMargin}%</span>
+                        </div>
+                        <div className="flex-1 w-full relative">
+                            {grossSales > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={barData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 500 }} />
+                                        <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value/1000}k`} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                                        <Tooltip 
+                                            formatter={(value: any) => `$${Number(value).toLocaleString()}`}
+                                            cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={60}>
+                                            {barData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos suficientes</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* TABLA DETALLADA */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <div className="p-6 border-b border-white/10">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Flujo de Caja Detallado</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Categoría</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Tipo</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-bold text-dash-text">Servicios Facturados</td>
+                                    <td className="px-6 py-4"><span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-md text-xs font-bold">Ingreso</span></td>
+                                    <td className="px-6 py-4 text-right font-mono text-emerald-400 font-bold">${grossSales.toLocaleString()}</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-bold text-dash-text">Productos</td>
+                                    <td className="px-6 py-4"><span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-md text-xs font-bold">Ingreso</span></td>
+                                    <td className="px-6 py-4 text-right font-mono text-dash-text-soft">$0</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-bold text-dash-text">Descuentos Aplicados</td>
+                                    <td className="px-6 py-4"><span className="px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded-md text-xs font-bold">Rebaja</span></td>
+                                    <td className="px-6 py-4 text-right font-mono text-dash-text-soft">$0</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-bold text-dash-text">Comisiones Pagadas</td>
+                                    <td className="px-6 py-4"><span className="px-2 py-1 bg-red-500/10 text-red-400 rounded-md text-xs font-bold">Egreso</span></td>
+                                    <td className="px-6 py-4 text-right font-mono text-red-400 font-bold">-${totalCommissions.toLocaleString()}</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-bold text-dash-text">Gastos Operativos</td>
+                                    <td className="px-6 py-4"><span className="px-2 py-1 bg-red-500/10 text-red-400 rounded-md text-xs font-bold">Egreso</span></td>
+                                    <td className="px-6 py-4 text-right font-mono text-dash-text-soft">-$0</td>
+                                </tr>
+                                <tr className="bg-white/5 border-t-2 border-t-white/10">
+                                    <td colSpan={2} className="px-6 py-4 text-sm font-black text-dash-text uppercase tracking-widest text-right">Ganancia Neta Calculada</td>
+                                    <td className="px-6 py-4 text-right font-mono text-blue-400 font-black text-lg">${netProfit.toLocaleString()}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // VENTAS - COMISIONES (DASHBOARD FINANCIERO)
     const renderComisiones = () => {
+        let totalCommissions = 0;
+        let totalSalesGenerated = 0;
+
         const comisionesData = barbers.map(barber => {
             const barberAppts = completedAppts.filter(a => a.barber_id === barber.id)
             let totalRevenue = 0
@@ -162,45 +348,143 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             const payout = (totalRevenue * commPercent) / 100
             const storeKeeps = totalRevenue - payout
 
+            totalCommissions += payout;
+            totalSalesGenerated += totalRevenue;
+
             return {
-                barber: barber.full_name,
+                id: barber.id,
+                barber: barber.full_name || 'Sin Nombre',
                 cuts: barberAppts.length,
                 totalRevenue,
                 commPercent,
                 payout,
-                storeKeeps
+                storeKeeps,
+                initials: (barber.full_name || 'SN').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
             }
-        }).filter(d => d.totalRevenue > 0)
+        }).filter(d => d.totalRevenue > 0).sort((a,b) => b.payout - a.payout)
+
+        let topEarner = comisionesData.length > 0 ? comisionesData[0] : { barber: '-', payout: 0 }
+        let lowestEarner = comisionesData.length > 0 ? comisionesData[comisionesData.length - 1] : { barber: '-', payout: 0 }
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="overflow-x-auto border border-white/5 bg-black/40">
-                    <table className="w-full text-left font-jakarta text-sm">
-                        <thead>
-                            <tr className="border-b border-white/10 bg-white/[0.02]">
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-dash-text-muted">Profesional</th>
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-dash-text-muted text-right">Servicios</th>
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-dash-text-muted text-right">Generado</th>
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-dash-text-muted text-right">% Com.</th>
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-emerald-500/70 text-right">A Pagar</th>
-                                <th className="p-4 font-bold uppercase tracking-[0.2em] text-[10px] text-cyan-500/70 text-right">Queda Tienda</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {comisionesData.length === 0 ? (
-                                <tr><td colSpan={6} className="p-8 text-center text-white/40 font-mono text-xs uppercase">Sin comisiones generadas</td></tr>
-                            ) : comisionesData.map((data, i) => (
-                                <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
-                                    <td className="p-4 font-oswald text-dash-text text-lg uppercase tracking-wide">{data.barber}</td>
-                                    <td className="p-4 font-mono text-dash-text-soft text-right">{data.cuts}</td>
-                                    <td className="p-4 font-mono text-dash-text text-right">${data.totalRevenue.toLocaleString()}</td>
-                                    <td className="p-4 font-mono text-dash-text-soft text-right">{data.commPercent}%</td>
-                                    <td className="p-4 font-mono text-emerald-400 font-bold text-right">${data.payout.toLocaleString()}</td>
-                                    <td className="p-4 font-mono text-cyan-400 font-bold text-right">${data.storeKeeps.toLocaleString()}</td>
+                {/* 1. KPIs */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Comisiones Totales</span>
+                            <div className="p-2 bg-yellow-500/10 rounded-xl"><CircleDollarSign className="w-4 h-4 text-yellow-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-yellow-500">${totalCommissions.toLocaleString()}</span>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)] border-l-4 border-l-yellow-500/50">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft truncate pr-2">Mayor Comisión</span>
+                            <div className="p-2 bg-yellow-500/10 rounded-xl"><TrendingUp className="w-4 h-4 text-yellow-500" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xl font-bold text-dash-text truncate">{topEarner.barber}</span>
+                            <span className="text-sm font-semibold font-mono text-yellow-500 shrink-0">${topEarner.payout.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft truncate pr-2">Menor Comisión</span>
+                            <div className="p-2 bg-white/5 rounded-xl"><TrendingDown className="w-4 h-4 text-white/40" /></div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-xl font-bold text-dash-text truncate">{lowestEarner.barber}</span>
+                            <span className="text-sm font-semibold font-mono text-dash-text-soft shrink-0">${lowestEarner.payout.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[120px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                        <div className="flex justify-between items-start w-full">
+                            <span className="text-xs font-bold uppercase tracking-wider text-dash-text-soft">Ventas Generadas</span>
+                            <div className="p-2 bg-emerald-500/10 rounded-xl"><Landmark className="w-4 h-4 text-emerald-500" /></div>
+                        </div>
+                        <span className="text-3xl font-black font-mono text-dash-text">${totalSalesGenerated.toLocaleString()}</span>
+                    </div>
+                </div>
+
+                {/* 2. BAR CHART HORIZONTAL */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[400px] shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-6">Comparativa de Comisiones Generadas</h3>
+                    <div className="flex-1 w-full relative">
+                        {comisionesData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={comisionesData} layout="vertical" margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
+                                    <XAxis type="number" axisLine={false} tickLine={false} tickFormatter={(value) => `$${value/1000}k`} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'monospace' }} />
+                                    <YAxis dataKey="barber" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: 500 }} />
+                                    <Tooltip 
+                                        formatter={(value: any) => `$${Number(value).toLocaleString()}`}
+                                        cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                    <Bar dataKey="payout" fill="#EAB308" radius={[0, 6, 6, 0]} animationDuration={800} maxBarSize={35} name="Comisión ($)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin comisiones generadas</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* 3. TABLA DE COMISIONES */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                    <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Desglose Económico por Colaborador</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Colaborador</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Comisión (%)</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Servicios ($)</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Propinas ($)</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">A Pagar ($)</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 text-right">Ventas Totales ($)</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {comisionesData.length === 0 ? (
+                                    <tr><td colSpan={6} className="p-8 text-center text-white/40 font-mono text-xs uppercase">Sin data registrada</td></tr>
+                                ) : comisionesData.map((data, i) => (
+                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-yellow-500 font-bold text-sm shrink-0">
+                                                    {data.initials}
+                                                </div>
+                                                <span className="text-sm font-bold text-dash-text">{data.barber}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-white/5 text-white/70 border border-white/10">
+                                                {data.commPercent}%
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-sm font-medium font-mono text-dash-text">${data.payout.toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-sm font-medium font-mono text-dash-text-soft">$0</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-lg font-black font-mono text-yellow-500">${data.payout.toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-sm font-bold font-mono text-dash-text">${data.totalRevenue.toLocaleString()}</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         )
@@ -634,8 +918,8 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             case 'ventas-resumen': return renderVentasResumen();
             case 'ventas-servicios': return renderVentasServicios();
             case 'ventas-comisiones': return renderComisiones();
+            case 'ventas-efectivo': return renderResumenEfectivo();
             case 'ventas-productos': 
-            case 'ventas-efectivo': 
                 return (
                     <div className="w-full min-h-[300px] border border-white/5 bg-black/40 flex items-center justify-center relative overflow-hidden group">
                         <span className="text-[120px] font-oswald font-black text-dash-text/[0.02] block leading-none pointer-events-none select-none absolute">N/A</span>
