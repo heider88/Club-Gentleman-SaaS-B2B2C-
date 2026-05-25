@@ -247,9 +247,11 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         )
     }
 
-    // RESERVAS - ESTADO
+    // RESERVAS - ESTADO (DASHBOARD COMPLETO)
     const renderReservasEstado = () => {
         let pending = 0, confirmed = 0, completed = 0, cancelled = 0
+        const total = appointments.length
+
         appointments.forEach(a => {
             if(a.status === 'pending') pending++
             if(a.status === 'confirmed') confirmed++
@@ -257,53 +259,152 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             if(a.status === 'cancelled') cancelled++
         })
 
-        const data = [
-            { name: 'Pendientes', value: pending, color: '#eab308' },
-            { name: 'Confirmadas', value: confirmed, color: '#3b82f6' },
-            { name: 'Completadas', value: completed, color: '#10b981' },
-            { name: 'Canceladas', value: cancelled, color: '#ef4444' },
-        ].filter(d => d.value > 0)
+        const getPercent = (val: number) => total > 0 ? ((val / total) * 100).toFixed(1) : '0.0'
+
+        // Data array
+        const statusData = [
+            { id: 'completed', label: 'Completadas', count: completed, pct: getPercent(completed), color: '#10b981', icon: <CheckCircle2 className="w-5 h-5 text-[#10b981]" /> },
+            { id: 'confirmed', label: 'Confirmadas', count: confirmed, pct: getPercent(confirmed), color: '#3b82f6', icon: <CalendarDays className="w-5 h-5 text-[#3b82f6]" /> },
+            { id: 'pending',   label: 'Pendientes',  count: pending,   pct: getPercent(pending),   color: '#eab308', icon: <Clock className="w-5 h-5 text-[#eab308]" /> },
+            { id: 'cancelled', label: 'Canceladas',  count: cancelled, pct: getPercent(cancelled), color: '#ef4444', icon: <CalendarX2 className="w-5 h-5 text-[#ef4444]" /> },
+        ]
+
+        // Filter out zero values for charts to look cleaner, but keep for table if you prefer (we'll filter charts)
+        const chartData = statusData.filter(d => d.count > 0).map(d => ({
+            name: d.label,
+            value: d.count,
+            color: d.color
+        }))
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                
+                {/* 1. CARDS DE MÉTRICAS (KPIs) */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {statusData.map(stat => (
+                        <div key={stat.id} className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col justify-between h-[140px] relative overflow-hidden group">
+                            <div className="flex justify-between items-start w-full">
+                                <span className="text-xs font-bold uppercase tracking-[0.1em] text-dash-text-soft">{stat.label}</span>
+                                <div className="p-2 bg-white/5 rounded-xl group-hover:scale-110 transition-transform">
+                                    {stat.icon}
+                                </div>
+                            </div>
+                            <div>
+                                <span className="text-3xl font-black font-mono text-dash-text block leading-none">{stat.count}</span>
+                                <span className="text-xs font-bold mt-2 block" style={{ color: stat.color }}>{stat.pct}% del total</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 2. GRÁFICOS (DONA Y BARRAS) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-8 flex items-center justify-center min-h-[400px]">
-                        {data.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={data} innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value" stroke="none">
-                                        {data.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip 
-                                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '0', fontFamily: 'monospace' }}
-                                    />
-                                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em' }}/>
-                                </PieChart>
-                            </ResponsiveContainer>
-                        ) : <span className="text-white/30 font-mono text-sm uppercase">Sin Data</span>}
+                    {/* Gráfico Donut */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px]">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-4">Distribución Porcentual</h3>
+                        <div className="flex-1 w-full relative">
+                            {chartData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie 
+                                            data={chartData} 
+                                            innerRadius="65%" 
+                                            outerRadius="90%" 
+                                            paddingAngle={3} 
+                                            dataKey="value" 
+                                            stroke="none"
+                                            animationDuration={800}
+                                        >
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                            itemStyle={{ fontWeight: 'bold' }}
+                                        />
+                                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: '500', color: '#9ca3af' }}/>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos en este periodo</div>
+                            )}
+                        </div>
                     </div>
-                    
-                    <div className="flex flex-col gap-4 justify-center">
-                        <div className="border border-white/5 border-l-yellow-500 bg-black/40 p-6 flex justify-between items-center">
-                            <span className="font-oswald text-xl uppercase tracking-widest text-dash-text">Pendientes</span>
-                            <span className="font-mono text-4xl font-bold text-yellow-500">{pending}</span>
-                        </div>
-                        <div className="border border-white/5 border-l-blue-500 bg-black/40 p-6 flex justify-between items-center">
-                            <span className="font-oswald text-xl uppercase tracking-widest text-dash-text">Confirmadas</span>
-                            <span className="font-mono text-4xl font-bold text-blue-500">{confirmed}</span>
-                        </div>
-                        <div className="border border-white/5 border-l-emerald-500 bg-black/40 p-6 flex justify-between items-center">
-                            <span className="font-oswald text-xl uppercase tracking-widest text-dash-text">Completadas</span>
-                            <span className="font-mono text-4xl font-bold text-emerald-500">{completed}</span>
-                        </div>
-                        <div className="border border-white/5 border-l-red-500 bg-black/40 p-6 flex justify-between items-center">
-                            <span className="font-oswald text-xl uppercase tracking-widest text-dash-text">Canceladas</span>
-                            <span className="font-mono text-4xl font-bold text-red-500">{cancelled}</span>
+
+                    {/* Gráfico de Barras */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 rounded-2xl flex flex-col h-[350px]">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider mb-4">Comparativa de Volúmenes</h3>
+                        <div className="flex-1 w-full relative">
+                            {chartData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 500 }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                                        <Tooltip 
+                                            cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                            contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '8px', color: '#fff' }}
+                                        />
+                                        <Bar dataKey="value" radius={[6, 6, 0, 0]} animationDuration={800} maxBarSize={60}>
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">Sin datos en este periodo</div>
+                            )}
                         </div>
                     </div>
                 </div>
+
+                {/* 3. TABLA DETALLADA CON PROGRESS BARS */}
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl overflow-hidden">
+                    <div className="p-6 border-b border-white/10">
+                        <h3 className="text-sm font-bold text-dash-text uppercase tracking-wider">Desglose Detallado</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Estado</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Cantidad</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5">Porcentaje</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-dash-text-soft uppercase tracking-wider border-b border-white/5 min-w-[200px]">Indicador</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {statusData.map((stat, i) => (
+                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stat.color }}></div>
+                                                <span className="text-sm font-medium text-dash-text">{stat.label}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm font-bold font-mono text-dash-text">{stat.count}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm font-semibold font-mono" style={{ color: stat.color }}>{stat.pct}%</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="h-full rounded-full transition-all duration-1000 ease-out" 
+                                                    style={{ width: `${stat.pct}%`, backgroundColor: stat.color }}
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         )
     }
