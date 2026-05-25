@@ -30,6 +30,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
     const [showOptions, setShowOptions] = useState(false)
     const [showCancelModal, setShowCancelModal] = useState(false)
     const optionsRef = useRef<HTMLDivElement>(null)
+    const cancelModalRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
     const router = useRouter()
 
@@ -43,6 +44,8 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
         const handleClickOutside = (event: MouseEvent) => {
             if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
                 setShowOptions(false)
+            }
+            if (cancelModalRef.current && !cancelModalRef.current.contains(event.target as Node)) {
                 setShowCancelModal(false)
             }
         }
@@ -115,27 +118,13 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                     </button>
                     
                     {/* Dropdown Options */}
-                    {showOptions && isPending && !showCancelModal && (
+                    {showOptions && isPending && (
                         <div className="absolute right-0 top-8 w-48 bg-dash-panel-alt border border-dash-border-alt shadow-2xl z-30 py-1 animate-in slide-in-from-top-2 fade-in duration-200">
                             {appt.customer_phone && appt.customer_phone !== "N/A" && (
                                 <a href={`tel:${appt.customer_phone}`} className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-dash-text-soft hover:text-dash-text hover:bg-dash-panel-alt flex items-center gap-3 transition-colors">
                                     <Phone className="w-4 h-4" /> Llamar Cliente
                                 </a>
                             )}
-                            <button onClick={() => setShowCancelModal(true)} className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-red-400 hover:text-red-300 hover:bg-red-950/30 flex items-center gap-3 transition-colors border-t border-dash-border/50">
-                                <UserX className="w-4 h-4" /> Marcar No Asistió
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Cancel Confirmation */}
-                    {showCancelModal && (
-                        <div className="absolute right-0 top-8 w-64 bg-dash-panel border border-dash-border-alt shadow-2xl z-30 p-4 animate-in slide-in-from-top-2 fade-in duration-200">
-                            <p className="text-xs font-bold uppercase tracking-widest text-dash-text-soft mb-4 text-center leading-relaxed">¿El cliente no llegó?</p>
-                            <div className="flex gap-2">
-                                <button onClick={() => {setShowCancelModal(false); setShowOptions(false)}} className="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest text-dash-text-soft bg-dash-panel-alt hover:brightness-110 transition-all border border-dash-border">Volver</button>
-                                <button onClick={() => updateStatus('cancelled')} className="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-900 hover:bg-red-800 transition-colors border border-red-800">Confirmar</button>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -162,14 +151,34 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             </div>
 
             {/* Actions */}
-            <div className="mt-auto">
+            <div className="mt-auto relative">
                 {isPending ? (
-                    <button 
-                        onClick={() => updateStatus('completed')}
-                        className="w-full bg-dash-text text-dash-bg hover:opacity-80 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-[0.98] border border-transparent"
-                    >
-                        Finalizar y Cobrar
-                    </button>
+                    <div className="flex gap-2 relative">
+                        <button 
+                            onClick={() => setShowCancelModal(true)}
+                            className="flex-[0.3] bg-red-950/20 text-red-500 hover:bg-red-950/50 hover:text-red-400 py-3 flex items-center justify-center font-bold transition-all duration-300 shadow-xl active:scale-[0.98] border border-red-500/20 hover:border-red-500/50"
+                            title="Marcar Inasistencia"
+                        >
+                            <UserX className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={() => updateStatus('completed')}
+                            className="flex-1 bg-dash-text text-dash-bg hover:opacity-80 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-[0.98] border border-transparent"
+                        >
+                            Finalizar y Cobrar
+                        </button>
+
+                        {/* Cancel Confirmation Popup */}
+                        {showCancelModal && (
+                            <div ref={cancelModalRef} className="absolute bottom-full mb-2 left-0 right-0 bg-dash-panel border border-red-900/50 shadow-[0_0_30px_rgba(0,0,0,0.8)] z-40 p-4 animate-in slide-in-from-bottom-2 fade-in duration-200">
+                                <p className="text-xs font-bold uppercase tracking-widest text-dash-text-soft mb-4 text-center leading-relaxed">¿Confirmar que el cliente no asistió?</p>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setShowCancelModal(false)} className="flex-[0.4] py-2 text-[10px] font-bold uppercase tracking-widest text-dash-text-soft bg-dash-panel-alt hover:brightness-110 transition-all border border-dash-border">Cancelar</button>
+                                    <button onClick={() => updateStatus('cancelled')} className="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-600 hover:bg-red-500 transition-colors border border-red-500">Sí, No Asistió</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <div className="w-full border border-dash-border/50 bg-dash-panel-alt/30 py-3 flex items-center justify-center gap-2 text-dash-text-muted text-xs font-bold uppercase tracking-widest">
                         <CheckCircle2 className="w-4 h-4" /> Completado
