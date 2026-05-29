@@ -161,11 +161,11 @@ export function StaticHeader() {
                 <div className="shrink-0 w-full sm:w-auto mt-1 sm:mt-0 sm:ml-4 flex justify-center">
                     <a
                         href="#booking-section"
-                        className="bg-white min-h-[44px] active:scale-95 hover:bg-gray-200 text-[#111] text-[12px] sm:text-[13px] font-black px-8 py-3 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#6D3294] hover:shadow-[0_0_20px_rgba(109,50,148,0.5)] flex items-center justify-center relative overflow-hidden group w-full sm:w-auto"
+                        className="bg-[#7B2CBF] min-h-[44px] active:scale-95 hover:bg-[#9D4EDD] text-white text-[12px] sm:text-[13px] font-black px-8 py-3 sm:py-4 rounded-full uppercase tracking-[0.15em] transition-all shadow-xl border-2 border-transparent hover:border-[#9D4EDD] hover:shadow-[0_0_20px_rgba(157,78,221,0.5)] flex items-center justify-center relative overflow-hidden group w-full sm:w-auto"
                     >
                         <span className="relative z-10">Reservar Ahora</span>
                         {/* Brillo de efecto al pasar cursor */}
-                        <div className="absolute inset-0 bg-white/50 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out z-[0]"></div>
+                        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out z-[0]"></div>
                     </a>
                 </div>
 
