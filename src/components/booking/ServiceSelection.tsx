@@ -43,10 +43,11 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
                     {/* Hover indicator line */}
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#6D3294] opacity-0 group-hover:opacity-100 transition-opacity" />
                     
-                    <div className="flex justify-between items-baseline gap-4 mb-2">
-                        <span className="font-oswald text-xl uppercase tracking-wider text-white/90 group-hover:text-white transition-colors">{service.name}</span>
-                        <div className="flex-1 border-b-2 border-dotted border-white/10 group-hover:border-[#6D3294]/50 transition-colors mx-2 relative top-[-4px]"></div>
-                        <span className="font-mono text-lg font-bold text-white group-hover:text-pink-400 transition-colors">${service.price}</span>
+                    <div className="flex justify-between items-baseline gap-2 sm:gap-4 mb-2">
+                        <span className="font-oswald text-lg sm:text-xl uppercase tracking-wider text-white/90 group-hover:text-white transition-colors truncate">{service.name}</span>
+                        <div className="hidden sm:block flex-1 border-b-2 border-dotted border-white/10 group-hover:border-[#6D3294]/50 transition-colors mx-2 relative top-[-4px]"></div>
+                        <div className="sm:hidden flex-1"></div>
+                        <span className="font-mono text-base sm:text-lg font-bold text-white group-hover:text-pink-400 transition-colors shrink-0">${service.price}</span>
                     </div>
                     
                     {service.description && (
