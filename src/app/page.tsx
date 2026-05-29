@@ -69,7 +69,7 @@ export default async function LandingPage() {
                 src="/lojito.webp"
                 alt="Club Gentleman For Men Logo"
                 fill
-                className="object-contain object-center scale-110 sm:scale-125"
+                className="object-contain object-center scale-[2.2] sm:scale-125"
                 priority
               />
             </div>
