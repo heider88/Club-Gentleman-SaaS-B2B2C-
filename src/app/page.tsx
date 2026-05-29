@@ -63,8 +63,8 @@ export default async function LandingPage() {
           {/* Sombra de luz para el header */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 blur-[100px] pointer-events-none -z-10" />
           <div className="space-y-6 flex flex-col items-center text-center">
-            {/* Logo Centrado (Tamaño doble, reducido 20%) */}
-            <div className="relative w-[76vw] sm:w-[45rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
+            {/* Logo Centrado (Incrementado 15%) */}
+            <div className="relative w-[87vw] sm:w-[52rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
               <Image
                 src="/lojito.webp"
                 alt="Club Gentleman For Men Logo"
