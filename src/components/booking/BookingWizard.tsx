@@ -41,11 +41,12 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
     useEffect(() => {
         if (scrollContainerRef.current) {
             const container = scrollContainerRef.current;
-            if (step > 1) {
-                const targetScroll = (step - 1) * 260; // Approx width of collapsed steps
-                container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-            } else {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
+            const targetStep = document.getElementById(`wizard-step-${step}`);
+            
+            if (targetStep) {
+                // Calculate scroll position exactly to the start of the step, subtracting some padding
+                const scrollPosition = targetStep.offsetLeft - 16; // 16px to give a slight gap on the left
+                container.scrollTo({ left: Math.max(0, scrollPosition), behavior: 'smooth' });
             }
         }
     }, [step])
@@ -70,7 +71,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             <div className="absolute inset-0 bg-gradient-to-r from-[#6D3294]/0 via-pink-500/5 to-[#6D3294]/0 opacity-0 group-hover/wizard:opacity-100 transition-opacity duration-1000 pointer-events-none -z-10" />
 
             {/* Step 1: Barber */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-[85vw] sm:w-[350px]' : 'w-[200px]'}`}>
+            <div id="wizard-step-1" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-[85vw] sm:w-[350px]' : 'w-[140px] sm:w-[200px]'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 1 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 1 ? <Check className="w-5 h-5" /> : 1}
@@ -105,7 +106,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 2: Service */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 2 ? 'w-[85vw] sm:w-[350px]' : step > 2 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-2" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 2 ? 'w-[85vw] sm:w-[350px]' : step > 2 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 2 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 2 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 2 ? <Check className="w-5 h-5" /> : 2}
@@ -145,7 +146,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 3: Time Slot */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 3 ? 'w-[85vw] sm:w-[350px]' : step > 3 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-3" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 3 ? 'w-[85vw] sm:w-[350px]' : step > 3 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 3 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 3 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 3 ? <Check className="w-5 h-5" /> : 3}
@@ -186,7 +187,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             </div>
 
             {/* Step 4: Contact Form */}
-            <div className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 4 ? 'w-[85vw] sm:w-[350px]' : step > 4 ? 'w-[200px]' : 'w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-4" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 4 ? 'w-[85vw] sm:w-[350px]' : step > 4 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 4 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 4 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 4 ? <Check className="w-5 h-5" /> : 4}
