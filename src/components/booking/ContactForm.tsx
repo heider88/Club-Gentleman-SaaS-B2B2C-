@@ -2,8 +2,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { createClient } from "@/lib/supabase/client"
 import { sendBookingNotifications } from "@/app/actions/notifications"
+import { createAppointmentAction } from "@/app/actions/appointments"
 
 const formSchema = z.object({
     name: z.string().min(2, "El nombre completo es requerido"),
@@ -38,33 +38,25 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
             return;
         }
 
-        const supabase = createClient();
-
         // Prepare Start and End time safely preserving local timezone (using parse for 12h format)
         const { parse } = require('date-fns');
         const startTime = parse(bookingData.time, 'h:mm a', bookingData.date);
         const endTime = new Date(startTime.getTime() + bookingData.serviceDuration * 60000);
 
         try {
-            const { error } = await supabase.from('appointments').insert({
-                barber_id: bookingData.barberId,
-                service_id: bookingData.serviceId,
-                customer_name: data.name,
-                customer_email: data.email,
-                customer_phone: data.phone,
-                start_time: startTime.toISOString(),
-                end_time: endTime.toISOString(),
-                status: 'pending' // Por defecto pendiente, se podría confirmar directamente
-            })
+            await createAppointmentAction({
+                barberId: bookingData.barberId,
+                serviceId: bookingData.serviceId,
+                customerName: data.name,
+                customerEmail: data.email,
+                customerPhone: data.phone,
+                startTime: startTime.toISOString(),
+                endTime: endTime.toISOString()
+            });
 
-            if (error) {
-                console.error("DB Error:", error);
-                onError("No se pudo guardar la reserva. Verifica conexión o disponibilidad.");
-                return;
-            }
-
-            console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE ---');
-            const notificationResult = await sendBookingNotifications({
+            console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE (Sin Bloquear UI) ---');
+            // Fire and forget: No hacemos await para no bloquear al usuario si el correo/whatsapp tarda
+            sendBookingNotifications({
                 customerName: data.name,
                 email: data.email,
                 phone: data.phone,
@@ -72,17 +64,12 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 barberName: bookingData.barberName || "Profesional",
                 date: bookingData.date.toISOString().split('T')[0],
                 time: bookingData.time
-            });
-
-            if (!notificationResult.emailSent) {
-                console.error("Email warning:", notificationResult);
-                // No bloqueamos UI porque la DB guardó la cita con éxito
-            }
+            }).catch(console.error);
 
             onSuccess();
         } catch (err: any) {
             console.error(err);
-            onError("Ha ocurrido un error inesperado al contactar con el servidor.");
+            onError(err.message || "Ha ocurrido un error inesperado al contactar con el servidor.");
         }
     }
 

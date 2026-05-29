@@ -18,6 +18,7 @@ export default async function LandingPage() {
       .select('image_url')
       .order('order_index', { ascending: true })
       .order('created_at', { ascending: false })
+      .limit(10)
 
   const fallbackImages = [
     "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&h=400&fit=crop",

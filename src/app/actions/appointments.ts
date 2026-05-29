@@ -2,6 +2,43 @@
 
 import { createAdminClient } from "@/lib/auth/adminClient";
 import { getUserRole } from "@/lib/auth/rbac";
+import { z } from "zod";
+
+const createAppointmentSchema = z.object({
+    barberId: z.string().uuid(),
+    serviceId: z.string().uuid(),
+    customerName: z.string().min(2),
+    customerEmail: z.string().email(),
+    customerPhone: z.string().min(8),
+    startTime: z.string().datetime(),
+    endTime: z.string().datetime(),
+});
+
+export async function createAppointmentAction(payload: z.infer<typeof createAppointmentSchema>) {
+    const validated = createAppointmentSchema.safeParse(payload);
+    if (!validated.success) throw new Error("Datos de reserva inválidos");
+
+    const adminClient = createAdminClient();
+    const { error } = await adminClient.from('appointments').insert({
+        barber_id: validated.data.barberId,
+        service_id: validated.data.serviceId,
+        customer_name: validated.data.customerName,
+        customer_email: validated.data.customerEmail,
+        customer_phone: validated.data.customerPhone,
+        start_time: validated.data.startTime,
+        end_time: validated.data.endTime,
+        status: 'pending'
+    });
+
+    if (error) {
+        if (error.code === '23P01') {
+            throw new Error("El horario seleccionado ya no está disponible (Cita duplicada).");
+        }
+        throw new Error(error.message);
+    }
+    
+    return { success: true };
+}
 
 export async function updateAppointmentStatus(appointmentId: string, newStatus: 'completed' | 'cancelled') {
     const { userId, role } = await getUserRole();
