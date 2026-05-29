@@ -37,16 +37,25 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-    // Smooth scroll the horizontal container when step changes
+    // Scroll behaviour para Desktop vs Mobile
     useEffect(() => {
         if (scrollContainerRef.current) {
             const container = scrollContainerRef.current;
             const targetStep = document.getElementById(`wizard-step-${step}`);
             
             if (targetStep) {
-                // Calculate scroll position exactly to the start of the step, subtracting some padding
-                const scrollPosition = targetStep.offsetLeft - 16; // 16px to give a slight gap on the left
-                container.scrollTo({ left: Math.max(0, scrollPosition), behavior: 'smooth' });
+                // Pequeño timeout para permitir que la animación CSS (w-full / flex-col) inicie antes de medir
+                setTimeout(() => {
+                    // En movil es flex-col (vertical), usamos scrollBy si se necesita o scrollIntoView
+                    const isMobile = window.innerWidth < 640; // sm breakpoint
+                    if(isMobile) {
+                        targetStep.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        // Desktop: horizontal
+                        const scrollPosition = targetStep.offsetLeft - 16;
+                        container.scrollTo({ left: Math.max(0, scrollPosition), behavior: 'smooth' });
+                    }
+                }, 100);
             }
         }
     }, [step])
@@ -62,7 +71,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
     return (
         <div
             ref={scrollContainerRef}
-            className="w-full relative py-2 overflow-x-auto pb-8 snap-x snap-mandatory flex items-start gap-4 group/wizard"
+            className="w-full relative py-2 overflow-x-hidden sm:overflow-x-auto pb-8 snap-y sm:snap-x snap-mandatory flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-4 group/wizard"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
@@ -71,16 +80,16 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
             <div className="absolute inset-0 bg-gradient-to-r from-[#6D3294]/0 via-pink-500/5 to-[#6D3294]/0 opacity-0 group-hover/wizard:opacity-100 transition-opacity duration-1000 pointer-events-none -z-10" />
 
             {/* Step 1: Barber */}
-            <div id="wizard-step-1" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-[85vw] sm:w-[350px]' : 'w-[140px] sm:w-[200px]'}`}>
+            <div id="wizard-step-1" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 1 ? 'w-full sm:w-[350px]' : 'w-full sm:w-[200px]'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 1 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 1 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 1 ? <Check className="w-5 h-5" /> : 1}
                     </div>
-                    <div className="flex-1 h-[2px] bg-white/10 rounded-full" />
+                    <div className="flex-1 h-[2px] bg-white/10 rounded-full sm:block" />
                 </div>
 
                 {step === 1 ? (
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative z-20 sm:animate-slide-in-right">
                         <h3 className="text-xl font-bold mb-4 text-white">Elige al Profesional</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             <BarberSelection
@@ -95,27 +104,29 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 1 ? (
                     <div
                         onClick={() => setStep(1)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 1 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Cambiar Profesional <Edit2 className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Cambiar Profesional</span>
+                            <span className="sm:hidden">Editar</span>
+                            <Edit2 className="w-3.5 h-3.5" />
                         </div>
                     </div>
                 ) : null}
             </div>
 
             {/* Step 2: Service */}
-            <div id="wizard-step-2" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 2 ? 'w-[85vw] sm:w-[350px]' : step > 2 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-2" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 2 ? 'w-full sm:w-[350px]' : step > 2 ? 'w-full sm:w-[200px]' : 'w-full sm:w-[80px] opacity-40 sm:grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 2 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 2 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 2 ? <Check className="w-5 h-5" /> : 2}
                     </div>
-                    <div className="flex-1 h-[2px] bg-white/10 rounded-full" />
+                    <div className="flex-1 h-[2px] bg-white/10 rounded-full sm:block" />
                 </div>
 
                 {step === 2 ? (
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative z-20 sm:animate-slide-in-right">
                         <h3 className="text-xl font-bold mb-4 text-white">Elige un Servicio</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             {!bookingData.barberId ? (
@@ -135,27 +146,33 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 2 ? (
                     <div
                         onClick={() => setStep(2)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 2 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Editar Servicio <Edit2 className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Editar Servicio</span>
+                            <span className="sm:hidden">Editar</span>
+                            <Edit2 className="w-3.5 h-3.5" />
                         </div>
+                    </div>
+                ) : step < 2 ? (
+                    <div className="sm:hidden flex h-14 bg-white/5 rounded-2xl items-center px-5 border border-white/5">
+                        <span className="text-sm font-medium text-white/40">Servicio</span>
                     </div>
                 ) : null}
             </div>
 
             {/* Step 3: Time Slot */}
-            <div id="wizard-step-3" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 3 ? 'w-[85vw] sm:w-[350px]' : step > 3 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-3" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 3 ? 'w-full sm:w-[350px]' : step > 3 ? 'w-full sm:w-[200px]' : 'w-full sm:w-[80px] opacity-40 sm:grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 3 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 3 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 3 ? <Check className="w-5 h-5" /> : 3}
                     </div>
-                    <div className="flex-1 h-[2px] bg-white/10 rounded-full" />
+                    <div className="flex-1 h-[2px] bg-white/10 rounded-full sm:block" />
                 </div>
 
                 {step === 3 ? (
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative z-20 sm:animate-slide-in-right">
                         <h3 className="text-xl font-bold mb-4 text-white">Fecha y Hora</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             {!bookingData.barberId || !bookingData.serviceId ? (
@@ -176,18 +193,24 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 3 ? (
                     <div
                         onClick={() => setStep(3)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-32 justify-center"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 3 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
-                            Editar Horario <Edit2 className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Editar Horario</span>
+                            <span className="sm:hidden">Editar</span>
+                            <Edit2 className="w-3.5 h-3.5" />
                         </div>
+                    </div>
+                ) : step < 3 ? (
+                    <div className="sm:hidden flex h-14 bg-white/5 rounded-2xl items-center px-5 border border-white/5">
+                        <span className="text-sm font-medium text-white/40">Fecha y Hora</span>
                     </div>
                 ) : null}
             </div>
 
             {/* Step 4: Contact Form */}
-            <div id="wizard-step-4" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 4 ? 'w-[85vw] sm:w-[350px]' : step > 4 ? 'w-[140px] sm:w-[200px]' : 'w-[60px] sm:w-[80px] opacity-40 grayscale pointer-events-none'}`}>
+            <div id="wizard-step-4" className={`shrink-0 snap-start flex flex-col transition-all duration-300 ease-in-out ${step === 4 ? 'w-full sm:w-[350px]' : step > 4 ? 'w-full sm:w-[200px]' : 'w-full sm:w-[80px] opacity-40 sm:grayscale pointer-events-none'}`}>
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-500 z-10 shrink-0 ${step === 4 ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--color-primary),0.5)]' : step > 4 ? 'bg-green-500 border-green-500 text-white' : 'bg-black/50 border-white/20 text-white/50'}`}>
                         {step > 4 ? <Check className="w-5 h-5" /> : 4}
@@ -195,7 +218,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 </div>
 
                 {step === 4 ? (
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-20">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative z-20 sm:animate-slide-in-right">
                         <h3 className="text-xl font-bold mb-4 text-white">Último Paso</h3>
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             <ContactForm
@@ -206,8 +229,12 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                         </div>
                     </motion.div>
                 ) : step > 4 ? (
-                    <div className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-3 relative z-20 h-32 justify-center">
+                    <div className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 relative z-20 h-auto sm:h-32">
                         <span className="text-sm font-medium text-white/80">Datos confirmados</span>
+                    </div>
+                ) : step < 4 ? (
+                    <div className="sm:hidden flex h-14 bg-white/5 rounded-2xl items-center px-5 border border-white/5">
+                        <span className="text-sm font-medium text-white/40">Datos de Contacto</span>
                     </div>
                 ) : null}
             </div>
