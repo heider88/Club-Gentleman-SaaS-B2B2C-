@@ -189,7 +189,10 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                         <span className="text-[10px] uppercase font-bold tracking-widest text-dash-text-soft">Hora</span>
                     </div>
                     <div className="flex-1 flex overflow-x-auto scrollbar-hide">
-                        {barberColumns.map(col => (
+                        {barberColumns.map(col => {
+                            const barberInfo = allBarbers.find(b => b.id === col.barberId);
+                            const colorClass = barberInfo?.color || 'bg-dash-text';
+                            return (
                             <div key={col.barberId} className="flex-1 min-w-[200px] md:min-w-[250px] p-4 flex items-center gap-3 border-r border-dash-border last:border-r-0">
                                 <div className="w-10 h-10 border border-dash-border-alt bg-dash-panel-alt overflow-hidden shrink-0">
                                     {col.avatarUrl ? (
@@ -199,11 +202,14 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                     )}
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="font-oswald text-sm md:text-base uppercase tracking-widest text-dash-text truncate">{col.barberName.split(' ')[0]}</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full ${colorClass} shadow-[0_0_8px_currentColor] opacity-80`} />
+                                        <span className="font-oswald text-sm md:text-base uppercase tracking-widest text-dash-text truncate">{col.barberName.split(' ')[0]}</span>
+                                    </div>
                                     <span className="text-[9px] font-bold uppercase tracking-widest text-dash-text-muted">Barbero</span>
                                 </div>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 </div>
 
@@ -229,6 +235,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                     const top = calculateTop(appt.start_time)
                                     const height = calculateHeight(duration)
                                     const isSelected = selectedAppt?.id === appt.id
+                                    const barberInfo = allBarbers.find(b => b.id === appt.barber_id);
+                                    const colorClass = barberInfo?.color || 'bg-dash-text';
 
                                     return (
                                         <div 
@@ -256,7 +264,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                                     {appt.services?.name || 'Servicio'}
                                                 </p>
                                             )}
-                                            <div className={`absolute top-0 left-0 w-1 h-full ${isPending ? 'bg-dash-text' : 'bg-dash-border-alt'}`}></div>
+                                            <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} ${isPending ? 'opacity-100 shadow-[0_0_8px_rgba(255,255,255,0.2)]' : 'opacity-40'}`}></div>
                                         </div>
                                     )
                                 })}
