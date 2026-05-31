@@ -53,10 +53,10 @@ export default async function LandingPage() {
   return (
     <>
       {/* Fondo Fijo Degradado Restaurado */}
-      <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none transform-gpu" />
       
       {/* Noise background ligero en lugar de feTurbulence SVG pesado */}
-      <div className="fixed inset-0 opacity-[0.03] mix-blend-overlay -z-10 pointer-events-none bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMNDxESFjk7Z3EAAAA/SURBVDjLpc0xDQAwDMOg0i69r1gJtN1o8wI4y8y+tO99n/mQ14e8PuT1Ia8PeX3I60NeH/L6kNeHvD7k9aG3DyHwBf3zT0nLAAAAAElFTkSuQmCC')] bg-repeat" />
+      <div className="fixed inset-0 opacity-[0.04] -z-10 pointer-events-none bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMNDxESFjk7Z3EAAAA/SURBVDjLpc0xDQAwDMOg0i69r1gJtN1o8wI4y8y+tO99n/mQ14e8PuT1Ia8PeX3I60NeH/L6kNeHvD7k9aG3DyHwBf3zT0nLAAAAAElFTkSuQmCC')] bg-repeat transform-gpu" />
 
       <main className="min-h-[100dvh] relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
@@ -64,7 +64,7 @@ export default async function LandingPage() {
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
         <div className="flex flex-col items-center gap-6 border-b border-white/[0.08] pb-12 relative">
           {/* Sombra de luz para el header */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 blur-[100px] pointer-events-none -z-10" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 blur-[100px] pointer-events-none -z-10 transform-gpu" />
           <div className="space-y-6 flex flex-col items-center text-center">
             {/* Logo Centrado (Incrementado 15%) */}
             <div className="relative w-[87vw] sm:w-[52rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
@@ -229,7 +229,7 @@ export default async function LandingPage() {
           {/* Booking Flow */}
           <div className="relative mt-12 scroll-mt-32" id="booking-section">
             {/* Glow del formulario */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 blur-[120px] pointer-events-none -z-10" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 blur-[120px] pointer-events-none -z-10 transform-gpu" />
             
             <div className="backdrop-blur-xl bg-black/40 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
               {/* Highlight superior sutil */}
@@ -257,7 +257,7 @@ export default async function LandingPage() {
 
           <div className="flex flex-col md:flex-row gap-8 items-center bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
             {/* Sutil glow de ubicación */}
-            <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none -z-10" />
+            <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none -z-10 transform-gpu" />
             
             <div className="flex-1 space-y-4 text-white/70">
               <p className="text-lg leading-relaxed">Nos encontramos ubicados en una zona central de fácil acceso para brindarte la mejor atención y comodidad.</p>
@@ -321,7 +321,7 @@ export default async function LandingPage() {
         </div>
         
         {/* Glow de fondo para el texto */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[#6D3294]/20 blur-[120px] pointer-events-none -z-0" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[#6D3294]/20 blur-[120px] pointer-events-none -z-0 transform-gpu" />
       </footer>
     </main>
     </>
