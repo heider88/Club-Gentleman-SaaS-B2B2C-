@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { Star, MapPin, Clock, Instagram, Facebook, ChevronUp } from "lucide-react"
-import { LazyBookingWizard } from "@/components/booking/LazyBookingWizard"
+import BookingWizard from "@/components/booking/BookingWizard"
 import BarbersList from "@/components/home/BarbersList"
 import { GallerySection } from "@/components/home/GallerySection"
 import Image from "next/image"
@@ -236,7 +236,7 @@ export default async function LandingPage() {
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               
               <h2 className="text-2xl md:text-3xl font-black text-white mb-8 tracking-wide">Reserva tu cita</h2>
-              <LazyBookingWizard barbers={barbers} services={services} />
+              <BookingWizard barbers={barbers} services={services} />
             </div>
           </div>
         </div>
