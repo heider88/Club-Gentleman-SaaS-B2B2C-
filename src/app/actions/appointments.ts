@@ -61,13 +61,29 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             workDays: number[], startHour: number, endHour: number, lunchStart: number, lunchEnd: number
         };
 
-        const startDate = new Date(validated.data.startTime);
-        if (isNaN(startDate.getTime())) {
+        const startDateUTC = new Date(validated.data.startTime);
+        if (isNaN(startDateUTC.getTime())) {
             return { success: false, error: "La fecha recibida está corrupta." };
         }
 
-        const dayOfWeek = startDate.getDay();
-        const startHourNum = startDate.getHours() + (startDate.getMinutes() / 60);
+        // Convertir explícitamente a la zona horaria de Bogotá para validar correctamente
+        const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Bogota',
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+        });
+        
+        // Parseamos la fecha local de bogotá
+        const bogotaParts = bogotaFormatter.formatToParts(startDateUTC);
+        const b = {} as any;
+        bogotaParts.forEach(p => b[p.type] = parseInt(p.value));
+        
+        // Creamos una fecha "Local" ficticia en el servidor solo para extraer el dia y la hora correctos
+        const bogotaDate = new Date(b.year, b.month - 1, b.day, b.hour, b.minute, b.second);
+
+        const dayOfWeek = bogotaDate.getDay();
+        const startHourNum = bogotaDate.getHours() + (bogotaDate.getMinutes() / 60);
 
         // ¿Es día laboral?
         if (!schedule.workDays.includes(dayOfWeek)) {
