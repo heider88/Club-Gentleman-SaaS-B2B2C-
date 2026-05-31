@@ -22,6 +22,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://clubgentleman.app"),
   title: {
     template: "%s | Club Gentleman for Men",
     default: "Club Gentleman for Men | Barbería Premium",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/lojito-og.png",
+        url: "https://clubgentleman.app/lojito-og.png",
         width: 1200,
         height: 630,
         alt: "Club Gentleman for Men Logo",
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Club Gentleman for Men | Barbería Premium",
     description: "Experiencia en cortes clásicos y arreglo de barba de primera clase.",
-    images: ["/lojito-og.png"],
+    images: ["https://clubgentleman.app/lojito-og.png"],
   },
 };
 
