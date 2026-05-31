@@ -22,6 +22,7 @@ const siteSettingsSchema = z.object({
         title: z.string(),
         content: z.string(),
         type: z.enum(['text_only', 'with_images']),
+        images: z.array(z.string()).optional(),
     })).default([]),
 })
 

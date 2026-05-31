@@ -200,9 +200,25 @@ export default async function LandingPage() {
                 </div>
               ) : (
                 <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 md:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
-                  <div className="text-white/80 text-lg leading-relaxed font-medium whitespace-pre-wrap">
+                  <div className="text-white/80 text-lg leading-relaxed font-medium whitespace-pre-wrap mb-8">
                     {section.content}
                   </div>
+                  {/* Renderizado de galería exclusiva para esta sección */}
+                  {section.images && section.images.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+                      {section.images.map((imgUrl: string, imgIdx: number) => (
+                        <div key={imgIdx} className="aspect-square relative rounded-2xl overflow-hidden border border-white/10 group bg-black/40">
+                          <Image
+                            src={imgUrl}
+                            alt={`${section.title} image ${imgIdx + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            unoptimized
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

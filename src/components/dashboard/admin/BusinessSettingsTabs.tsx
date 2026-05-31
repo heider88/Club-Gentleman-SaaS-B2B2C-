@@ -187,7 +187,8 @@ export function BusinessSettingsTabs({
                 id: crypto.randomUUID(),
                 title: "Nueva Sección",
                 content: "",
-                type: "text_only" as const
+                type: "text_only" as const,
+                images: []
             }
             setSettings({
                 ...settings,
@@ -195,7 +196,7 @@ export function BusinessSettingsTabs({
             })
         }
 
-        const updateSection = (id: string, field: string, value: string) => {
+        const updateSection = (id: string, field: string, value: any) => {
             setSettings({
                 ...settings,
                 custom_sections: settings.custom_sections.map(s => s.id === id ? { ...s, [field]: value } : s)
@@ -271,6 +272,53 @@ export function BusinessSettingsTabs({
                                         placeholder="Escribe aquí el contenido..."
                                     />
                                 </div>
+
+                                {section.type === 'with_images' && (
+                                    <div className="pt-4 border-t border-white/5 space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-xs font-bold text-dash-text-soft uppercase">Imágenes de la Sección</label>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                            {(section.images || []).map((imgUrl, i) => (
+                                                <div key={i} className="aspect-square relative rounded-xl overflow-hidden border border-white/10 group">
+                                                    <img src={imgUrl} alt="Sección" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                        <button 
+                                                            onClick={() => updateSection(section.id, 'images', (section.images || []).filter((_: string, index: number) => index !== i))}
+                                                            className="bg-red-500/80 hover:bg-red-500 text-white p-2 rounded-full"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <input 
+                                                type="url"
+                                                id={`url-${section.id}`}
+                                                placeholder="Pega el enlace directo a una imagen (ej: https://...)"
+                                                className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none"
+                                            />
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    const input = document.getElementById(`url-${section.id}`) as HTMLInputElement;
+                                                    if (input.value) {
+                                                        updateSection(section.id, 'images', [...(section.images || []), input.value]);
+                                                        input.value = '';
+                                                    }
+                                                }}
+                                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl transition-all font-bold text-sm"
+                                            >
+                                                Añadir
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] text-white/40">Pega enlaces directos a las imágenes para mostrarlas en una galería exclusiva de esta sección.</p>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
