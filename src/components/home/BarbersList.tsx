@@ -26,7 +26,7 @@ export default function BarbersList({ barbers }: BarbersListProps) {
                 {displayBarbers.map((barber, index) => (
                     <div 
                         key={barber.id} 
-                        className="group relative overflow-hidden bg-black/60 border border-white/[0.05] border-t-white/[0.1] h-[500px] flex flex-col justify-end p-8 shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-700 hover:border-[#7B2CBF]/60 hover:shadow-[0_0_40px_rgba(123,44,191,0.4)] animate-in fade-in slide-in-from-bottom-12 cursor-pointer"
+                        className="group relative overflow-hidden bg-black/60 border border-white/[0.05] border-t-white/[0.1] h-[500px] flex flex-col justify-end p-8 shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-[transform,opacity,visibility,shadow,border-color,color] duration-700 hover:border-[#7B2CBF]/60 hover:shadow-[0_0_40px_rgba(123,44,191,0.4)] animate-in fade-in slide-in-from-bottom-12 cursor-pointer"
                         style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
                     >
                         {/* Background Image (Always Color, zooms on hover) */}
@@ -37,7 +37,7 @@ export default function BarbersList({ barbers }: BarbersListProps) {
                                     alt={barber.full_name}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                                    className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-[transform,opacity,visibility,shadow,border-color,color] duration-700"
                                 />
                             ) : (
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-stone-900 to-stone-800 flex items-center justify-center text-8xl opacity-50">
@@ -57,7 +57,7 @@ export default function BarbersList({ barbers }: BarbersListProps) {
                                 {barber.full_name}
                             </h3>
 
-                            <div className="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-500 overflow-hidden">
+                            <div className="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-[transform,opacity,visibility,shadow,border-color,color] duration-500 overflow-hidden">
                                 <p className="text-sm text-white/70 leading-relaxed font-medium mt-2 border-l-2 border-[#6D3294] pl-4">
                                     {barber.bio || "Artista residente en el club, listo para elevar tu estilo al máximo nivel. Reserva con este experto hoy mismo."}
                                 </p>

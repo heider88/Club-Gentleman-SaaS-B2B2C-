@@ -115,7 +115,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 1 ? (
                     <div
                         onClick={() => setStep(1)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
+                        className="bg-white/5 bg-[#111111] sm:bg-white/5 sm:backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 1 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
@@ -157,7 +157,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 2 ? (
                     <div
                         onClick={() => setStep(2)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
+                        className="bg-white/5 bg-[#111111] sm:bg-white/5 sm:backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 2 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
@@ -208,7 +208,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 ) : step > 3 ? (
                     <div
                         onClick={() => setStep(3)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
+                        className="bg-white/5 bg-[#111111] sm:bg-white/5 sm:backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 cursor-pointer hover:bg-white/10 hover:border-primary/50 active:scale-95 transition-all relative z-20 group min-h-[44px] h-auto sm:h-32"
                     >
                         <span className="text-sm font-medium text-white/80">Paso 3 completado</span>
                         <div className="flex items-center gap-2 text-sm font-bold text-primary group-hover:text-primary/80">
@@ -244,7 +244,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                         </div>
                     </motion.div>
                 ) : step > 4 ? (
-                    <div className="bg-black/40 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 relative z-20 h-auto sm:h-32">
+                    <div className="bg-black/40 bg-[#111111] sm:bg-white/5 sm:backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-center gap-3 relative z-20 h-auto sm:h-32">
                         <span className="text-sm font-medium text-white/80">Datos confirmados</span>
                     </div>
                 ) : step < 4 ? (

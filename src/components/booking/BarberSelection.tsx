@@ -33,7 +33,7 @@ export function BarberSelection({ barbers, onSelect }: BarberSelectionProps) {
                             key={barber.id}
                             onClick={() => onSelect(barber.id, "", new Date(), barber.full_name || "Barbero")}
                             className={cn(
-                                "group relative overflow-hidden rounded-xl backdrop-blur-sm border cursor-pointer min-h-[44px] active:scale-95 transition-all duration-300",
+                                "group relative overflow-hidden rounded-xl bg-[#1a1a1a] sm:bg-white/5 sm:backdrop-blur-sm border cursor-pointer min-h-[44px] active:scale-95 transition-all duration-300",
                                 "bg-white/5 border-white/10 hover:border-primary/40 hover:bg-white/10"
                             )}
                         >

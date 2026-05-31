@@ -18,14 +18,14 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
             </div>
             <button
               onClick={() => setShowPortfolio(!showPortfolio)}
-              className="mt-6 md:mt-0 text-xs font-bold uppercase tracking-[0.2em] bg-transparent hover:bg-white text-white hover:text-black border border-white/20 hover:border-white px-6 py-3 transition-all duration-300 flex items-center gap-3"
+              className="mt-6 md:mt-0 text-xs font-bold uppercase tracking-[0.2em] bg-transparent hover:bg-white text-white hover:text-black border border-white/20 hover:border-white px-6 py-3 transition-[transform,opacity,max-height] duration-300 flex items-center gap-3"
             >
               {showPortfolio ? 'Cerrar Archivo' : 'Explorar'}
               <ChevronUp className={`w-4 h-4 transition-transform duration-500 ${showPortfolio ? '' : 'rotate-180'}`} />
             </button>
           </div>
 
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 sm:gap-2 overflow-hidden transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 sm:gap-2 overflow-hidden transition-[transform,opacity,max-height] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
             {initialPhotos.map((src, i) => {
               // Create irregular masonry-like pattern
               const isLarge = i % 5 === 0;
@@ -43,7 +43,7 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
                     alt={`Trabajo de barbería ${i + 1}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="object-cover grayscale opacity-60 group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[800ms] ease-out"
+                    className="object-cover grayscale opacity-60 group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100 transition-[transform,opacity,max-height] duration-[800ms] ease-out"
                   />
                   
                   {/* Brutalist Overlay Info */}

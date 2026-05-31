@@ -64,7 +64,7 @@ export default async function LandingPage() {
       <header className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-4 relative z-10">
         <div className="flex flex-col items-center gap-6 border-b border-white/[0.08] pb-12 relative">
           {/* Sombra de luz para el header */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 blur-[100px] pointer-events-none -z-10 transform-gpu" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-1/2 bg-[#6D3294]/10 hidden sm:block sm:blur-[100px] pointer-events-none -z-10 transform-gpu" />
           <div className="space-y-6 flex flex-col items-center text-center">
             {/* Logo Centrado (Incrementado 15%) */}
             <div className="relative w-[87vw] sm:w-[52rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
@@ -152,7 +152,7 @@ export default async function LandingPage() {
               Sobre Nosotros
             </h2>
             <div>
-              <span className="inline-block border border-white/10 border-t-white/20 bg-black/40 backdrop-blur-xl text-white/80 text-[10px] font-black px-4 py-2 rounded-full mb-8 tracking-[0.2em] uppercase shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-10">
+              <span className="inline-block border border-white/10 border-t-white/20 bg-black/40 bg-black/90 sm:bg-black/40 sm:backdrop-blur-xl text-white/80 text-[10px] font-black px-4 py-2 rounded-full mb-8 tracking-[0.2em] uppercase shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative z-10">
                 La Experiencia
               </span>
             </div>
@@ -199,7 +199,7 @@ export default async function LandingPage() {
                   {section.content}
                 </div>
               ) : (
-                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 md:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+                <div className="bg-black/40 bg-black/90 sm:bg-black/40 sm:backdrop-blur-xl border border-white/5 border-t-white/10 p-6 md:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                   <div className="text-white/80 text-lg leading-relaxed font-medium whitespace-pre-wrap mb-8">
                     {section.content}
                   </div>
@@ -229,9 +229,9 @@ export default async function LandingPage() {
           {/* Booking Flow */}
             <div className="relative mt-12 scroll-mt-32" id="booking-section">
             {/* Glow del formulario */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 blur-[120px] pointer-events-none -z-10 transform-gpu" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 hidden sm:block sm:blur-[120px] pointer-events-none -z-10 transform-gpu" />
             
-            <div className="backdrop-blur-md bg-black/60 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
+            <div className="bg-black/80 sm:bg-black/60 sm:backdrop-blur-md bg-black/60 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
               {/* Highlight superior sutil */}
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               
@@ -255,9 +255,9 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/60 bg-black/80 sm:bg-black/60 sm:backdrop-blur-md border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
             {/* Sutil glow de ubicación */}
-            <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none -z-10 transform-gpu" />
+            <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 hidden sm:block sm:blur-[100px] pointer-events-none -z-10 transform-gpu" />
             
             <div className="flex-1 space-y-4 text-white/70">
               <p className="text-lg leading-relaxed">Nos encontramos ubicados en una zona central de fácil acceso para brindarte la mejor atención y comodidad.</p>
@@ -289,7 +289,7 @@ export default async function LandingPage() {
 
               {/* Etiqueta flotante al posar el mouse */}
               <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                <span className="bg-black/60 backdrop-blur-md text-white border border-white/20 px-6 py-2 rounded-full font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+                <span className="bg-black/60 bg-black/80 sm:bg-black/60 sm:backdrop-blur-md text-white border border-white/20 px-6 py-2 rounded-full font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
                   Abrir Mapa Directo
                 </span>
               </div>
@@ -321,7 +321,7 @@ export default async function LandingPage() {
         </div>
         
         {/* Glow de fondo para el texto */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[#6D3294]/20 blur-[120px] pointer-events-none -z-0 transform-gpu" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-[#6D3294]/20 hidden sm:block sm:blur-[120px] pointer-events-none -z-0 transform-gpu" />
       </footer>
     </main>
     </>
