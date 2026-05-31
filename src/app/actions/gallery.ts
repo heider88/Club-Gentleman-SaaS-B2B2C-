@@ -16,7 +16,7 @@ export async function addGalleryImage(imageUrl: string, caption?: string) {
     
     // Al cambiar la galería, forzamos a Next.js a regenerar el HTML estático de la página de inicio
     revalidatePath('/')
-    revalidatePath('/dashboard/admin/gallery')
+    revalidatePath('/dashboard/admin/settings')
     return { success: true }
 }
 
@@ -50,7 +50,7 @@ export async function uploadGalleryImageDirect(formData: FormData) {
     if (dbError) return { error: dbError.message }
 
     revalidatePath('/')
-    revalidatePath('/dashboard/admin/gallery')
+    revalidatePath('/dashboard/admin/settings')
     return { success: true }
 }
 
@@ -74,6 +74,6 @@ export async function deleteGalleryImage(id: string, imageUrl?: string) {
     if (error) return { error: error.message }
     
     revalidatePath('/')
-    revalidatePath('/dashboard/admin/gallery')
+    revalidatePath('/dashboard/admin/settings')
     return { success: true }
 }

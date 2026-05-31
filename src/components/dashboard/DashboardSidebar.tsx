@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { CalendarDays, Scissors, User, Lock, LogOut, FileText, ImageIcon, Users, XCircle, PanelLeftClose, PanelLeftOpen, BarChart3, CalendarClock } from "lucide-react"
+import { CalendarDays, Scissors, User, Lock, LogOut, FileText, ImageIcon, Users, XCircle, PanelLeftClose, PanelLeftOpen, BarChart3, CalendarClock, Settings } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ThemeToggle } from "./ThemeToggle"
 import { useState } from "react"
@@ -29,7 +29,7 @@ export function DashboardSidebar({ role }: { role: string }) {
         { label: "Bloqueos & Horarios", href: "/dashboard/admin/schedules", icon: CalendarClock, showTo: ['admin'] },
         { label: "Canceladas", href: "/dashboard/admin/cancelled", icon: XCircle, showTo: ['admin'] },
         { label: "Servicios", href: "/dashboard/services", icon: Scissors, showTo: ['admin'] },
-        { label: "Config Web", href: "/dashboard/admin/gallery", icon: ImageIcon, showTo: ['admin'] }, 
+        { label: "Mi Negocio", href: "/dashboard/admin/settings", icon: Settings, showTo: ['admin'] }, 
         { label: "Administración", href: "/dashboard/admin", icon: Lock, showTo: ['admin'] }, 
     ].filter(item => item.showTo.includes(role))
 

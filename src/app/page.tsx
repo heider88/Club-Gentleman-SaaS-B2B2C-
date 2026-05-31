@@ -4,6 +4,7 @@ import BookingWizard from "@/components/booking/BookingWizard"
 import BarbersList from "@/components/home/BarbersList"
 import { GallerySection } from "@/components/home/GallerySection"
 import Image from "next/image"
+import { getSiteSettings } from "@/app/actions/settings"
 
 // Revalidar caché de la Landing Page cada 1 hora (3600 segundos) automáticamente,
 // y también de forma inmediata cuando el Admin suba una foto desde el panel.
@@ -11,6 +12,7 @@ export const revalidate = 3600;
 
 export default async function LandingPage() {
   const supabase = await createClient()
+  const settings = await getSiteSettings()
 
   // 1. Fetch de imágenes dinámicas generadas por el Administrador (con caché)
   const { data: galleryImages } = await supabase
@@ -87,7 +89,7 @@ export default async function LandingPage() {
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-green-400" />
                 <span className="text-green-400 font-bold">Open now</span>
-                <span>09:00 - 20:00</span>
+                <span>{settings.contact.schedule || "09:00 - 20:00"}</span>
               </div>
             </div>
           </div>
@@ -97,25 +99,41 @@ export default async function LandingPage() {
               Barbería
             </span>
             <div className="flex justify-center gap-3">
-              <a
-                href="https://www.facebook.com/profile.php?id=100065179103783"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(24,119,242,0.3)] active:scale-95"
-                title="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.instagram.com/club_gentlemanbarber?igsh=cGcwd3F0YXEzb2hl&utm_source=qr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-pink-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group active:scale-95 overflow-hidden relative"
-                title="Instagram"
-              >
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-yellow-400/20 via-pink-500/20 to-purple-500/20 transition-opacity" />
-                <Instagram className="w-5 h-5 relative z-10" />
-              </a>
+              {settings.contact.facebook && (
+                <a
+                  href={settings.contact.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(24,119,242,0.3)] active:scale-95"
+                  title="Facebook"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+              )}
+              {settings.contact.instagram && (
+                <a
+                  href={settings.contact.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-pink-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group active:scale-95 overflow-hidden relative"
+                  title="Instagram"
+                >
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-yellow-400/20 via-pink-500/20 to-purple-500/20 transition-opacity" />
+                  <Instagram className="w-5 h-5 relative z-10" />
+                </a>
+              )}
+              {settings.contact.whatsapp && (
+                <a
+                  href={`https://wa.me/${settings.contact.whatsapp.replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-green-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] group active:scale-95 overflow-hidden relative"
+                  title="WhatsApp"
+                >
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-green-400/20 to-emerald-600/20 transition-opacity" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="relative z-10"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -142,10 +160,10 @@ export default async function LandingPage() {
             <div className="relative z-10 flex flex-col md:flex-row gap-10 md:gap-16">
               {/* Drop Cap & Intro */}
               <div className="text-white/70 text-lg leading-relaxed font-medium md:w-1/2">
-                <p className="first-letter:text-7xl first-letter:font-oswald first-letter:text-[#6D3294] first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-line:uppercase first-line:tracking-widest">
-                  GENTLEMAN | Barbería & Club para Hombres con más de 7 años de experiencia.
+                <p className="first-letter:text-7xl first-letter:font-oswald first-letter:text-[#6D3294] first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-line:uppercase first-line:tracking-widest whitespace-pre-wrap">
+                  {settings.general.description || `GENTLEMAN | Barbería & Club para Hombres con más de 7 años de experiencia.
                   No somos solo una barbería. En GENTLEMAN, cada visita es una experiencia inmersiva.
-                  Aquí, los cortes de alta precisión se combinan con un espacio pensado para el hombre moderno.
+                  Aquí, los cortes de alta precisión se combinan con un espacio pensado para el hombre moderno.`}
                 </p>
               </div>
 
@@ -162,12 +180,33 @@ export default async function LandingPage() {
                 
                 <blockquote className="border-l-2 border-pink-500 pl-6 py-2">
                   <p className="text-xl md:text-2xl font-oswald text-white/90 italic tracking-wide">
-                    "Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero."
+                    "{settings.general.slogan || "Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero."}"
                   </p>
                 </blockquote>
               </div>
             </div>
           </div>
+
+          {/* Renderizar Secciones Dinámicas */}
+          {settings.custom_sections && settings.custom_sections.map((section: any, idx: number) => (
+            <div key={section.id} className="space-y-6 pt-12 border-t border-white/[0.05]">
+              <h2 className="text-3xl md:text-4xl font-black text-white/90 uppercase tracking-widest relative z-10">
+                <span className="absolute -top-10 -left-10 text-[100px] text-white/[0.03] select-none pointer-events-none tracking-tighter hidden md:block">0{idx + 2}</span>
+                {section.title}
+              </h2>
+              {section.type === 'text_only' ? (
+                <div className="text-white/70 text-lg leading-relaxed font-medium whitespace-pre-wrap">
+                  {section.content}
+                </div>
+              ) : (
+                <div className="bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 p-6 md:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+                  <div className="text-white/80 text-lg leading-relaxed font-medium whitespace-pre-wrap">
+                    {section.content}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
 
           <hr className="border-white/[0.05]" />
 
@@ -260,8 +299,8 @@ export default async function LandingPage() {
 
         {/* Typographic Monument */}
         <div className="w-full text-center relative z-10 px-4">
-          <h2 className="font-oswald font-black leading-none text-[15vw] tracking-tighter text-transparent" style={{ WebkitTextStroke: '2px rgba(255,255,255,0.08)' }}>
-            GENTLEMAN
+          <h2 className="font-oswald font-black leading-none text-[10vw] sm:text-[15vw] tracking-tighter text-transparent break-words" style={{ WebkitTextStroke: '2px rgba(255,255,255,0.08)' }}>
+            {settings.general.name ? settings.general.name.split(' ')[0].toUpperCase() : "GENTLEMAN"}
           </h2>
         </div>
         

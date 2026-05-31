@@ -221,6 +221,33 @@ export interface Database {
                 }
                 Relationships: []
             }
+            site_settings: {
+                Row: {
+                    id: string
+                    general: Json
+                    contact: Json
+                    custom_sections: Json
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    general?: Json
+                    contact?: Json
+                    custom_sections?: Json
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    general?: Json
+                    contact?: Json
+                    custom_sections?: Json
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: []
+            }
         }
         Views: {
             [_ in never]: never
