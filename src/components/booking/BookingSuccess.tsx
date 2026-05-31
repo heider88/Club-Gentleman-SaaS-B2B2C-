@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { useEffect, useRef } from "react"
 
 interface BookingSuccessProps {
     date: Date | null
@@ -8,8 +9,24 @@ interface BookingSuccessProps {
 }
 
 export function BookingSuccess({ date, time }: BookingSuccessProps) {
+    const successRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // En cuanto se renderice este componente, forzamos la vista hacia él.
+        // Esto previene el salto abrupto hacia la sección de barberos inferior.
+        if (successRef.current) {
+            // Un timeout pequeñito asegura que el DOM se pintó (altura final resuelta)
+            setTimeout(() => {
+                successRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }, 100);
+        }
+    }, []);
+
     return (
-        <div className="text-center py-8">
+        <div ref={successRef} className="text-center py-8">
             <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -19,23 +36,23 @@ export function BookingSuccess({ date, time }: BookingSuccessProps) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
             </motion.div>
 
-            <h2 className="text-3xl font-bold mb-2">¡Reserva Confirmada!</h2>
-            <p className="text-muted-foreground mb-8">Te hemos enviado un correo con los detalles.</p>
+            <h2 className="text-3xl font-bold mb-2 text-white">¡Reserva Confirmada!</h2>
+            <p className="text-white/60 mb-8">Te hemos enviado un mensaje con los detalles.</p>
 
-            <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left space-y-3">
+            <div className="bg-black/60 border border-white/10 rounded-xl p-6 mb-8 text-left space-y-3">
                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">Fecha</span>
-                    <span className="font-bold">{date?.toLocaleDateString()}</span>
+                    <span className="text-white/60">Fecha</span>
+                    <span className="font-bold text-white">{date?.toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">Hora</span>
+                    <span className="text-white/60">Hora</span>
                     <span className="font-bold text-primary">{time}</span>
                 </div>
             </div>
 
             <button
                 onClick={() => window.location.reload()}
-                className="text-primary hover:underline"
+                className="w-full py-4 min-h-[44px] rounded-xl bg-white/10 border border-white/20 text-white font-bold text-lg hover:bg-white/20 active:scale-95 transition-all"
             >
                 Volver al inicio
             </button>
