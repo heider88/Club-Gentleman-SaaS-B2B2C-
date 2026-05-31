@@ -6,9 +6,9 @@ import { sendBookingNotifications } from "@/app/actions/notifications"
 import { createAppointmentAction } from "@/app/actions/appointments"
 
 const formSchema = z.object({
-    name: z.string().min(2, "El nombre completo es requerido"),
-    email: z.string().email("Correo electrónico inválido"),
-    phone: z.string().min(8, "Número de teléfono inválido")
+    name: z.string().trim().min(2, "El nombre completo es requerido"),
+    email: z.string().trim().toLowerCase().email("Correo electrónico inválido"),
+    phone: z.string().trim().replace(/[\s-()]/g, '').min(8, "Número de teléfono inválido")
 })
 
 type ContactFormData = z.infer<typeof formSchema>
@@ -38,13 +38,26 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
             return;
         }
 
-        // Prepare Start and End time safely preserving local timezone (using parse for 12h format)
-        const { parse } = require('date-fns');
-        const startTime = parse(bookingData.time, 'h:mm a', bookingData.date);
-        const endTime = new Date(startTime.getTime() + bookingData.serviceDuration * 60000);
+        let startTime: Date;
+        let endTime: Date;
 
         try {
-            await createAppointmentAction({
+            // Prepare Start and End time safely preserving local timezone (using parse for 12h format)
+            const { parse } = require('date-fns');
+            startTime = parse(bookingData.time, 'h:mm a', bookingData.date);
+            endTime = new Date(startTime.getTime() + bookingData.serviceDuration * 60000);
+            
+            if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+                onError("El formato de fecha es inválido en este dispositivo. Reinicia la reserva.");
+                return;
+            }
+        } catch (e) {
+            onError("Error al procesar la fecha. Por favor inténtalo de nuevo.");
+            return;
+        }
+
+        try {
+            const result = await createAppointmentAction({
                 barberId: bookingData.barberId,
                 serviceId: bookingData.serviceId,
                 customerName: data.name,
@@ -53,6 +66,11 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 startTime: startTime.toISOString(),
                 endTime: endTime.toISOString()
             });
+
+            if (!result?.success) {
+                onError(result?.error || "No se pudo procesar la reserva.");
+                return;
+            }
 
             console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE (Sin Bloquear UI) ---');
             // Fire and forget: No hacemos await para no bloquear al usuario si el correo/whatsapp tarda
@@ -68,8 +86,8 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
 
             onSuccess();
         } catch (err: any) {
-            console.error(err);
-            onError(err.message || "Ha ocurrido un error inesperado al contactar con el servidor.");
+            console.error("Network/Action call error:", err);
+            onError("Error de conexión. Verifica tu internet y vuelve a intentarlo.");
         }
     }
 

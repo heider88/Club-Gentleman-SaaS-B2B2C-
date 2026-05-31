@@ -96,130 +96,186 @@ export async function deleteEmployee(userId: string) {
 // -- NUEVO: Gestión de Bloqueos de Agenda y Horario de Tienda --
 
 export async function createAvailabilityBlock(payload: { barber_id: string | null, start_time: string, end_time: string, reason: string | null, is_global: boolean }) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
-    
-    // Si es global, forzamos barber_id a nulo para que aplique a toda la tienda (si la lógica BD lo soporta así, o creamos un flag)
-    const { data, error } = await adminClient.from('availability_blocks').insert([payload]).select().single();
-    
-    if (error) return { error: error.message };
-    revalidatePath('/dashboard/admin/schedules');
-    return { success: true, data };
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
+        
+        // Validación básica de fechas
+        const startDate = new Date(payload.start_time);
+        const endDate = new Date(payload.end_time);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return { error: "Formato de fecha u hora inválido." };
+        }
+        
+        const { data, error } = await adminClient.from('availability_blocks').insert([payload]).select().single();
+        
+        if (error) return { error: error.message };
+        revalidatePath('/dashboard/admin/schedules');
+        return { success: true, data };
+    } catch (err: any) {
+        console.error("Action Error in createAvailabilityBlock:", err);
+        return { error: "Ocurrió un error inesperado al procesar la solicitud." };
+    }
 }
 
 export async function deleteAvailabilityBlock(blockId: string) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
-    
-    const { error } = await adminClient.from('availability_blocks').delete().eq('id', blockId);
-    
-    if (error) return { error: error.message };
-    revalidatePath('/dashboard/admin/schedules');
-    return { success: true };
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
+        
+        const { error } = await adminClient.from('availability_blocks').delete().eq('id', blockId);
+        
+        if (error) return { error: error.message };
+        revalidatePath('/dashboard/admin/schedules');
+        return { success: true };
+    } catch (err: any) {
+        console.error("Action Error in deleteAvailabilityBlock:", err);
+        return { error: "Ocurrió un error inesperado al procesar la solicitud." };
+    }
 }
 
 export async function manageBarberService(action: 'add' | 'delete' | 'update', payload: any) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
-    
-    if (action === 'add') {
-        const { data, error } = await adminClient.from('services').insert(payload).select().single();
-        if (error) return { error: error.message };
-        return { success: true, data };
-    }
-    
-    if (action === 'update') {
-        const { id, ...updates } = payload;
-        const { data, error } = await adminClient.from('services').update(updates).eq('id', id).select().single();
-        if (error) return { error: error.message };
-        return { success: true, data };
-    }
-    
-    if (action === 'delete') {
-        const { error } = await adminClient.from('services').delete().eq('id', payload.id);
-        if (error) return { error: error.message };
-        return { success: true };
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
+        
+        if (action === 'add') {
+            const { data, error } = await adminClient.from('services').insert(payload).select().single();
+            if (error) return { error: error.message };
+            return { success: true, data };
+        }
+        
+        if (action === 'update') {
+            const { id, ...updates } = payload;
+            const { data, error } = await adminClient.from('services').update(updates).eq('id', id).select().single();
+            if (error) return { error: error.message };
+            return { success: true, data };
+        }
+        
+        if (action === 'delete') {
+            const { error } = await adminClient.from('services').delete().eq('id', payload.id);
+            if (error) return { error: error.message };
+            return { success: true };
+        }
+        
+        return { error: "Acción no reconocida." };
+    } catch (err: any) {
+        console.error("Action Error in manageBarberService:", err);
+        return { error: "Ocurrió un error inesperado al gestionar el servicio." };
     }
 }
 
 export async function importServicesToBarber(barberId: string, servicesToImport: any[]) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
-    
-    const newServices = servicesToImport.map(s => ({
-        barber_id: barberId,
-        name: s.name,
-        price: s.price,
-        duration_minutes: s.duration_minutes,
-        description: s.description
-    }));
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
+        
+        if (!Array.isArray(servicesToImport)) {
+            return { error: "Los servicios a importar tienen un formato inválido." };
+        }
 
-    const { data, error } = await adminClient.from('services').insert(newServices).select();
-    if (error) return { error: error.message };
-    
-    return { success: true, data };
+        const newServices = servicesToImport.map(s => ({
+            barber_id: barberId,
+            name: s.name,
+            price: s.price,
+            duration_minutes: s.duration_minutes,
+            description: s.description
+        }));
+
+        const { data, error } = await adminClient.from('services').insert(newServices).select();
+        if (error) return { error: error.message };
+        
+        return { success: true, data };
+    } catch (err: any) {
+        console.error("Action Error in importServicesToBarber:", err);
+        return { error: "Ocurrió un error inesperado al importar servicios." };
+    }
 }
 
 export async function updateBarberProfile(barberId: string, updates: any) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
-    
-    const { data, error } = await adminClient
-        .from('profiles')
-        .update(updates)
-        .eq('id', barberId)
-        .select();
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
         
-    if (error) return { error: error.message };
-    
-    revalidatePath(`/dashboard/admin/barber/${barberId}`);
-    return { success: true, data };
+        const { data, error } = await adminClient
+            .from('profiles')
+            .update(updates)
+            .eq('id', barberId)
+            .select();
+            
+        if (error) return { error: error.message };
+        
+        revalidatePath(`/dashboard/admin/barber/${barberId}`);
+        return { success: true, data };
+    } catch (err: any) {
+        console.error("Action Error in updateBarberProfile:", err);
+        return { error: "Ocurrió un error inesperado al actualizar el perfil." };
+    }
 }
 
 export async function updateEmployeePassword(userId: string, newPassword: string) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
 
-    const { data, error } = await adminClient.auth.admin.updateUserById(userId, {
-        password: newPassword
-    });
+        if (!newPassword || newPassword.length < 6) {
+            return { error: "La contraseña es muy corta o inválida." };
+        }
 
-    if (error) {
-        console.error("Error al actualizar contraseña:", error);
-        return { error: `Error: ${error.message}` };
+        const { data, error } = await adminClient.auth.admin.updateUserById(userId, {
+            password: newPassword
+        });
+
+        if (error) {
+            console.error("Error al actualizar contraseña:", error);
+            return { error: `Error: ${error.message}` };
+        }
+
+        return { success: true, message: "Contraseña actualizada exitosamente." };
+    } catch (err: any) {
+        console.error("Action Error in updateEmployeePassword:", err);
+        return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }
-
-    return { success: true, message: "Contraseña actualizada exitosamente." };
 }
 
 export async function updateEmployeeEmail(userId: string, newEmail: string) {
-    await requireAdmin();
-    const adminClient = createAdminClient();
+    try {
+        await requireAdmin();
+        const adminClient = createAdminClient();
 
-    // 1. Actualizar en el sistema de autenticación (auth.users)
-    const { data: authData, error: authError } = await adminClient.auth.admin.updateUserById(userId, {
-        email: newEmail,
-        email_confirm: true // Confirmar automáticamente para evitar bloqueos
-    });
+        if (!newEmail || !/^\S+@\S+\.\S+$/.test(newEmail)) {
+            return { error: "Formato de correo electrónico inválido." };
+        }
 
-    if (authError) {
-        console.error("Error al actualizar email en Auth:", authError);
-        return { error: `Error Auth: ${authError.message}` };
+        // 1. Actualizar en el sistema de autenticación (auth.users)
+        const { data: authData, error: authError } = await adminClient.auth.admin.updateUserById(userId, {
+            email: newEmail,
+            email_confirm: true // Confirmar automáticamente para evitar bloqueos
+        });
+
+        if (authError) {
+            console.error("Error al actualizar email en Auth:", authError);
+            return { error: `Error Auth: ${authError.message}` };
+        }
+
+        // 2. Sincronizar el correo en la tabla pública de profiles
+        const { error: profileError } = await adminClient
+            .from('profiles')
+            .update({ email: newEmail })
+            .eq('id', userId);
+
+        if (profileError) {
+            console.error("Error al sincronizar email en Profiles:", profileError);
+            // Retornamos success parcial porque el login sí cambió, pero avisamos.
+            return { success: true, message: "Email actualizado en acceso, pero falló sincronización en perfil público." };
+        }
+        
+        revalidatePath(`/dashboard/admin/barber/${userId}`);
+        return { success: true, message: "Correo de acceso actualizado exitosamente." };
+    } catch (err: any) {
+        console.error("Action Error in updateEmployeeEmail:", err);
+        return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }
-
-    // 2. Sincronizar el correo en la tabla pública de profiles
-    const { error: profileError } = await adminClient
-        .from('profiles')
-        .update({ email: newEmail })
-        .eq('id', userId);
-
-    if (profileError) {
-        console.error("Error al sincronizar email en Profiles:", profileError);
-        // Retornamos success parcial porque el login sí cambió, pero avisamos.
-        return { success: true, message: "Email actualizado en acceso, pero falló sincronización en perfil público." };
-    }
-    
-    revalidatePath(`/dashboard/admin/barber/${userId}`);
-    return { success: true, message: "Correo de acceso actualizado exitosamente." };
 }
 
