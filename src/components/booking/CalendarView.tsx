@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import { format, isAfter, isBefore, addMinutes, startOfDay, endOfDay, isSameDay, addDays } from "date-fns"
 import { es } from "date-fns/locale"
 import { motion } from "framer-motion"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, CalendarX2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface TimeSlot {
@@ -76,16 +76,16 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
             try {
                 // Promise.all para ejecutar consultas concurrentes
-                // 1. Obtener horario GLOBAL (del Admin)
-                const [adminRes, appointmentsRes, blocksRes] = await Promise.all([
-                    supabase.from('profiles').select('schedule_settings').eq('role', 'admin').limit(1).single(),
+                // 1. Obtener horario ESPECÍFICO del Barbero seleccionado
+                const [barberProfileRes, appointmentsRes, blocksRes] = await Promise.all([
+                    supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
                     supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
                     supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
                 ]);
 
-                // Fallback de seguridad extrema: Si el admin borró su cuenta o no tiene horario, usar uno por defecto a prueba de fallos
+                // Fallback de seguridad extrema si el barbero aún no tiene configurado un horario
                 const defaultFallbackSettings: ScheduleSettings = { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
-                const settings = adminRes.data?.schedule_settings || defaultFallbackSettings;
+                const settings = barberProfileRes.data?.schedule_settings || defaultFallbackSettings;
 
                 if (appointmentsRes.error) throw appointmentsRes.error;
                 if (blocksRes.error) throw blocksRes.error;
@@ -162,10 +162,15 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             }
 
             const timeStr = format(slotStart, 'h:mm a');
-            generatedSlots.push({
-                time: timeStr,
-                available: !isColliding(slotStart, slotEnd)
-            })
+            const available = !isColliding(slotStart, slotEnd);
+            
+            // Solo añadir a la lista visual los slots que realmente están disponibles
+            if (available) {
+                generatedSlots.push({
+                    time: timeStr,
+                    available: true
+                });
+            }
 
             current = addMinutes(current, 15);
         }
@@ -220,20 +225,33 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                     >
                         {days.map((d) => {
                             const isSelected = isSameDay(d, selectedDate)
+                            const isWorkingDay = scheduleSettings ? scheduleSettings.workDays.includes(d.getDay()) : true;
+                            
                             return (
                                 <button
                                     key={d.toISOString()}
-                                    onClick={() => setSelectedDate(d)}
+                                    onClick={() => {
+                                        if(isWorkingDay) setSelectedDate(d)
+                                    }}
+                                    disabled={!isWorkingDay}
                                     className={cn(
                                         "flex flex-col items-center justify-center min-w-[70px] h-20 rounded-xl border transition-all relative shrink-0 overflow-hidden",
                                         isSelected
                                             ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]"
-                                            : "bg-black/40 backdrop-blur-sm border-white/10 hover:bg-black/60 hover:border-primary/50 text-white/90"
+                                            : !isWorkingDay
+                                                ? "bg-black/20 border-transparent text-white/20 cursor-not-allowed grayscale"
+                                                : "bg-black/40 backdrop-blur-sm border-white/10 hover:bg-black/60 hover:border-primary/50 text-white/90"
                                     )}
                                 >
-                                    {!isSelected && <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity" />}
+                                    {!isSelected && isWorkingDay && <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity" />}
+                                    
+                                    {!isWorkingDay && (
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <div className="w-full h-px bg-white/10 rotate-[-35deg]" />
+                                        </div>
+                                    )}
 
-                                    <span className="text-xs font-medium uppercase opacity-80 z-10">
+                                    <span className="text-xs font-medium uppercase z-10 opacity-80">
                                         {format(d, 'EEE', { locale: es })}
                                     </span>
                                     <span className="text-xl font-black z-10">
@@ -259,9 +277,10 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             <div className="pt-2">
                 <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Horas Disponibles</h4>
                 {slots.length === 0 ? (
-                    <div className="p-8 text-center border border-white/5 rounded-2xl bg-white/5 backdrop-blur-md text-white/50 space-y-2 min-h-[44px]">
-                        <p>El barbero no labora el <strong>{format(selectedDate, 'EEEE d', { locale: es })}</strong></p>
-                        <p className="text-xs">Por favor, elige otra fecha.</p>
+                    <div className="p-8 text-center border border-white/5 rounded-2xl bg-white/5 backdrop-blur-md text-white/50 space-y-2 min-h-[44px] flex flex-col justify-center items-center">
+                        <CalendarX2 className="w-8 h-8 opacity-50 mb-2" />
+                        <p>No hay disponibilidad para el <strong>{format(selectedDate, 'EEEE d', { locale: es })}</strong></p>
+                        <p className="text-xs">Por favor, selecciona otro día en el calendario.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-3 gap-2">
