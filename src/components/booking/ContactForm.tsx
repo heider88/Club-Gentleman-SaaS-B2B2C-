@@ -8,7 +8,7 @@ import { createAppointmentAction } from "@/app/actions/appointments"
 const formSchema = z.object({
     name: z.string().trim().min(2, "El nombre completo es requerido"),
     email: z.string().trim().toLowerCase().email("Correo electrónico inválido"),
-    phone: z.string().trim().replace(/[\s-()]/g, '').min(8, "Número de teléfono inválido")
+    phone: z.string().trim().min(8, "Número de teléfono inválido").transform(v => v.replace(/[\s-()]/g, ''))
 })
 
 type ContactFormData = z.infer<typeof formSchema>
