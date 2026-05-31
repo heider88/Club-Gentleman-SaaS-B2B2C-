@@ -252,7 +252,7 @@ export default async function LandingPage() {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#6D3294]/50 to-transparent" />
         
         <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6 mb-16 relative z-10">
-          <p className="font-mono text-white/30 text-xs tracking-[0.3em] uppercase">Est. 2017 © Todos los derechos reservados</p>
+          <p className="font-mono text-white/30 text-xs tracking-[0.3em] uppercase">Est. 2018 © Todos los derechos reservados</p>
           <a href="#" className="font-oswald text-white/50 hover:text-white uppercase tracking-[0.2em] text-sm flex items-center gap-2 transition-colors border border-white/10 hover:border-white/30 px-6 py-2 rounded-full">
             <ChevronUp className="w-4 h-4" /> Volver Arriba
           </a>
