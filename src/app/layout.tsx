@@ -35,11 +35,20 @@ export const metadata: Metadata = {
     siteName: "Club Gentleman for Men",
     locale: "es_CO",
     type: "website",
+    images: [
+      {
+        url: "/lojito-og.png",
+        width: 1200,
+        height: 630,
+        alt: "Club Gentleman for Men Logo",
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Club Gentleman for Men | Barbería Premium",
     description: "Experiencia en cortes clásicos y arreglo de barba de primera clase.",
+    images: ["/lojito-og.png"],
   },
 };
 
