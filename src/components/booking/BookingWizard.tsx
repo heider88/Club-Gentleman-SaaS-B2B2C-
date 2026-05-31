@@ -8,6 +8,8 @@ import { ContactForm } from "./ContactForm"
 import { BookingSuccess } from "./BookingSuccess"
 import { Check, Edit2 } from "lucide-react"
 
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver"
+
 export interface GlobalBookingState {
     serviceName: string;
     serviceDuration: number;
@@ -36,9 +38,11 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
     })
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [wizardRef, isIntersecting] = useIntersectionObserver({ rootMargin: '200px' })
 
     // Scroll behaviour para Desktop vs Mobile
     useEffect(() => {
+        if (!isIntersecting) return; // No animar scroll si no está en pantalla
         if (scrollContainerRef.current) {
             const container = scrollContainerRef.current;
             const targetStep = document.getElementById(`wizard-step-${step}`);
@@ -62,15 +66,22 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
 
     if (step === 5) {
         return (
+            <div ref={wizardRef as React.RefObject<HTMLDivElement>}>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
                 <BookingSuccess date={bookingData.date} time={bookingData.time} />
             </motion.div>
+            </div>
         )
     }
 
     return (
         <div
-            ref={scrollContainerRef}
+            ref={(node) => {
+                // @ts-ignore - Merge both refs (internal scroll ref and intersection ref)
+                scrollContainerRef.current = node;
+                // @ts-ignore
+                wizardRef.current = node;
+            }}
             className="w-full relative py-2 overflow-x-hidden sm:overflow-x-auto pb-8 snap-y sm:snap-x snap-mandatory flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-4 group/wizard"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
@@ -177,6 +188,10 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                         <div className="max-h-[500px] overflow-y-auto pr-2 pb-4 scrollbar-hide">
                             {!bookingData.barberId || !bookingData.serviceId ? (
                                 <p className="text-white/50 text-sm">Faltan datos previos.</p> // Failsafe
+                            ) : !isIntersecting ? (
+                                <div className="text-white/50 text-sm p-4 text-center animate-pulse border border-white/5 bg-black/20 rounded-xl min-h-[200px] flex items-center justify-center">
+                                    Preparando calendario...
+                                </div>
                             ) : (
                                 <CalendarView
                                     barberId={bookingData.barberId}
