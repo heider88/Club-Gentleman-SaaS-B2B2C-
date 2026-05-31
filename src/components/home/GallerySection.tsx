@@ -42,6 +42,7 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
                     src={src}
                     alt={`Trabajo de barbería ${i + 1}`}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-cover grayscale opacity-60 group-hover:scale-[1.03] group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[800ms] ease-out"
                   />
                   

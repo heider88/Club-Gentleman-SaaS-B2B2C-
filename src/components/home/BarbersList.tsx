@@ -30,12 +30,13 @@ export default function BarbersList({ barbers }: BarbersListProps) {
                         style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
                     >
                         {/* Background Image (Always Color, zooms on hover) */}
-                        <div className="absolute inset-0 z-0">
+                        <div className="absolute inset-0 z-0 bg-[#111111]">
                             {barber.avatar_url ? (
                                 <Image
                                     src={barber.avatar_url}
                                     alt={barber.full_name}
                                     fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
                                 />
                             ) : (
