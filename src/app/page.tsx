@@ -95,7 +95,7 @@ export default async function LandingPage() {
           </div>
 
           <div className="flex flex-col items-center gap-4 w-full sm:w-auto mt-4">
-            <span className="bg-black/40 backdrop-blur-xl border border-white/10 border-t-white/20 text-white/90 text-xs font-black px-6 py-2 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+            <span className="bg-black/60 border border-white/10 border-t-white/20 text-white/90 text-xs font-black px-6 py-2 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
               Barbería
             </span>
             <div className="flex justify-center gap-3">
@@ -104,7 +104,7 @@ export default async function LandingPage() {
                   href={settings.contact.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(24,119,242,0.3)] active:scale-95"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/60 rounded-full hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(24,119,242,0.3)] active:scale-95"
                   title="Facebook"
                 >
                   <Facebook className="w-5 h-5" />
@@ -115,7 +115,7 @@ export default async function LandingPage() {
                   href={settings.contact.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-pink-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group active:scale-95 overflow-hidden relative"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/60 rounded-full hover:border-pink-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group active:scale-95 overflow-hidden relative"
                   title="Instagram"
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-yellow-400/20 via-pink-500/20 to-purple-500/20 transition-opacity" />
@@ -127,7 +127,7 @@ export default async function LandingPage() {
                   href={`https://wa.me/${settings.contact.whatsapp.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/40 backdrop-blur-xl rounded-full hover:border-green-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] group active:scale-95 overflow-hidden relative"
+                  className="w-12 h-12 flex items-center justify-center border border-white/5 border-t-white/10 bg-black/60 rounded-full hover:border-green-500/50 transition-all text-white/60 hover:text-white hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] group active:scale-95 overflow-hidden relative"
                   title="WhatsApp"
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-green-400/20 to-emerald-600/20 transition-opacity" />
@@ -227,11 +227,11 @@ export default async function LandingPage() {
           <hr className="border-white/[0.05]" />
 
           {/* Booking Flow */}
-          <div className="relative mt-12 scroll-mt-32" id="booking-section">
+            <div className="relative mt-12 scroll-mt-32" id="booking-section">
             {/* Glow del formulario */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 blur-[120px] pointer-events-none -z-10 transform-gpu" />
             
-            <div className="backdrop-blur-xl bg-black/40 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
+            <div className="backdrop-blur-md bg-black/60 border border-white/5 border-t-white/10 text-white rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-full max-w-screen-xl mx-auto relative overflow-hidden">
               {/* Highlight superior sutil */}
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               
@@ -255,7 +255,7 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/40 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-black/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
             {/* Sutil glow de ubicación */}
             <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/5 blur-[100px] pointer-events-none -z-10 transform-gpu" />
             

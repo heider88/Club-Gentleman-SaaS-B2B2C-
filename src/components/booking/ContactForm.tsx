@@ -92,7 +92,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
     }
 
     return (
-        <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+        <form onSubmit={handleSubmit(processSubmit)} className="space-y-4 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl p-6">
             <div className="space-y-2">
                 <label className="text-sm font-bold text-white/90">Nombre Completo</label>
                 <input
