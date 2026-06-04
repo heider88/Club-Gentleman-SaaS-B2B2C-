@@ -18,6 +18,7 @@ export function BusinessSettingsTabs({
     const [isPending, startTransition] = useTransition()
 
     const TABS = [
+        { id: "nosotros", label: "Sobre Nosotros" },
         { id: "general", label: "General" },
         { id: "contacto", label: "Contacto y Redes" },
         { id: "secciones", label: "Secciones Adicionales" },
@@ -80,15 +81,79 @@ export function BusinessSettingsTabs({
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-dash-text">DIRECCIÓN</label>
-                    <div className="relative">
+                    <label className="text-sm font-bold text-dash-text">Dirección</label>
+                    <input 
+                        type="text" 
+                        value={settings.contact.address || ''}
+                        onChange={e => setSettings({...settings, contact: {...settings.contact, address: e.target.value}})}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                        placeholder="Ej: Cll 72 sur #14-80 Bogotá"
+                    />
+                </div>
+                
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-dash-text">Enlace de Google Maps</label>
+                    <input 
+                        type="url" 
+                        value={settings.contact.map_url || ''}
+                        onChange={e => setSettings({...settings, contact: {...settings.contact, map_url: e.target.value}})}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                        placeholder="https://maps.app.goo.gl/..."
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-dash-text">URL de la Imagen de la Fachada/Mapa</label>
+                    <input 
+                        type="text" 
+                        value={settings.general.location_image_url || ''}
+                        onChange={e => setSettings({...settings, general: {...settings.general, location_image_url: e.target.value}})}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                        placeholder="/shop.webp o https://..."
+                    />
+                </div>
+
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-dash-text">URL del Logo</label>
                         <input 
                             type="text" 
-                            disabled
-                            value="Cll 72 sur #14-80 (Gestionado desde código/mapa por ahora)"
-                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white/50 outline-none pr-10 cursor-not-allowed"
+                            value={settings.general.logo_url || ''}
+                            onChange={e => setSettings({...settings, general: {...settings.general, logo_url: e.target.value}})}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                            placeholder="/lojito.webp o https://..."
                         />
-                        <HelpCircle className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-dash-text">Año de Fundación</label>
+                        <input 
+                            type="text" 
+                            value={settings.general.established_year || ''}
+                            onChange={e => setSettings({...settings, general: {...settings.general, established_year: e.target.value}})}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                            placeholder="Ej: 2018"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-dash-text">Calificación (Rating)</label>
+                        <input 
+                            type="text" 
+                            value={settings.general.rating || ''}
+                            onChange={e => setSettings({...settings, general: {...settings.general, rating: e.target.value}})}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                            placeholder="Ej: 5.0"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-dash-text">Cantidad de Reseñas</label>
+                        <input 
+                            type="text" 
+                            value={settings.general.reviews_count || ''}
+                            onChange={e => setSettings({...settings, general: {...settings.general, reviews_count: e.target.value}})}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                            placeholder="Ej: 341"
+                        />
                     </div>
                 </div>
 
@@ -180,6 +245,79 @@ export function BusinessSettingsTabs({
             </div>
         </div>
     )
+
+    
+    const renderNosotros = () => {
+        const features = settings.general.about_features || [];
+        
+        const addFeature = () => {
+            setSettings({
+                ...settings,
+                general: {
+                    ...settings.general,
+                    about_features: [...features, "Nueva característica"]
+                }
+            });
+        };
+        
+        const updateFeature = (index: number, value: string) => {
+            const newFeatures = [...features];
+            newFeatures[index] = value;
+            setSettings({
+                ...settings,
+                general: {
+                    ...settings.general,
+                    about_features: newFeatures
+                }
+            });
+        };
+        
+        const removeFeature = (index: number) => {
+            const newFeatures = features.filter((_, i) => i !== index);
+            setSettings({
+                ...settings,
+                general: {
+                    ...settings.general,
+                    about_features: newFeatures
+                }
+            });
+        };
+
+        return (
+            <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                    <p className="text-sm text-dash-text-soft">Gestiona las viñetas que aparecen en la sección "Sobre Nosotros".</p>
+                    <button onClick={addFeature} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-lg transition-colors text-sm">
+                        <Plus className="w-4 h-4" /> Añadir Viñeta
+                    </button>
+                </div>
+                
+                <div className="space-y-3">
+                    {features.map((feature, index) => (
+                        <div key={index} className="flex gap-2 items-center">
+                            <input 
+                                type="text"
+                                value={feature}
+                                onChange={e => updateFeature(index, e.target.value)}
+                                className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
+                            />
+                            <button onClick={() => removeFeature(index)} className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-3 rounded-xl transition-colors">
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ))}
+                    {features.length === 0 && <p className="text-white/40 text-sm italic">No hay viñetas añadidas.</p>}
+                </div>
+                
+                <div className="pt-4">
+                    <button onClick={handleSave} disabled={isPending} className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-3 rounded-xl transition-all disabled:opacity-50">
+                        <Save className="w-5 h-5" /> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
 
     const renderSecciones = () => {
         const addSection = () => {
@@ -368,6 +506,7 @@ export function BusinessSettingsTabs({
             {/* Tab Content */}
             <div className="bg-card/90 backdrop-blur-xl border border-border rounded-3xl p-6 sm:p-8 shadow-xl">
                 {activeTab === 'general' && renderGeneral()}
+                {activeTab === 'nosotros' && renderNosotros()}
                 {activeTab === 'contacto' && renderContacto()}
                 {activeTab === 'secciones' && renderSecciones()}
                 {activeTab === 'horarios' && renderEnConstruccion("Configuración de Horarios")}

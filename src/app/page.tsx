@@ -69,7 +69,7 @@ export default async function LandingPage() {
             {/* Logo Centrado (Incrementado 15%) */}
             <div className="relative w-[87vw] sm:w-[52rem] aspect-[2/1] max-w-full drop-shadow-2xl -mt-4">
               <Image
-                src="/lojito.webp"
+                src={settings.general.logo_url || "/lojito.webp"}
                 alt="Club Gentleman For Men Logo"
                 fill
                 className="object-contain object-center scale-[2.2] sm:scale-125"
@@ -80,11 +80,11 @@ export default async function LandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/80 font-medium">
               <div className="flex items-center gap-1 text-yellow-400">
                 <Star className="w-4 h-4 fill-current" />
-                <span className="text-white">5.0 <span className="text-white/60 font-normal">(341 reviews)</span></span>
+                <span className="text-white">{settings.general.rating || "5.0"} <span className="text-white/60 font-normal">({settings.general.reviews_count || "341"} reviews)</span></span>
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4" />
-                <span>Cll 72 sur #14-80 . Bogotá</span>
+                <span>{settings.contact.address || "Cll 72 sur #14-80 Bogotá"}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-green-400" />
@@ -172,9 +172,15 @@ export default async function LandingPage() {
                 <div>
                   <p className="text-white/50 text-sm uppercase tracking-widest font-bold mb-4">Descubrí nuestra selección:</p>
                   <ul className="space-y-3 text-white/80 font-medium text-[15px]">
-                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Productos de cuidado masculino</li>
-                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Camisetas, gorras, relojes y joyas</li>
-                    <li className="flex items-center gap-3"><span className="w-8 h-px bg-pink-500/50"></span> Ceras, aceites, fragancias exclusivas</li>
+                    {(settings.general.about_features || [
+                        "Productos de cuidado masculino",
+                        "Camisetas, gorras, relojes y joyas",
+                        "Ceras, aceites, fragancias exclusivas"
+                    ]).map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-3">
+                            <span className="w-8 h-px bg-pink-500/50"></span> {feature}
+                        </li>
+                    ))}
                   </ul>
                 </div>
                 
@@ -261,9 +267,9 @@ export default async function LandingPage() {
             
             <div className="flex-1 space-y-4 text-white/70">
               <p className="text-lg leading-relaxed">Nos encontramos ubicados en una zona central de fácil acceso para brindarte la mejor atención y comodidad.</p>
-              <p className="text-2xl md:text-3xl font-black text-white/90">Cll 72 sur #14-80 Bogotá</p>
+              <p className="text-2xl md:text-3xl font-black text-white/90">{settings.contact.address || "Cll 72 sur #14-80 Bogotá"}</p>
               <a
-                href="https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"
+                href={settings.contact.map_url || "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#6D3294] hover:text-pink-400 font-bold hover:underline transition-colors mt-4 inline-flex items-center gap-2 group"
@@ -275,13 +281,13 @@ export default async function LandingPage() {
 
             {/* Map Image (Clickable) */}
             <a
-              href="https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"
+              href={settings.contact.map_url || "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7"}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full md:w-[400px] h-64 bg-black/80 rounded-2xl overflow-hidden relative grayscale opacity-60 hover:grayscale-0 hover:opacity-100 hover:shadow-[0_0_40px_rgba(109,50,148,0.3)] transition-all duration-700 border border-white/10 group cursor-pointer block"
             >
               <Image
-                src="/shop.webp"
+                src={settings.general.location_image_url || "/shop.webp"}
                 alt="Fachada Club Gentleman For Men"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -307,7 +313,7 @@ export default async function LandingPage() {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#6D3294]/50 to-transparent" />
         
         <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6 mb-16 relative z-10">
-          <p className="font-mono text-white/30 text-xs tracking-[0.3em] uppercase">Est. 2018 © Todos los derechos reservados</p>
+          <p className="font-mono text-white/30 text-xs tracking-[0.3em] uppercase">Est. {settings.general.established_year || "2018"} © Todos los derechos reservados</p>
           <a href="#" className="font-oswald text-white/50 hover:text-white uppercase tracking-[0.2em] text-sm flex items-center gap-2 transition-colors border border-white/10 hover:border-white/30 px-6 py-2 rounded-full">
             <ChevronUp className="w-4 h-4" /> Volver Arriba
           </a>
