@@ -25,18 +25,12 @@ export function GallerySection({ initialPhotos }: { initialPhotos: string[] }) {
             </button>
           </div>
 
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 sm:gap-2 overflow-hidden transition-[transform,opacity,max-height] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-2 overflow-hidden transition-[transform,opacity,max-height] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${showPortfolio ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
             {initialPhotos.map((src, i) => {
-              // Create irregular masonry-like pattern
-              const isLarge = i % 5 === 0;
-              const isWide = i % 7 === 0 && !isLarge;
-              
               return (
                 <div 
                   key={i} 
-                  className={`relative overflow-hidden bg-black group cursor-pointer border border-white/[0.05] 
-                  ${isLarge ? 'md:row-span-2 md:col-span-2 aspect-[3/4] md:aspect-[4/5]' : 
-                    isWide ? 'md:col-span-2 aspect-video md:aspect-[21/9]' : 'aspect-square'}`}
+                  className={`relative overflow-hidden bg-black group cursor-pointer border border-white/[0.05] aspect-square`}
                 >
                   <Image
                     src={src}

@@ -3,6 +3,7 @@
 import { requireAdmin } from "@/lib/auth/rbac"
 import { createAdminClient } from "@/lib/auth/adminClient"
 import { revalidatePath } from "next/cache"
+import sharp from "sharp"
 
 export async function addGalleryImage(imageUrl: string, caption?: string) {
     await requireAdmin()
@@ -27,19 +28,31 @@ export async function uploadGalleryImageDirect(formData: FormData) {
     const file = formData.get('file') as File;
     if (!file) return { error: "No se proporcionó un archivo." };
 
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
-    const filePath = `public/${fileName}`
-
     // Convert file to buffer for server-side Supabase upload
     const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    const originalBuffer = Buffer.from(arrayBuffer)
+
+    // Estandarizar imagen: Redimensionar y recortar a cuadrado 1080x1080, comprimir JPEG
+    const buffer = await sharp(originalBuffer)
+        .resize({
+            width: 1080,
+            height: 1080,
+            fit: sharp.fit.cover,
+            position: sharp.strategy.entropy
+        })
+        .jpeg({ quality: 80 })
+        .toBuffer()
+
+    // Cambiar la extensión a jpg ya que la estandarizamos
+    const fileExt = "jpg"
+    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
+    const filePath = `public/${fileName}`
 
     // Usamos adminClient para saltar el RLS de Storage (ya que verificamos requireAdmin arriba)
     const { error: uploadError } = await adminClient.storage
         .from('gallery')
         .upload(filePath, buffer, {
-            contentType: file.type,
+            contentType: 'image/jpeg',
             upsert: false
         })
 
