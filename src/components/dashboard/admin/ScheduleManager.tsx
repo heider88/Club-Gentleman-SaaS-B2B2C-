@@ -1,16 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Lock, Unlock, CalendarX2, Save, Trash2, ShieldAlert } from "lucide-react"
+import { Lock, Unlock, CalendarX2, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { createAvailabilityBlock, deleteAvailabilityBlock } from "@/app/actions/admin"
-import { useRouter } from "next/navigation"
 
 export function ScheduleManager({ barbers, existingBlocks }: { barbers: any[], existingBlocks: any[] }) {
-    const router = useRouter()
+    
     
     // Form State
     const [targetType, setTargetType] = useState<'global' | 'barber'>('global')

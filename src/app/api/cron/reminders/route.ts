@@ -87,8 +87,9 @@ export async function GET(request: Request) {
             emailsSent
         });
 
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("CRON JOB ERROR:", err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     }
 }

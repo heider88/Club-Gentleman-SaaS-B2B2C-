@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { ShieldAlert, XCircle, Trash2, CalendarX2 } from "lucide-react"
+import { ShieldAlert, XCircle, CalendarX2 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 

@@ -112,7 +112,8 @@ export async function saveSiteSettings(payload: SiteSettingsPayload) {
         revalidatePath('/dashboard/admin/settings')
         
         return { success: true }
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in saveSiteSettings:", err)
         return { success: false, error: "Error inesperado al guardar la configuración." }
     }

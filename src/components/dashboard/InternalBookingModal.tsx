@@ -34,7 +34,7 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
             }
             fetchServices()
         }
-    }, [isOpen, barberId])
+    }, [isOpen, barberId, services.length, supabase])
 
     const selectedService = services.find(s => s.id === selectedServiceId)
 

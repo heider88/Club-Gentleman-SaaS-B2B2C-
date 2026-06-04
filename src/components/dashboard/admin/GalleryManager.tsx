@@ -5,7 +5,6 @@ import { Upload, Trash2, Link as LinkIcon, Loader2, Image as ImageIcon } from "l
 import { toast } from "sonner"
 import Image from "next/image"
 import { addGalleryImage, deleteGalleryImage, uploadGalleryImageDirect } from "@/app/actions/gallery"
-import { createClient } from "@/lib/supabase/client"
 
 import { useRouter } from "next/navigation"
 
@@ -59,8 +58,9 @@ export function GalleryManager({ initialImages }: { initialImages: any[] }) {
 
             toast.success("¡Imagen publicada en la página web!", { id: toastId })
             router.refresh()
-        } catch (error: any) {
-            toast.error(error.message || "Error al subir la imagen", { id: toastId })
+        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "Error al subir la imagen", { id: toastId })
             console.error(error)
         } finally {
             setIsUploading(false)

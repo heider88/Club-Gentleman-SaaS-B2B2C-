@@ -119,7 +119,8 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         }
         
         return { success: true };
-    } catch (error: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (error: unknown) {
         console.error("Action Error:", error);
         return { success: false, error: "Error inesperado en el servidor." };
     }
@@ -161,7 +162,8 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
             if (error) return { success: false, error: error.message };
             return { success: true };
         }
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in updateAppointmentStatus:", err);
         return { success: false, error: "Error inesperado al intentar actualizar la cita." };
     }

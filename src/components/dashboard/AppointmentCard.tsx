@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { CheckCircle2, Phone, UserX, MoreHorizontal, Scissors } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -31,8 +30,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
     const [showCancelModal, setShowCancelModal] = useState(false)
     const optionsRef = useRef<HTMLDivElement>(null)
     const cancelModalRef = useRef<HTMLDivElement>(null)
-    const supabase = createClient()
-    const router = useRouter()
+        const router = useRouter()
 
     const isAdmin = userRole === 'admin'
 
@@ -64,8 +62,9 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             setStatus(newStatus)
             toast.success(newStatus === 'completed' ? 'Corte finalizado' : 'Cita cancelada')
             router.refresh()
-        } catch (err: any) {
-            toast.error(err.message || "Error al actualizar la cita")
+        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "Error al actualizar la cita")
         } finally {
             setLoading(false)
         }

@@ -62,7 +62,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
                 }, 100);
             }
         }
-    }, [step])
+    }, [step, isIntersecting])
 
     if (step === 5) {
         return (
@@ -77,9 +77,7 @@ export default function BookingWizard({ barbers, services }: BookingWizardProps)
     return (
         <div
             ref={(node) => {
-                // @ts-ignore - Merge both refs (internal scroll ref and intersection ref)
                 scrollContainerRef.current = node;
-                // @ts-ignore
                 wizardRef.current = node;
             }}
             className="w-full relative py-2 overflow-x-hidden sm:overflow-x-auto pb-8 snap-y sm:snap-x snap-mandatory flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-4 group/wizard"

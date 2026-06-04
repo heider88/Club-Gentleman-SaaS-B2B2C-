@@ -1,9 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { startOfDay, endOfDay, format } from "date-fns"
-import { es } from "date-fns/locale"
-import { CalendarX2, CalendarDays } from "lucide-react"
-import { AppointmentCard } from "@/components/dashboard/AppointmentCard"
+import { startOfDay, endOfDay } from "date-fns"
+import { CalendarX2 } from "lucide-react"
 import { InternalBookingModal } from "@/components/dashboard/InternalBookingModal"
 import { TeamRadar } from "@/components/dashboard/TeamRadar"
 

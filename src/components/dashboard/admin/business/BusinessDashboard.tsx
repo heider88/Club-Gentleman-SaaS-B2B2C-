@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, isSameDay } from "date-fns"
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Banknote, FileDown, Scissors, CheckCircle2, CalendarDays, Users, Star, ArrowDownToLine, Clock, CalendarX2, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, TrendingDown, Wallet, Landmark, Receipt, CircleDollarSign } from "lucide-react"
-import { toast } from "sonner"
+import { Banknote, Scissors, CheckCircle2, CalendarDays, Users, ArrowDownToLine, Clock, CalendarX2, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, TrendingDown, Wallet, Landmark, Receipt, CircleDollarSign } from "lucide-react"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import {
@@ -363,8 +362,8 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             }
         }).sort((a,b) => b.payout - a.payout) // Always show all barbers, even if payout is 0
 
-        let topEarner = comisionesData.length > 0 ? comisionesData[0] : { barber: '-', payout: 0 }
-        let lowestEarner = comisionesData.length > 0 ? comisionesData[comisionesData.length - 1] : { barber: '-', payout: 0 }
+        const topEarner = comisionesData.length > 0 ? comisionesData[0] : { barber: '-', payout: 0 }
+        const lowestEarner = comisionesData.length > 0 ? comisionesData[comisionesData.length - 1] : { barber: '-', payout: 0 }
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -499,7 +498,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         
         validAppts.forEach(a => {
             const dayName = format(new Date(a.start_time), 'EEE', { locale: es })
-            let key = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+            const key = dayName.charAt(0).toUpperCase() + dayName.slice(1);
             if(key === 'Dom') daysMap['Dom']++;
             else if(key === 'Lun') daysMap['Lun']++;
             else if(key === 'Mar') daysMap['Mar']++;
@@ -975,8 +974,8 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         const totalCollaborators = collaboratorData.length
         const average = totalCollaborators > 0 ? Math.round(totalReservations / totalCollaborators) : 0
 
-        let topCollaborator = collaboratorData.length > 0 ? collaboratorData[0] : { name: '-', count: 0 }
-        let lowestCollaborator = collaboratorData.length > 0 ? collaboratorData[collaboratorData.length - 1] : { name: '-', count: 0 }
+        const topCollaborator = collaboratorData.length > 0 ? collaboratorData[0] : { name: '-', count: 0 }
+        const lowestCollaborator = collaboratorData.length > 0 ? collaboratorData[collaboratorData.length - 1] : { name: '-', count: 0 }
 
         // Process data for table (add performance metric)
         const tableData = collaboratorData.map(c => {

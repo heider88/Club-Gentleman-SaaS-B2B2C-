@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter,  } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { CalendarDays, Scissors, User, Lock, LogOut, FileText, ImageIcon, Users, XCircle, PanelLeftClose, PanelLeftOpen, BarChart3, CalendarClock, Settings } from "lucide-react"
+import { CalendarDays, Scissors, User, Lock, LogOut, FileText, Users, XCircle, PanelLeftClose, BarChart3, CalendarClock, Settings } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ThemeToggle } from "./ThemeToggle"
 import { useState } from "react"

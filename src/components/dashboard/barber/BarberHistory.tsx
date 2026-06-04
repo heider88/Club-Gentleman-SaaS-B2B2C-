@@ -9,7 +9,7 @@ import {
     format 
 } from "date-fns"
 import { es } from "date-fns/locale"
-import { Banknote, CheckCircle2, Search, ArrowDownToLine, CalendarClock } from "lucide-react"
+import { Banknote, CheckCircle2, Search, ArrowDownToLine } from "lucide-react"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -33,7 +33,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
     // Derived KPIs
     const totalRevenue = appointments.reduce((sum, a) => sum + (a.services?.price || 0), 0)
     const totalAppointments = appointments.length
-    const storeCut = totalRevenue * ((100 - commissionPercentage) / 100)
+    totalRevenue * ((100 - commissionPercentage) / 100)
     const barberCut = totalRevenue * (commissionPercentage / 100)
 
     useEffect(() => {

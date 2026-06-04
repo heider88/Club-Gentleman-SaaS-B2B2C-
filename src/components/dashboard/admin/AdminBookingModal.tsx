@@ -37,7 +37,7 @@ export function AdminBookingModal() {
             }
             fetchBarbers()
         }
-    }, [isOpen])
+    }, [isOpen, barbers.length, supabase])
 
     useEffect(() => {
         if (selectedBarberId) {
@@ -53,7 +53,7 @@ export function AdminBookingModal() {
         } else {
             setServices([])
         }
-    }, [selectedBarberId])
+    }, [selectedBarberId, supabase])
 
     const selectedService = services.find(s => s.id === selectedServiceId)
 

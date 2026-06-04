@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Search, Phone, MessageCircle, Scissors, Users } from "lucide-react"
+import { Search, Phone, MessageCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 type Customer = {

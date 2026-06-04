@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useMemo, useState } from "react"
-import { format, differenceInMinutes, startOfDay, addMinutes, isSameDay, getDay } from "date-fns"
+import { format, startOfDay, addMinutes, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { AppointmentCard } from "../AppointmentCard"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"

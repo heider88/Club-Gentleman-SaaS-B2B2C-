@@ -1,6 +1,6 @@
 "use client"
 import { motion } from "framer-motion"
-import { ChevronRight, Scissors } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 

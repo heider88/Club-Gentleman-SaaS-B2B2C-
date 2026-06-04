@@ -93,9 +93,10 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                 setScheduleSettings(settings as ScheduleSettings);
                 setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
                 setAllBlocks(blocksRes.data || []);
-            } catch (err: any) {
+            } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
                 console.error("Error preloading data:", err);
-                setError(err.message || "Hubo un error al cargar las horas disponibles.");
+                setError(err instanceof Error ? err.message : "Hubo un error al cargar las horas disponibles.");
             } finally {
                 setLoading(false);
             }

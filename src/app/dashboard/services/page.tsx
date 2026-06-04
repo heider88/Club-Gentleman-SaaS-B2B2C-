@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
-import { Plus, Edit2, Trash2, Scissors, Save, X, Ban, CheckCircle2 } from "lucide-react"
+import { Plus, Edit2, Trash2, Scissors, Save, X, Ban } from "lucide-react"
 
 interface Service {
     id: string
@@ -53,7 +53,7 @@ export default function ServicesPage() {
 
     useEffect(() => {
         fetchServices()
-    }, [supabase])
+    }, [fetchServices, supabase])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target

@@ -58,7 +58,8 @@ export async function createEmployee(formData: FormData) {
         
         return { success: true, message: "Empleado creado con éxito." };
         
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Fallo crítico en Server Action Admin:", err);
         return { error: "Ocurrió un error inesperado al intentar procesar la solicitud." };
     }
@@ -87,7 +88,8 @@ export async function deleteEmployee(userId: string) {
         revalidatePath('/dashboard/admin');
         
         return { success: true };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Fallo crítico en eliminación de empleado:", err);
         return { error: "Error inesperado al intentar eliminar el empleado." };
     }
@@ -113,7 +115,8 @@ export async function createAvailabilityBlock(payload: { barber_id: string | nul
         if (error) return { error: error.message };
         revalidatePath('/dashboard/admin/schedules');
         return { success: true, data };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in createAvailabilityBlock:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }
@@ -129,7 +132,8 @@ export async function deleteAvailabilityBlock(blockId: string) {
         if (error) return { error: error.message };
         revalidatePath('/dashboard/admin/schedules');
         return { success: true };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in deleteAvailabilityBlock:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }
@@ -160,7 +164,8 @@ export async function manageBarberService(action: 'add' | 'delete' | 'update', p
         }
         
         return { error: "Acción no reconocida." };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in manageBarberService:", err);
         return { error: "Ocurrió un error inesperado al gestionar el servicio." };
     }
@@ -177,17 +182,18 @@ export async function importServicesToBarber(barberId: string, servicesToImport:
 
         const newServices = servicesToImport.map(s => ({
             barber_id: barberId,
-            name: s.name,
-            price: s.price,
-            duration_minutes: s.duration_minutes,
-            description: s.description
+            name: s.name as string,
+            price: s.price as number,
+            duration_minutes: s.duration_minutes as number,
+            description: s.description as string | null
         }));
 
         const { data, error } = await adminClient.from('services').insert(newServices).select();
         if (error) return { error: error.message };
         
         return { success: true, data };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in importServicesToBarber:", err);
         return { error: "Ocurrió un error inesperado al importar servicios." };
     }
@@ -208,7 +214,8 @@ export async function updateBarberProfile(barberId: string, updates: any) {
         
         revalidatePath(`/dashboard/admin/barber/${barberId}`);
         return { success: true, data };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in updateBarberProfile:", err);
         return { error: "Ocurrió un error inesperado al actualizar el perfil." };
     }
@@ -223,7 +230,7 @@ export async function updateEmployeePassword(userId: string, newPassword: string
             return { error: "La contraseña es muy corta o inválida." };
         }
 
-        const { data, error } = await adminClient.auth.admin.updateUserById(userId, {
+        const { error } = await adminClient.auth.admin.updateUserById(userId, {
             password: newPassword
         });
 
@@ -233,7 +240,8 @@ export async function updateEmployeePassword(userId: string, newPassword: string
         }
 
         return { success: true, message: "Contraseña actualizada exitosamente." };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in updateEmployeePassword:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }
@@ -249,7 +257,7 @@ export async function updateEmployeeEmail(userId: string, newEmail: string) {
         }
 
         // 1. Actualizar en el sistema de autenticación (auth.users)
-        const { data: authData, error: authError } = await adminClient.auth.admin.updateUserById(userId, {
+        const { error: authError } = await adminClient.auth.admin.updateUserById(userId, {
             email: newEmail,
             email_confirm: true // Confirmar automáticamente para evitar bloqueos
         });
@@ -273,7 +281,8 @@ export async function updateEmployeeEmail(userId: string, newEmail: string) {
         
         revalidatePath(`/dashboard/admin/barber/${userId}`);
         return { success: true, message: "Correo de acceso actualizado exitosamente." };
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: unknown) {
         console.error("Action Error in updateEmployeeEmail:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
     }

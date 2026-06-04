@@ -189,7 +189,7 @@ export default async function LandingPage() {
                 
                 <blockquote className="border-l-2 border-pink-500 pl-6 py-2">
                   <p className="text-xl md:text-2xl font-oswald text-white/90 italic tracking-wide">
-                    "{settings.general.slogan || "Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero."}"
+                    &quot;{settings.general.slogan || "Esto no es solo un lugar para cortarte el cabello. Es donde comienza el camino del caballero."}&quot;
                   </p>
                 </blockquote>
               </div>

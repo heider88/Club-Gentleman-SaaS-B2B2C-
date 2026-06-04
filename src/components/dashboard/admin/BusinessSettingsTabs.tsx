@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { GalleryManager } from "./GalleryManager"
 import { saveSiteSettings, SiteSettingsPayload } from "@/app/actions/settings"
 import { toast } from "sonner"
-import { HelpCircle, Save, Plus, Trash2, GripVertical, Image as ImageIcon, Type, Link as LinkIcon, Instagram, Facebook } from "lucide-react"
+import { HelpCircle, Save, Plus, Trash2, GripVertical, Image as ImageIcon, Link as LinkIcon, Instagram, Facebook } from "lucide-react"
 
 export function BusinessSettingsTabs({ 
     initialSettings, 
@@ -294,7 +294,7 @@ export function BusinessSettingsTabs({
         return (
             <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between">
-                    <p className="text-sm text-dash-text-soft">Gestiona las viñetas que aparecen en la sección "Sobre Nosotros".</p>
+                    <p className="text-sm text-dash-text-soft">Gestiona las viñetas que aparecen en la sección &quot;Sobre Nosotros&quot;.</p>
                     <button onClick={addFeature} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-lg transition-colors text-sm">
                         <Plus className="w-4 h-4" /> Añadir Viñeta
                     </button>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { ShieldCheck, Mail, KeyRound, Loader2 } from "lucide-react"
+import { Mail, KeyRound, Loader2 } from "lucide-react"
 import { updateEmployeeEmail, updateEmployeePassword } from "@/app/actions/admin"
 
 export function AdminSecurityManager({ barberId, currentEmail }: { barberId: string, currentEmail: string }) {

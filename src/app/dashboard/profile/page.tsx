@@ -80,7 +80,7 @@ export default function ProfilePage() {
             setLoading(false)
         }
         fetchProfile()
-    }, [])
+    }, [supabase])
 
     const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -132,8 +132,9 @@ export default function ProfilePage() {
                 .eq('id', userId)
 
             toast.success("Foto de perfil actualizada correctamente")
-        } catch (error: any) {
-            toast.error("Error al subir foto", { description: error.message })
+        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (error: unknown) {
+            toast.error("Error al subir foto", { description: error instanceof Error ? error.message : String(error) })
         } finally {
             setUploading(false)
         }
