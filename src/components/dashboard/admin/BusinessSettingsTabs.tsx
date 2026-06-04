@@ -307,19 +307,20 @@ export function BusinessSettingsTabs({
                     <div className="space-y-3">
                         <label className="text-sm font-bold text-dash-text block mt-4">Elementos de la Lista</label>
                         {features.map((feature, index) => (
-                        <div key={index} className="flex gap-2 items-center">
-                            <input 
-                                type="text"
-                                value={feature}
-                                onChange={e => updateFeature(index, e.target.value)}
-                                className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
-                            />
-                            <button onClick={() => removeFeature(index)} className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-3 rounded-xl transition-colors">
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
-                    ))}
-                    {features.length === 0 && <p className="text-white/40 text-sm italic">No hay viñetas añadidas.</p>}
+                            <div key={index} className="flex gap-2 items-center">
+                                <input 
+                                    type="text"
+                                    value={feature}
+                                    onChange={e => updateFeature(index, e.target.value)}
+                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none"
+                                />
+                                <button onClick={() => removeFeature(index)} className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-3 rounded-xl transition-colors">
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+                        {features.length === 0 && <p className="text-white/40 text-sm italic">No hay viñetas añadidas.</p>}
+                    </div>
                 </div>
                 
                 <div className="pt-4">
