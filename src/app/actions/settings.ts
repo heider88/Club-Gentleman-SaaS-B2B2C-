@@ -15,6 +15,7 @@ const siteSettingsSchema = z.object({
         reviews_count: z.string().optional(),
         established_year: z.string().optional(),
         about_features: z.array(z.string()).optional(),
+        about_features_title: z.string().optional(),
         location_image_url: z.string().optional(),
     }),
     contact: z.object({
@@ -44,7 +45,7 @@ export async function getSiteSettings(): Promise<SiteSettingsPayload> {
         if (error || !data) {
             // Devuelve configuraciones por defecto si la tabla no existe o está vacía
             return {
-                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], location_image_url: "" },
+                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], about_features_title: "Descubrí nuestra selección:", location_image_url: "" },
                 contact: { facebook: "", instagram: "", whatsapp: "", schedule: "09:00 - 20:00", address: "Cll 72 sur #14-80 Bogotá", map_url: "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7" },
                 custom_sections: [],
             }
@@ -52,12 +53,12 @@ export async function getSiteSettings(): Promise<SiteSettingsPayload> {
         
         return {
             general: data.general || {
-                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], location_image_url: "" },
+                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], about_features_title: "Descubrí nuestra selección:", location_image_url: "" },
                 contact: { facebook: "", instagram: "", whatsapp: "", schedule: "09:00 - 20:00", address: "Cll 72 sur #14-80 Bogotá", map_url: "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7" },
                 custom_sections: [],
             }.general,
             contact: data.contact || {
-                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], location_image_url: "" },
+                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], about_features_title: "Descubrí nuestra selección:", location_image_url: "" },
                 contact: { facebook: "", instagram: "", whatsapp: "", schedule: "09:00 - 20:00", address: "Cll 72 sur #14-80 Bogotá", map_url: "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7" },
                 custom_sections: [],
             }.contact,
@@ -66,7 +67,7 @@ export async function getSiteSettings(): Promise<SiteSettingsPayload> {
     } catch (err) {
         console.error("Error fetching site settings:", err)
         return {
-                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], location_image_url: "" },
+                general: { name: "CLUB GENTLEMAN FOR MEN", description: "", slogan: "", logo_url: "", rating: "5.0", reviews_count: "341", established_year: "2018", about_features: ["Productos de cuidado masculino", "Camisetas, gorras, relojes y joyas", "Ceras, aceites, fragancias exclusivas"], about_features_title: "Descubrí nuestra selección:", location_image_url: "" },
                 contact: { facebook: "", instagram: "", whatsapp: "", schedule: "09:00 - 20:00", address: "Cll 72 sur #14-80 Bogotá", map_url: "https://maps.app.goo.gl/bfDpJrCcxnpkGfBX7" },
                 custom_sections: [],
             }

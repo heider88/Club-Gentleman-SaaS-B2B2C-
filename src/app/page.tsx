@@ -170,7 +170,7 @@ export default async function LandingPage() {
               {/* List & Pull Quote */}
               <div className="md:w-1/2 border-l border-white/[0.05] pl-0 md:pl-10 space-y-8 flex flex-col justify-center">
                 <div>
-                  <p className="text-white/50 text-sm uppercase tracking-widest font-bold mb-4">Descubrí nuestra selección:</p>
+                  <p className="text-white/50 text-sm uppercase tracking-widest font-bold mb-4">{settings.general.about_features_title || "Descubrí nuestra selección:"}</p>
                   <ul className="space-y-3 text-white/80 font-medium text-[15px]">
                     {(settings.general.about_features || [
                         "Productos de cuidado masculino",

@@ -292,8 +292,21 @@ export function BusinessSettingsTabs({
                     </button>
                 </div>
                 
-                <div className="space-y-3">
-                    {features.map((feature, index) => (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-dash-text">Título de la Lista</label>
+                        <input 
+                            type="text"
+                            value={settings.general.about_features_title || ''}
+                            onChange={e => setSettings({...settings, general: {...settings.general, about_features_title: e.target.value}})}
+                            placeholder="Ej: Descubrí nuestra selección:"
+                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:border-primary outline-none transition-colors"
+                        />
+                    </div>
+                    
+                    <div className="space-y-3">
+                        <label className="text-sm font-bold text-dash-text block mt-4">Elementos de la Lista</label>
+                        {features.map((feature, index) => (
                         <div key={index} className="flex gap-2 items-center">
                             <input 
                                 type="text"
