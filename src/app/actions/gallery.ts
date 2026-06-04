@@ -31,10 +31,17 @@ export async function uploadGalleryImageDirect(formData: FormData) {
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
     const filePath = `public/${fileName}`
 
+    // Convert file to buffer for server-side Supabase upload
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
     // Usamos adminClient para saltar el RLS de Storage (ya que verificamos requireAdmin arriba)
     const { error: uploadError } = await adminClient.storage
         .from('gallery')
-        .upload(filePath, file)
+        .upload(filePath, buffer, {
+            contentType: file.type,
+            upsert: false
+        })
 
     if (uploadError) return { error: `Fallo en Storage: ${uploadError.message}` };
 
