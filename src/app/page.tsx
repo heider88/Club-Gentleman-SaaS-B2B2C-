@@ -172,11 +172,14 @@ export default async function LandingPage() {
                 <div>
                   <p className="text-white/50 text-sm uppercase tracking-widest font-bold mb-4">{settings.general.about_features_title || "Descubrí nuestra selección:"}</p>
                   <ul className="space-y-3 text-white/80 font-medium text-[15px]">
-                    {(settings.general.about_features || [
-                        "Productos de cuidado masculino",
-                        "Camisetas, gorras, relojes y joyas",
-                        "Ceras, aceites, fragancias exclusivas"
-                    ]).map((feature, idx) => (
+                    {(settings.general.about_features && settings.general.about_features.length > 0 
+                      ? settings.general.about_features 
+                      : [
+                          "Productos de cuidado masculino",
+                          "Camisetas, gorras, relojes y joyas",
+                          "Ceras, aceites, fragancias exclusivas"
+                        ]
+                    ).map((feature: string, idx: number) => (
                         <li key={idx} className="flex items-center gap-3">
                             <span className="w-8 h-px bg-pink-500/50"></span> {feature}
                         </li>

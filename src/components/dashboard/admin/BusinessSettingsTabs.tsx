@@ -248,7 +248,15 @@ export function BusinessSettingsTabs({
 
     
     const renderNosotros = () => {
-        const features = settings.general.about_features || [];
+        // Precargar con valores por defecto si no hay ninguno, para que el administrador sepa qué hay
+        const defaultFeatures = [
+            "Productos de cuidado masculino",
+            "Camisetas, gorras, relojes y joyas",
+            "Ceras, aceites, fragancias exclusivas"
+        ];
+        
+        const currentFeatures = settings.general.about_features || [];
+        const features = currentFeatures.length > 0 ? currentFeatures : defaultFeatures;
         
         const addFeature = () => {
             setSettings({
