@@ -36,16 +36,23 @@ export default async function DashboardLayout({
 
     return (
         <DashboardThemeProvider>
-            <div className={`min-h-screen bg-dash-bg text-dash-text flex flex-col md:flex-row relative ${oswald.variable} ${jakarta.variable} font-jakarta`}>
-                {/* Noise texture overlay for Luxury Industrial feel */}
-                <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] dark:opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
+            <div className={`min-h-screen text-dash-text flex flex-col md:flex-row relative ${oswald.variable} ${jakarta.variable} font-jakarta overflow-hidden bg-black`}>
+                
+                {/* Purple Gradient Background matches customer view */}
+                <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none transform-gpu" />
+                
+                {/* Texture Overlay matches customer view */}
+                <div className="fixed inset-0 opacity-[0.04] -z-10 pointer-events-none bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAElBMVEUAAAAAAAAAAAAAAAAAAAAAAADgKxmiAAAABXRSTlMNDxESFjk7Z3EAAAA/SURBVDjLpc0xDQAwDMOg0i69r1gJtN1o8wI4y8y+tO99n/mQ14e8PuT1Ia8PeX3I60NeH/L6kNeHvD7k9aG3DyHwBf3zT0nLAAAAAElFTkSuQmCC')] bg-repeat transform-gpu" />
+                
+                {/* Center Glow matches customer view */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 hidden sm:block sm:blur-[120px] pointer-events-none -z-10 transform-gpu" />
 
                 {/* Pasamos el rol evaluado en el servidor hacia nuestro componente cliente */}
                 <div className="z-10 flex flex-col md:flex-row w-full h-full relative">
                     <DashboardSidebar role={role} />
 
                     {/* Main Content */}
-                    <main className="flex-1 pb-20 md:pb-0 p-4 md:p-8 overflow-y-auto w-full max-w-full">
+                    <main className="flex-1 pb-20 md:pb-0 p-4 md:p-8 overflow-y-auto w-full max-w-full relative z-10">
                         {children}
                     </main>
                 </div>

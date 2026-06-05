@@ -231,12 +231,15 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                             <div key={col.barberId} className="flex-1 min-w-[200px] md:min-w-[250px] border-r border-dash-border/30 relative">
                                 {col.appointments.map(appt => {
                                     const isPending = appt.status === 'pending' || appt.status === 'confirmed'
+                                    const isCancelled = appt.status === 'cancelled'
                                     const duration = appt.services?.duration_minutes || 30
                                     const top = calculateTop(appt.start_time)
                                     const height = calculateHeight(duration)
                                     const isSelected = selectedAppt?.id === appt.id
                                     const barberInfo = allBarbers.find(b => b.id === appt.barber_id);
-                                    const colorClass = barberInfo?.color || 'bg-dash-text';
+                                    
+                                    // Make cancelled appointments strictly grey
+                                    const colorClass = isCancelled ? 'bg-dash-border-alt' : (barberInfo?.color || 'bg-dash-text');
 
                                     return (
                                         <div 
@@ -245,26 +248,28 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                             className={`absolute left-1 right-1 border p-2 cursor-pointer transition-all duration-300 overflow-hidden group
                                                 ${isPending 
                                                     ? 'bg-dash-panel border-dash-border hover:border-dash-text hover:shadow-lg z-10' 
-                                                    : 'bg-dash-bg border-dash-border-alt/30 opacity-60 hover:opacity-100 z-0'
+                                                    : isCancelled
+                                                        ? 'bg-black/40 border-dash-border-alt/20 opacity-40 hover:opacity-70 grayscale z-0'
+                                                        : 'bg-dash-bg border-dash-border-alt/30 opacity-60 hover:opacity-100 z-0'
                                                 }
                                                 ${isSelected ? 'ring-2 ring-dash-text z-30' : ''}
                                             `}
                                             style={{ top: `${top}px`, height: `${height}px` }}
                                         >
                                             <div className="flex justify-between items-start mb-1">
-                                                <span className="font-oswald text-[10px] text-dash-text-soft">
+                                                <span className={`font-oswald text-[10px] ${isCancelled ? 'line-through text-dash-text-soft/50' : 'text-dash-text-soft'}`}>
                                                     {format(new Date(appt.start_time), 'HH:mm')}
                                                 </span>
                                             </div>
-                                            <h4 className={`font-oswald text-sm uppercase truncate ${isPending ? 'text-dash-text' : 'text-dash-text-muted'}`}>
+                                            <h4 className={`font-oswald text-sm uppercase truncate ${isPending ? 'text-dash-text' : isCancelled ? 'text-dash-text-soft/50 line-through' : 'text-dash-text-muted'}`}>
                                                 {appt.customer_name}
                                             </h4>
                                             {height >= 60 && (
-                                                <p className="text-[9px] font-bold uppercase tracking-widest text-dash-text-soft truncate mt-1">
+                                                <p className={`text-[9px] font-bold uppercase tracking-widest truncate mt-1 ${isCancelled ? 'text-dash-text-soft/50 line-through' : 'text-dash-text-soft'}`}>
                                                     {appt.services?.name || 'Servicio'}
                                                 </p>
                                             )}
-                                            <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} ${isPending ? 'opacity-100 shadow-[0_0_8px_rgba(255,255,255,0.2)]' : 'opacity-40'}`}></div>
+                                            <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} ${isPending ? 'opacity-100 shadow-[0_0_8px_rgba(255,255,255,0.2)]' : isCancelled ? 'opacity-20' : 'opacity-40'}`}></div>
                                         </div>
                                     )
                                 })}
@@ -346,7 +351,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                 <div key={i} className={`flex-1 min-w-[150px] border-r border-dash-border/30 relative ${isToday ? 'bg-white/[0.02]' : ''}`}>
                                     {dayAppts.map((appt, idx) => {
                                         const barberInfo = allBarbers.find(b => b.id === appt.barber_id);
-                                        const colorClass = barberInfo?.color || 'bg-dash-text';
+                                        const isCancelled = appt.status === 'cancelled';
+                                        const colorClass = isCancelled ? 'bg-dash-border-alt' : (barberInfo?.color || 'bg-dash-text');
                                         
                                         const duration = appt.services?.duration_minutes || 30;
                                         const top = calculateTop(appt.start_time);
@@ -374,25 +380,21 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                                 className={`absolute border p-2 cursor-pointer transition-all duration-300 overflow-hidden group hover:z-20
                                                     bg-black/60 backdrop-blur-md border-dash-border hover:border-dash-text shadow-[0_4px_10px_rgba(0,0,0,0.5)]
                                                     ${isSelected ? 'ring-1 ring-dash-text z-30' : 'z-10'}
+                                                    ${isCancelled ? 'opacity-40 hover:opacity-70 grayscale' : ''}
                                                 `}
                                                 style={{ top: `${top}px`, height: `${height}px`, width: widthStr, left: leftStr }}
                                             >
                                                 {/* Colored glowing accent line */}
-                                                <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} shadow-[0_0_10px_currentColor] opacity-80 group-hover:opacity-100`}></div>
+                                                <div className={`absolute top-0 left-0 w-1 h-full ${colorClass} ${isCancelled ? 'opacity-20' : 'shadow-[0_0_10px_currentColor] opacity-80 group-hover:opacity-100'}`}></div>
                                                 <div className="flex flex-col h-full pl-2">
-                                                    <span className="font-mono text-[9px] text-dash-text-soft leading-tight tracking-widest">
+                                                    <span className={`font-mono text-[9px] leading-tight tracking-widest ${isCancelled ? 'line-through text-dash-text-soft/50' : 'text-dash-text-soft'}`}>
                                                         {format(new Date(appt.start_time), 'HH:mm')}
                                                     </span>
-                                                    <h4 className="font-oswald text-[11px] uppercase truncate text-dash-text leading-tight mt-1 tracking-wide">
+                                                    <h4 className={`font-oswald text-[11px] uppercase truncate leading-tight mt-1 tracking-wide ${isCancelled ? 'line-through text-dash-text-soft/50' : 'text-dash-text'}`}>
                                                         {appt.customer_name}
                                                     </h4>
-                                                    {height >= 60 && (
-                                                        <div className="mt-auto flex items-center gap-1.5">
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${colorClass}`} />
-                                                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-dash-text-soft truncate">
-                                                                {barberInfo?.name.split(' ')[0] || 'PRO'}
-                                                            </p>
-                                                        </div>
+                                                </div>
+                                            </div>
                                                     )}
                                                 </div>
                                             </div>
