@@ -77,11 +77,11 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
     if (isCancelled) return null
 
     // Determine state colors based on luxury industrial palette
-    const cardBg = isCompleted ? 'bg-transparent border-dash-border/50' : 'bg-dash-panel border-dash-border'
-    const textColor = isCompleted ? 'text-dash-text-muted' : 'text-dash-text'
+    const cardBg = isCompleted ? 'bg-green-950/20 border-green-900/30 max-md:bg-green-900/40 max-md:border-green-500/50' : 'bg-dash-panel border-dash-border'
+    const textColor = isCompleted ? 'text-green-600/70 max-md:text-green-400' : 'text-dash-text'
 
     return (
-        <div className={`relative rounded-none p-6 border transition-all duration-500 flex flex-col w-full group ${cardBg} ${isCompleted ? 'grayscale opacity-70 hover:opacity-100' : 'hover:border-dash-border-alt hover:shadow-xl'}`}>
+        <div className={`relative rounded-none p-6 border transition-all duration-500 flex flex-col w-full group ${cardBg} ${isCompleted ? 'grayscale-[0.5] opacity-80 hover:opacity-100 max-md:grayscale-0 max-md:opacity-100' : 'hover:border-dash-border-alt hover:shadow-xl'}`}>
             
             {/* Loading overlay */}
             {loading && (
@@ -93,8 +93,8 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             {/* Header: Service & Options */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
-                    <Scissors className={`w-3.5 h-3.5 ${isCompleted ? 'text-dash-text-muted' : 'text-dash-text-soft'}`} />
-                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isCompleted ? 'text-dash-text-muted' : 'text-dash-text-soft'}`}>
+                    <Scissors className={`w-3.5 h-3.5 ${isCompleted ? 'text-green-600/70 max-md:text-green-400' : 'text-dash-text-soft'}`} />
+                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isCompleted ? 'text-green-600/70 max-md:text-green-400' : 'text-dash-text-soft'}`}>
                         {appt.services?.name || 'Servicio General'}
                     </span>
                 </div>
@@ -134,7 +134,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                 </div>
                 
                 <div className="text-right">
-                    <span className={`font-oswald text-xl md:text-2xl ${isCompleted ? 'text-dash-text-muted' : 'text-dash-text'}`}>
+                    <span className={`font-oswald text-xl md:text-2xl ${isCompleted ? 'text-green-600/70 max-md:text-green-400' : 'text-dash-text'}`}>
                         {formatCurrency(appt.services?.price || 0)}
                     </span>
                 </div>
@@ -172,7 +172,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                         )}
                     </div>
                 ) : (
-                    <div className="w-full border border-dash-border/50 bg-dash-panel-alt/30 py-3 flex items-center justify-center gap-2 text-dash-text-muted text-xs font-bold uppercase tracking-widest">
+                    <div className="w-full border border-green-900/30 max-md:border-green-500/50 bg-green-950/20 max-md:bg-green-900/40 py-3 flex items-center justify-center gap-2 text-green-600/70 max-md:text-green-400 text-xs font-bold uppercase tracking-widest">
                         <CheckCircle2 className="w-4 h-4" /> Completado
                     </div>
                 )}
