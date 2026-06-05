@@ -79,19 +79,23 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     const [selectedBarbers, setSelectedBarbers] = useState<string[]>(allBarbers.map(b => b.id));
 
     React.useEffect(() => {
-        const newBarbers = allBarbers.filter(b => !selectedBarbers.includes(b.id));
-        if (newBarbers.length > 0 && selectedBarbers.length > 0) {
-            setTimeout(() => setSelectedBarbers(prev => [...prev, ...newBarbers.map(b => b.id)]), 0);
-        }
+        // Inicialización: si no hay nadie seleccionado y ya tenemos la lista, seleccionamos por defecto.
+        // En vista diaria seleccionamos a todos, en vista semanal solo al primero.
         if (selectedBarbers.length === 0 && allBarbers.length > 0) {
-             setTimeout(() => setSelectedBarbers(allBarbers.map(b => b.id)), 0);
+            if (view === 'weekly') {
+                setSelectedBarbers([allBarbers[0].id]);
+            } else {
+                setSelectedBarbers(allBarbers.map(b => b.id));
+            }
         }
-    }, [allBarbers, selectedBarbers]);
+    }, [allBarbers, selectedBarbers.length, view]);
 
     const toggleBarber = (id: string) => {
         if (view === 'weekly') {
+            // En vista semanal, el clic siempre cambia exclusivamente a ese barbero
             setSelectedBarbers([id]);
         } else {
+            // En vista diaria, actúa como un checkbox múltiple
             setSelectedBarbers(prev => 
                 prev.includes(id) && prev.length > 1 ? prev.filter(bId => bId !== id) : [...prev, id]
             )
@@ -99,10 +103,15 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     }
 
     React.useEffect(() => {
+        // Cuando cambiamos de vista Diaria a Semanal, forzar a tener solo 1
         if (view === 'weekly' && selectedBarbers.length > 1) {
             setSelectedBarbers([selectedBarbers[0]]);
         }
-    }, [view]);
+        // Cuando cambiamos de vista Semanal a Diaria, seleccionamos a todos
+        if (view === 'daily' && allBarbers.length > 0 && selectedBarbers.length < allBarbers.length) {
+            setSelectedBarbers(allBarbers.map(b => b.id));
+        }
+    }, [view, allBarbers, selectedBarbers]);
 
     const setView = (newView: string) => {
         const params = new URLSearchParams(searchParams.toString())
