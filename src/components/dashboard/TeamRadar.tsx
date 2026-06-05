@@ -110,12 +110,10 @@ export function TeamRadar({ currentUserId }: { currentUserId: string }) {
                     <div key={member.id} className="snap-start min-w-[200px] bg-dash-panel border border-dash-border p-3 flex items-center gap-3">
                         <div className="w-10 h-10 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
                             {member.avatarUrl ? (
-                                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover grayscale" />
+                                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
                             ) : (
-                                <span className="grayscale opacity-50">🧔🏻‍♂️</span>
+                                <span className="opacity-70">🧔🏻‍♂️</span>
                             )}
-                            {/* Indicador de estado flotante */}
-                            <span className={`absolute -bottom-1 -right-1 w-3 h-3 border-2 border-black ${member.isAvailable ? 'bg-dash-text' : 'bg-zinc-600'}`} />
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className="text-xs font-bold font-oswald uppercase tracking-widest text-dash-text truncate">{member.name}</span>

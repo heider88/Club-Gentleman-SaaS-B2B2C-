@@ -79,11 +79,11 @@ export const WeeklyGrid = ({
 
     return (
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
-            {/* Fondo de cuadrícula global */}
+            {/* Fondo de cuadrícula global (Líneas claras continuas) */}
             <div 
-                className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+                className="absolute inset-0 z-0 pointer-events-none"
                 style={{ 
-                    backgroundImage: 'linear-gradient(var(--dash-border) 1px, transparent 1px)', 
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px)', 
                     backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
                     marginTop: '40px' // Offset para el header del día
                 }} 

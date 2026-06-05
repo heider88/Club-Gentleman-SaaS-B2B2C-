@@ -56,12 +56,22 @@ export const DailyGrid = ({
 
     return (
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
+            {/* Fondo de cuadrícula global (Líneas claras continuas) */}
+            <div 
+                className="absolute inset-0 z-0 pointer-events-none"
+                style={{ 
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px)', 
+                    backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
+                    marginTop: '40px' // Offset para evadir el header sticky
+                }} 
+            />
+
             {/* Eje Y: Columna de Horas Fija a la izquierda */}
             <div className="w-12 md:w-14 shrink-0 bg-dash-panel border-r border-dash-border sticky left-0 z-30">
                 {/* Cabecera vacía esquina superior izquierda */}
                 <div className="h-10 border-b border-dash-border sticky top-0 bg-dash-panel z-40" /> 
                 {timeSlots.map((time, idx) => (
-                    <div key={idx} className="h-[60px] relative border-b border-dash-border/30">
+                    <div key={idx} className="h-[60px] relative border-b border-dash-border/30 bg-dash-panel">
                         {time.getMinutes() === 0 && (
                             <span className="absolute -top-2.5 right-2 text-[9px] md:text-[10px] font-mono text-dash-text-muted">
                                 {format(time, 'HH:mm')}
