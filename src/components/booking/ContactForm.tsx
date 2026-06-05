@@ -85,7 +85,7 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
             }).catch(console.error);
 
             onSuccess();
-        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        }  
     catch (err: unknown) {
             console.error("Network/Action call error:", err);
             onError("Error de conexión. Verifica tu internet y vuelve a intentarlo.");

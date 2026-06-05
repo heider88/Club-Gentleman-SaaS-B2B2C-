@@ -58,7 +58,7 @@ export async function createEmployee(formData: FormData) {
         
         return { success: true, message: "Empleado creado con éxito." };
         
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Fallo crítico en Server Action Admin:", err);
         return { error: "Ocurrió un error inesperado al intentar procesar la solicitud." };
@@ -88,7 +88,7 @@ export async function deleteEmployee(userId: string) {
         revalidatePath('/dashboard/admin');
         
         return { success: true };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Fallo crítico en eliminación de empleado:", err);
         return { error: "Error inesperado al intentar eliminar el empleado." };
@@ -115,7 +115,7 @@ export async function createAvailabilityBlock(payload: { barber_id: string | nul
         if (error) return { error: error.message };
         revalidatePath('/dashboard/admin/schedules');
         return { success: true, data };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in createAvailabilityBlock:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
@@ -132,7 +132,7 @@ export async function deleteAvailabilityBlock(blockId: string) {
         if (error) return { error: error.message };
         revalidatePath('/dashboard/admin/schedules');
         return { success: true };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in deleteAvailabilityBlock:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
@@ -164,7 +164,7 @@ export async function manageBarberService(action: 'add' | 'delete' | 'update', p
         }
         
         return { error: "Acción no reconocida." };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in manageBarberService:", err);
         return { error: "Ocurrió un error inesperado al gestionar el servicio." };
@@ -192,7 +192,7 @@ export async function importServicesToBarber(barberId: string, servicesToImport:
         if (error) return { error: error.message };
         
         return { success: true, data };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in importServicesToBarber:", err);
         return { error: "Ocurrió un error inesperado al importar servicios." };
@@ -214,7 +214,7 @@ export async function updateBarberProfile(barberId: string, updates: any) {
         
         revalidatePath(`/dashboard/admin/barber/${barberId}`);
         return { success: true, data };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in updateBarberProfile:", err);
         return { error: "Ocurrió un error inesperado al actualizar el perfil." };
@@ -240,7 +240,7 @@ export async function updateEmployeePassword(userId: string, newPassword: string
         }
 
         return { success: true, message: "Contraseña actualizada exitosamente." };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in updateEmployeePassword:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };
@@ -281,7 +281,7 @@ export async function updateEmployeeEmail(userId: string, newEmail: string) {
         
         revalidatePath(`/dashboard/admin/barber/${userId}`);
         return { success: true, message: "Correo de acceso actualizado exitosamente." };
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    }  
     catch (err: unknown) {
         console.error("Action Error in updateEmployeeEmail:", err);
         return { error: "Ocurrió un error inesperado al procesar la solicitud." };

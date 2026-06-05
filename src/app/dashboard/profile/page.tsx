@@ -132,7 +132,7 @@ export default function ProfilePage() {
                 .eq('id', userId)
 
             toast.success("Foto de perfil actualizada correctamente")
-        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        }  
     catch (error: unknown) {
             toast.error("Error al subir foto", { description: error instanceof Error ? error.message : String(error) })
         } finally {

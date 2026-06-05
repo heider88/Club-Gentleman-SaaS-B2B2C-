@@ -62,7 +62,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             setStatus(newStatus)
             toast.success(newStatus === 'completed' ? 'Corte finalizado' : 'Cita cancelada')
             router.refresh()
-        } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        }  
     catch (err: unknown) {
             toast.error(err instanceof Error ? err.message : "Error al actualizar la cita")
         } finally {
