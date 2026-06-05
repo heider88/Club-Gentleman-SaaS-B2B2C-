@@ -64,7 +64,7 @@ export const WeeklyGrid = ({
     const calculateTopMins = (startTimeStr: string) => {
         const d = new Date(startTimeStr);
         const minutesFromStart = (d.getHours() - startHour) * 60 + d.getMinutes();
-        return minutesFromStart * PIXELS_PER_MINUTE;
+        return (minutesFromStart * PIXELS_PER_MINUTE) + 40; // +40px para compensar la cabecera (h-10)
     };
 
     // En vista semanal siempre hay exactamente 1 barbero seleccionado por lógica del padre
