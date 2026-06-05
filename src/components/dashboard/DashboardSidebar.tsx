@@ -46,11 +46,10 @@ export function DashboardSidebar({ role }: { role: string }) {
                 "hidden md:flex fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
                 isCollapsed ? "left-0" : "-left-16"
             )}>
-                <button 
-                    onClick={() => setIsCollapsed(false)}
-                    className="flex items-center justify-center w-8 h-24 bg-dash-text hover:bg-primary text-dash-bg rounded-r-2xl shadow-[5px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 group"
-                    title="Abrir menú"
-                >
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="flex items-center justify-center w-8 h-24 bg-dash-text hover:bg-primary text-black rounded-r-2xl shadow-[5px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 group"
+                    >
                     <div className="flex flex-col gap-1.5 items-center group-hover:scale-110 transition-transform">
                         <div className="w-1 h-1 rounded-full bg-current"></div>
                         <div className="w-1 h-1 rounded-full bg-current"></div>
@@ -74,9 +73,8 @@ export function DashboardSidebar({ role }: { role: string }) {
                         </div>
                     </div>
                     <button 
-                        onClick={() => setIsCollapsed(true)}
-                        className="absolute right-6 top-6 w-8 h-8 flex items-center justify-center bg-transparent border border-dash-border hover:bg-dash-text hover:border-dash-text text-dash-text-muted hover:text-dash-bg rounded-full transition-all duration-300 opacity-0 group-hover/header:opacity-100 -translate-x-4 group-hover/header:translate-x-0"
-                        title="Ocultar menú"
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="absolute right-6 top-6 w-8 h-8 flex items-center justify-center bg-transparent border border-dash-border hover:bg-dash-text hover:border-dash-text text-dash-text-muted hover:text-black rounded-full transition-all duration-300 opacity-0 group-hover/header:opacity-100 -translate-x-4 group-hover/header:translate-x-0"
                     >
                         <PanelLeftClose className="w-4 h-4" />
                     </button>

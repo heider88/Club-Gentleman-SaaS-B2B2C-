@@ -181,10 +181,10 @@ export function CustomersList({ barberId, isAdmin = false }: { barberId?: string
                             <div className="md:col-span-2 w-full md:text-right relative z-10 mt-2 md:mt-0">
                                 {customer.phone !== "N/A" ? (
                                     <div className="flex gap-2 md:justify-end w-full">
-                                        <a href={`https://wa.me/${customer.phone.replace('+', '')}`} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-3 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest active:scale-95 transform-gpu" title="WhatsApp">
+                                        <a href={`https://wa.me/${customer.phone.replace('+', '')}`} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-3 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-black text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest active:scale-95 transform-gpu" title="WhatsApp">
                                             <MessageCircle className="w-4 h-4" /> <span className="md:hidden">WhatsApp</span>
                                         </a>
-                                        <a href={`tel:${customer.phone}`} className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-3 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-dash-bg text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest active:scale-95 transform-gpu" title="Llamar">
+                                        <a href={`tel:${customer.phone}`} className="flex-1 md:flex-none flex items-center justify-center gap-2 md:gap-0 px-4 py-3 md:w-10 md:h-10 md:p-0 bg-dash-panel-alt hover:bg-dash-text hover:text-black text-dash-text transition-colors rounded-sm text-[10px] font-bold uppercase tracking-widest active:scale-95 transform-gpu" title="Llamar">
                                             <Phone className="w-4 h-4" /> <span className="md:hidden">Llamar</span>
                                         </a>
                                     </div>

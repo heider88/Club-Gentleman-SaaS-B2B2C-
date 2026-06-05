@@ -318,7 +318,7 @@ export default function ProfilePage() {
                                                 key={day.value}
                                                 onClick={() => toggleWorkDay(day.value)}
                                                 className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-colors ${isSelected
-                                                        ? 'bg-dash-text text-dash-bg border-white shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+                                                        ? 'bg-dash-text text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.1)]'
                                                         : 'bg-dash-panel text-dash-text-muted border-dash-border hover:border-dash-border-alt hover:text-dash-text-soft'
                                                     }`}
                                             >
@@ -393,7 +393,7 @@ export default function ProfilePage() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="w-full flex items-center justify-center gap-2 bg-dash-text text-dash-bg hover:opacity-80 font-bold px-6 py-4 transition-all shadow-xl text-xs uppercase tracking-widest"
+                    className="w-full flex items-center justify-center gap-2 bg-dash-text text-black hover:opacity-80 font-bold px-6 py-4 transition-all shadow-xl text-xs uppercase tracking-widest"
                 >
                     {saving ? (
                         <span className="w-5 h-5 rounded-full border-2 border-dash-border-alt border-t-dash-bg animate-spin" />

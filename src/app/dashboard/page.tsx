@@ -190,7 +190,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                             {appointments.length} Total
                         </span>
                         {pendingCount > 0 && (
-                            <span className="bg-dash-text text-dash-bg px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                            <span className="bg-dash-text text-black px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                                 {pendingCount} Pendientes
                             </span>
                         )}
