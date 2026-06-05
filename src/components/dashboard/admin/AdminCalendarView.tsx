@@ -395,9 +395,6 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                                     </h4>
                                                 </div>
                                             </div>
-                                                    )}
-                                                </div>
-                                            </div>
                                         )
                                     })}
                                 </div>
