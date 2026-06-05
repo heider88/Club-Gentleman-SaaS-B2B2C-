@@ -74,7 +74,43 @@ export async function getSiteSettings(): Promise<SiteSettingsPayload> {
     }
 }
 
+export async function uploadSectionImage(formData: FormData) {
+    try {
+        await requireAdmin()
+        const adminClient = createAdminClient()
+        
+        const file = formData.get('file') as File;
+        if (!file) return { success: false, error: "No se proporcionó un archivo." };
+
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        
+        const fileExt = file.name.split('.').pop() || 'png';
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `sections/${fileName}`;
+        
+        const { error: uploadError } = await adminClient.storage
+            .from('gallery')
+            .upload(filePath, buffer, {
+                contentType: file.type || 'image/jpeg',
+                upsert: false
+            })
+
+        if (uploadError) return { success: false, error: `Fallo en Storage: ${uploadError.message}` };
+
+        const { data: { publicUrl } } = adminClient.storage
+            .from('gallery')
+            .getPublicUrl(filePath)
+
+        return { success: true, url: publicUrl }
+    } catch (err: unknown) {
+        console.error("Action Error in uploadSectionImage:", err)
+        return { success: false, error: "Error inesperado al subir la imagen." }
+    }
+}
+
 export async function saveSiteSettings(payload: SiteSettingsPayload) {
+
     try {
         await requireAdmin()
         const adminClient = createAdminClient()

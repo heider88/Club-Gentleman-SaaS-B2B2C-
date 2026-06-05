@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { GalleryManager } from "./GalleryManager"
-import { saveSiteSettings, SiteSettingsPayload } from "@/app/actions/settings"
+import { saveSiteSettings, SiteSettingsPayload, uploadSectionImage } from "@/app/actions/settings"
 import { toast } from "sonner"
 import { HelpCircle, Save, Plus, Trash2, GripVertical, Image as ImageIcon, Link as LinkIcon, Instagram, Facebook } from "lucide-react"
 
@@ -474,30 +474,13 @@ export function BusinessSettingsTabs({
                                                         const formData = new FormData();
                                                         formData.append("file", file);
                                                         
-                                                        // Reusing the gallery upload action which returns the publicUrl or saves to DB.
-                                                        // Actually, we just want to upload to storage. Let's make a direct Supabase call
-                                                        // or use a new server action just for uploading. 
-                                                        // For simplicity, we will assume you have a generic upload endpoint or we just 
-                                                        // use the Supabase client here since it's a client component.
+                                                        const res = await uploadSectionImage(formData);
                                                         
-                                                        const { createClient } = await import("@/lib/supabase/client");
-                                                        const supabase = createClient();
-                                                        
-                                                        const fileExt = file.name.split('.').pop();
-                                                        const fileName = `${crypto.randomUUID()}.${fileExt}`;
-                                                        const filePath = `sections/${fileName}`;
-                                                        
-                                                        const { error: uploadError } = await supabase.storage
-                                                            .from('gallery') // Reuse gallery bucket for simplicity
-                                                            .upload(filePath, file);
+                                                        if (!res.success) {
+                                                            throw new Error(res.error);
+                                                        }
 
-                                                        if (uploadError) throw uploadError;
-
-                                                        const { data: { publicUrl } } = supabase.storage
-                                                            .from('gallery')
-                                                            .getPublicUrl(filePath);
-
-                                                        updateSection(section.id, 'images', [...(section.images || []), publicUrl]);
+                                                        updateSection(section.id, 'images', [...(section.images || []), res.url]);
                                                         toast.success("Imagen subida", { id: toastId });
                                                     } catch (error: any) {
                                                         toast.error(`Error: ${error.message}`, { id: toastId });
