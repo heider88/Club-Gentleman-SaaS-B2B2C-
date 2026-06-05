@@ -91,27 +91,18 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     }, [allBarbers, selectedBarbers.length, view]);
 
     const toggleBarber = (id: string) => {
-        if (view === 'weekly') {
-            // En vista semanal, el clic siempre cambia exclusivamente a ese barbero
-            setSelectedBarbers([id]);
-        } else {
-            // En vista diaria, actúa como un checkbox múltiple
-            setSelectedBarbers(prev => 
-                prev.includes(id) && prev.length > 1 ? prev.filter(bId => bId !== id) : [...prev, id]
-            )
-        }
+        // Actúa como un checkbox múltiple en ambas vistas
+        setSelectedBarbers(prev => 
+            prev.includes(id) && prev.length > 1 ? prev.filter(bId => bId !== id) : [...prev, id]
+        )
     }
 
     React.useEffect(() => {
-        // Cuando cambiamos de vista Diaria a Semanal, forzar a tener solo 1
-        if (view === 'weekly' && selectedBarbers.length > 1) {
-            setSelectedBarbers([selectedBarbers[0]]);
-        }
-        // Cuando cambiamos de vista Semanal a Diaria, seleccionamos a todos
-        if (view === 'daily' && allBarbers.length > 0 && selectedBarbers.length < allBarbers.length) {
+        // Asegurar que siempre haya alguien seleccionado al inicio
+        if (allBarbers.length > 0 && selectedBarbers.length === 0) {
             setSelectedBarbers(allBarbers.map(b => b.id));
         }
-    }, [view, allBarbers, selectedBarbers]);
+    }, [allBarbers, selectedBarbers.length]);
 
     const setView = (newView: string) => {
         const params = new URLSearchParams(searchParams.toString())

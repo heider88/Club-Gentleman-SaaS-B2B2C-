@@ -67,17 +67,6 @@ export const WeeklyGrid = ({
         return (minutesFromStart * PIXELS_PER_MINUTE) + 40; // +40px para compensar la cabecera (h-10)
     };
 
-    // En vista semanal siempre hay exactamente 1 barbero seleccionado por lógica del padre
-    const activeBarberId = selectedBarbers[0];
-    const barber = allBarbers.find(b => b.id === activeBarberId);
-    
-    // Fallbacks de color por si acaso
-    const colorHex = barber?.color || 'bg-dash-text'; 
-    const borderColorClass = colorHex.replace('bg-', 'border-');
-    // Usar el color sólido para el fondo en lugar de translúcido
-    const bgSolidClass = colorHex;
-    const textColorClass = 'text-white';
-
     return (
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
             {/* Fondo de cuadrícula global (Líneas claras continuas) */}
@@ -108,10 +97,27 @@ export const WeeklyGrid = ({
             <div className="flex flex-1 min-w-max">
                 {daysOfWeek.map((day, i) => {
                     const isToday = isSameDay(day, new Date());
-                    // Filtrar SOLO citas de este barbero específico para este día
+                    // Filtrar SOLO citas de los barberos seleccionados para este día
                     const dayAppts = appointments.filter(a => 
-                        isSameDay(new Date(a.start_time), day) && a.barber_id === activeBarberId
+                        isSameDay(new Date(a.start_time), day) && selectedBarbers.includes(a.barber_id)
                     );
+
+                    // Calcular solapamientos para distribuirlas en el ancho de la columna
+                    const sortedAppts = [...dayAppts].sort((a,b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+                    const overlappingInfo = sortedAppts.map(appt => {
+                        const start = new Date(appt.start_time).getTime();
+                        const end = new Date(appt.end_time).getTime();
+                        const overlapping = sortedAppts.filter(other => {
+                            const oStart = new Date(other.start_time).getTime();
+                            const oEnd = new Date(other.end_time).getTime();
+                            return (start < oEnd && end > oStart);
+                        });
+                        return {
+                            appt,
+                            count: overlapping.length,
+                            index: overlapping.findIndex(o => o.id === appt.id)
+                        };
+                    });
 
                     return (
                         <div key={i} className={`flex-1 min-w-[120px] md:min-w-[150px] border-r border-dash-border/30 relative shrink-0 ${isToday ? 'bg-white/[0.02]' : ''}`}>
@@ -132,24 +138,33 @@ export const WeeklyGrid = ({
                                         key={`slot-${idx}`} 
                                         className="border-b border-dash-border/10 hover:bg-white/5 cursor-pointer active:bg-white/10"
                                         style={{ height: ROW_HEIGHT / 2 }} // Slots de 30 mins
-                                        onClick={() => onSlotTap(activeBarberId, time)}
+                                        onClick={() => onSlotTap(selectedBarbers[0], time)}
                                     />
                                 ))}
                             </div>
 
-                            {/* Tarjetas de citas (Ocupan el 90% del ancho) */}
-                            {dayAppts.map(appt => {
+                            {/* Tarjetas de citas */}
+                            {overlappingInfo.map(info => {
+                                const { appt, count, index } = info;
                                 const isCompleted = appt.status === 'completed';
                                 const duration = appt.services?.duration_minutes || 30;
                                 
                                 const top = calculateTopMins(appt.start_time);
                                 const height = duration * PIXELS_PER_MINUTE;
 
+                                const barber = allBarbers.find(b => b.id === appt.barber_id);
+                                const colorHex = barber?.color || 'bg-dash-text'; 
+                                const borderColorClass = colorHex.replace('bg-', 'border-');
+                                const bgSolidClass = colorHex;
+
+                                const widthPct = 90 / count;
+                                const leftPct = 5 + (index * widthPct);
+
                                 return (
                                     <div
                                         key={appt.id}
                                         onClick={() => onAppointmentTap(appt)}
-                                        className={`absolute w-[90%] left-[5%] rounded-sm cursor-pointer border-l-[3px] shadow-sm flex flex-col px-1.5 py-1 overflow-hidden z-10 active:scale-95 transition-all
+                                        className={`absolute rounded-sm cursor-pointer border-l-[3px] shadow-sm flex flex-col px-1.5 py-1 overflow-hidden z-10 active:scale-95 transition-all
                                             ${isCompleted 
                                                 ? 'bg-green-600 border-green-400 opacity-100' 
                                                 : `${bgSolidClass} ${borderColorClass} opacity-100 hover:brightness-110`
@@ -158,6 +173,8 @@ export const WeeklyGrid = ({
                                         style={{
                                             top: `${top}px`,
                                             height: `${height}px`,
+                                            width: `${widthPct}%`,
+                                            left: `${leftPct}%`,
                                         }}
                                     >
                                         <div className="flex items-center gap-1 mb-0.5">
@@ -169,6 +186,7 @@ export const WeeklyGrid = ({
                                         {height >= 30 && (
                                             <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize text-white`}>
                                                 {appt.customer_name.split(' ')[0]}
+                                                {count === 1 && barber ? ` (${barber.name.split(' ')[0]})` : ''}
                                             </span>
                                         )}
                                     </div>
