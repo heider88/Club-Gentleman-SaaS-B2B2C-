@@ -77,7 +77,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
     if (isCancelled) return null
 
     // Determine state colors based on luxury industrial palette
-    const cardBg = isCompleted ? 'bg-dash-bg border-dash-border/50' : 'bg-dash-panel border-dash-border'
+    const cardBg = isCompleted ? 'bg-transparent border-dash-border/50' : 'bg-dash-panel border-dash-border'
     const textColor = isCompleted ? 'text-dash-text-muted' : 'text-dash-text'
 
     return (
@@ -85,7 +85,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
             
             {/* Loading overlay */}
             {loading && (
-                <div className="absolute inset-0 z-20 bg-dash-bg/90 rounded-none flex items-center justify-center">
+                <div className="absolute inset-0 z-20 bg-transparent/90 rounded-none flex items-center justify-center">
                     <span className="w-6 h-6 border-2 border-dash-border-alt border-t-dash-text rounded-full animate-spin"></span>
                 </div>
             )}
