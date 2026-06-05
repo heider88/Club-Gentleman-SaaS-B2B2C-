@@ -120,8 +120,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
     // Filter appointments
     const filteredAppointments = useMemo(() => {
-        // Removemos el filtro a.status !== 'cancelled' para que pasen a la vista
-        return appointments.filter(a => selectedBarbers.includes(a.barber_id));
+        // Volvemos a ocultar las citas canceladas
+        return appointments.filter(a => selectedBarbers.includes(a.barber_id) && a.status !== 'cancelled');
     }, [appointments, selectedBarbers]);
 
     const { startHour, endHour, barberColumns } = useMemo(() => {

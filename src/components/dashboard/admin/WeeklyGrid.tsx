@@ -147,7 +147,6 @@ export const WeeklyGrid = ({
                             {overlappingInfo.map(info => {
                                 const { appt, count, index } = info;
                                 const isCompleted = appt.status === 'completed';
-                                const isCancelled = appt.status === 'cancelled';
                                 const duration = appt.services?.duration_minutes || 30;
                                 
                                 const top = calculateTopMins(appt.start_time);
@@ -163,9 +162,7 @@ export const WeeklyGrid = ({
                                 
                                 let statusClasses = `${bgSolidClass} ${borderColorClass} opacity-100 hover:brightness-110`;
                                 if (isCompleted) {
-                                    statusClasses = 'bg-green-600 border-green-400 opacity-100';
-                                } else if (isCancelled) {
-                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-70 border-dashed';
+                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed';
                                 }
 
                                 return (
@@ -181,14 +178,13 @@ export const WeeklyGrid = ({
                                         }}
                                     >
                                         <div className="flex items-center gap-1 mb-0.5">
-                                            <span className={`text-[9px] font-mono leading-none ${isCancelled ? 'text-neutral-400' : 'text-white'}`}>
+                                            <span className={`text-[9px] font-mono leading-none ${isCompleted ? 'text-neutral-400' : 'text-white'}`}>
                                                 {format(new Date(appt.start_time), 'h:mm a')}
                                             </span>
                                             {isCompleted && <span className="text-white font-bold text-[8px] leading-none">✓</span>}
-                                            {isCancelled && <span className="text-red-500 font-bold text-[8px] leading-none">✕</span>}
                                         </div>
                                         {height >= 30 && (
-                                            <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize ${isCancelled ? 'text-neutral-500 line-through' : 'text-white'}`}>
+                                            <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize ${isCompleted ? 'text-neutral-500 line-through' : 'text-white'}`}>
                                                 {appt.customer_name.split(' ')[0]}
                                                 {count === 1 && barber ? ` (${barber.name.split(' ')[0]})` : ''}
                                             </span>
