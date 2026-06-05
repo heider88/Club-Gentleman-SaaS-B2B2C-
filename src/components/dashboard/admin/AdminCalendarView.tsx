@@ -6,6 +6,7 @@ import { es } from "date-fns/locale"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { CompactHeader } from "./CompactHeader"
 import { DailyGrid } from "./DailyGrid"
+import { WeeklyGrid } from "./WeeklyGrid"
 import { ActionBottomSheet } from "./ActionBottomSheet"
 import { updateAppointmentStatus } from "@/app/actions/appointments"
 import { toast } from "sonner"
@@ -197,14 +198,21 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
             )}
             
             {view === 'weekly' && (
-                <div className="flex-1 flex items-center justify-center text-dash-text-soft bg-dash-bg">
-                    <p>La vista semanal requiere una cuadrícula adaptada. Cambia a &quot;Día&quot;.</p>
-                </div>
+                <WeeklyGrid 
+                    selectedDate={selectedDate}
+                    timeSlots={timeSlots}
+                    appointments={filteredAppointments}
+                    allBarbers={allBarbers}
+                    selectedBarbers={selectedBarbers}
+                    startHour={startHour}
+                    onSlotTap={handleSlotTap}
+                    onAppointmentTap={setSelectedAppt}
+                />
             )}
             
             {view === 'monthly' && (
                 <div className="flex-1 flex items-center justify-center text-dash-text-soft bg-dash-bg">
-                    <p>La vista mensual requiere una cuadrícula adaptada. Cambia a &quot;Día&quot;.</p>
+                    <p>La vista mensual requiere una cuadrícula adaptada. Cambia a &quot;Día&quot; o &quot;Semanal&quot;.</p>
                 </div>
             )}
 
