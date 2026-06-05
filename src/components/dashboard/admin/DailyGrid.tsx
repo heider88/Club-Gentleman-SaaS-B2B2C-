@@ -85,9 +85,9 @@ export const DailyGrid = ({
             <div className="flex flex-1 min-w-max">
                 {barberColumns.map(col => {
                     const barber = allBarbers.find(b => b.id === col.barberId);
-                    // Color translúcido basado en el color del barbero (ej. bg-blue-500/20)
+                    // Color sólido basado en el color del barbero (ej. bg-blue-500)
                     const colorClass = barber?.color || 'bg-dash-text';
-                    const bgTranslucentClass = colorClass.replace('bg-', 'bg-').concat('/10');
+                    const bgSolidClass = colorClass;
                     const borderSolidClass = colorClass.replace('bg-', 'border-');
 
                     return (
@@ -121,23 +121,25 @@ export const DailyGrid = ({
                                         key={appt.id}
                                         onClick={() => onAppointmentTap(appt)}
                                         className={`absolute left-1 right-1 p-2 rounded-sm cursor-pointer border-l-[3px] overflow-hidden z-10 transition-all active:scale-95
-                                            ${bgTranslucentClass} ${borderSolidClass}
-                                            ${isCompleted ? 'opacity-40 grayscale-[0.5]' : 'opacity-100 shadow-md hover:brightness-110'}
+                                            ${isCompleted 
+                                                ? 'bg-green-600 border-green-400 opacity-100 shadow-md' 
+                                                : `${bgSolidClass} ${borderSolidClass} opacity-100 shadow-md hover:brightness-110`
+                                            }
                                         `}
                                         style={{ top: `${top}px`, height: `${height}px` }}
                                     >
                                         <div className="flex justify-between items-start">
-                                            <h4 className={`text-xs font-medium capitalize leading-tight truncate ${isCompleted ? 'text-white/60' : 'text-white/90'}`}>
+                                            <h4 className={`text-xs font-medium capitalize leading-tight truncate text-white`}>
                                                 {appt.customer_name.toLowerCase()}
                                             </h4>
-                                            {isCompleted && <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0 ml-1" />}
+                                            {isCompleted && <CheckCircle2 className="w-3 h-3 text-white shrink-0 ml-1" />}
                                         </div>
                                         {height >= 45 && (
-                                            <p className={`text-[10px] truncate mt-0.5 capitalize ${isCompleted ? 'text-white/40' : 'text-white/60'}`}>
+                                            <p className={`text-[10px] truncate mt-0.5 capitalize text-white/90`}>
                                                 {appt.services?.name?.toLowerCase() || 'Servicio'}
                                             </p>
                                         )}
-                                        <span className={`text-[9px] font-mono absolute bottom-1 right-1 ${isCompleted ? 'text-white/30' : 'text-white/40'}`}>
+                                        <span className={`text-[9px] font-mono absolute bottom-1 right-1 text-white/50`}>
                                             {format(new Date(appt.start_time), 'h:mm a')}
                                         </span>
                                     </div>

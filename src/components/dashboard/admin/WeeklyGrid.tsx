@@ -74,8 +74,9 @@ export const WeeklyGrid = ({
     // Fallbacks de color por si acaso
     const colorHex = barber?.color || 'bg-dash-text'; 
     const borderColorClass = colorHex.replace('bg-', 'border-');
-    const bgTranslucentClass = colorHex.replace('bg-', 'bg-').concat('/20');
-    const textColorClass = colorHex.replace('bg-', 'text-');
+    // Usar el color sólido para el fondo en lugar de translúcido
+    const bgSolidClass = colorHex;
+    const textColorClass = 'text-white';
 
     return (
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
@@ -149,8 +150,10 @@ export const WeeklyGrid = ({
                                         key={appt.id}
                                         onClick={() => onAppointmentTap(appt)}
                                         className={`absolute w-[90%] left-[5%] rounded-sm cursor-pointer border-l-[3px] shadow-sm flex flex-col px-1.5 py-1 overflow-hidden z-10 active:scale-95 transition-all
-                                            ${bgTranslucentClass} ${borderColorClass}
-                                            ${isCompleted ? 'opacity-40 grayscale-[0.5]' : 'opacity-100 hover:brightness-110'}
+                                            ${isCompleted 
+                                                ? 'bg-green-600 border-green-400 opacity-100' 
+                                                : `${bgSolidClass} ${borderColorClass} opacity-100 hover:brightness-110`
+                                            }
                                         `}
                                         style={{
                                             top: `${top}px`,
@@ -158,13 +161,13 @@ export const WeeklyGrid = ({
                                         }}
                                     >
                                         <div className="flex items-center gap-1 mb-0.5">
-                                            <span className={`text-[9px] font-mono leading-none ${isCompleted ? 'text-white/50' : textColorClass}`}>
+                                            <span className={`text-[9px] font-mono leading-none text-white`}>
                                                 {format(new Date(appt.start_time), 'h:mm a')}
                                             </span>
-                                            {isCompleted && <span className="text-green-500 text-[8px] leading-none">✓</span>}
+                                            {isCompleted && <span className="text-white font-bold text-[8px] leading-none">✓</span>}
                                         </div>
                                         {height >= 30 && (
-                                            <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize ${isCompleted ? 'text-white/60' : 'text-white/95'}`}>
+                                            <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize text-white`}>
                                                 {appt.customer_name.split(' ')[0]}
                                             </span>
                                         )}
