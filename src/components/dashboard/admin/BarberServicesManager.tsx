@@ -23,7 +23,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
     const [newService, setNewService] = useState({ name: "", price: 0, duration_minutes: 30, description: "" })
 
     const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
-    const [editForm, setEditForm] = useState({ name: "", price: 0, duration_minutes: 30 })
+    const [editForm, setEditForm] = useState({ name: "", price: 0, duration_minutes: 30, description: "" })
 
     // Estado del Modal de Importación
     const [showImportModal, setShowImportModal] = useState(false)
@@ -89,7 +89,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
 
     const startEditing = (service: Service) => {
         setEditingServiceId(service.id)
-        setEditForm({ name: service.name, price: service.price, duration_minutes: service.duration_minutes })
+        setEditForm({ name: service.name, price: service.price, duration_minutes: service.duration_minutes, description: service.description || "" })
     }
 
     const cancelEditing = () => {
@@ -105,7 +105,8 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
             id: editingServiceId,
             name: editForm.name,
             price: editForm.price,
-            duration_minutes: editForm.duration_minutes
+            duration_minutes: editForm.duration_minutes,
+            description: editForm.description || null
         }
 
         const res = await manageBarberService('update', payload)
@@ -291,8 +292,8 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                                     />
                                     <textarea 
                                         rows={2} placeholder="Descripción del servicio (Opcional)"
-                                        value={editData.description || ''} 
-                                        onChange={e => setEditData({...editData, description: e.target.value})}
+                                        value={editForm.description || ''} 
+                                        onChange={e => setEditForm({...editForm, description: e.target.value})}
                                         className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary resize-y"
                                     />
                                     <div className="flex gap-2">
