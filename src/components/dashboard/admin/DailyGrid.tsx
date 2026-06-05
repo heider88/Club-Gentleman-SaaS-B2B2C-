@@ -112,34 +112,38 @@ export const DailyGrid = ({
                             {/* Bloques de Citas */}
                             {col.appointments.map(appt => {
                                 const isCompleted = appt.status === 'completed';
+                                const isCancelled = appt.status === 'cancelled';
                                 const duration = appt.services?.duration_minutes || 30;
                                 const height = duration * PIXELS_PER_MINUTE; 
                                 const top = calculateTopMins(appt.start_time);
+
+                                let statusClasses = `${bgSolidClass} ${borderSolidClass} opacity-100 shadow-md hover:brightness-110`;
+                                if (isCompleted) {
+                                    statusClasses = 'bg-green-600 border-green-400 opacity-100 shadow-md';
+                                } else if (isCancelled) {
+                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed shadow-none hover:bg-neutral-800';
+                                }
 
                                 return (
                                     <div 
                                         key={appt.id}
                                         onClick={() => onAppointmentTap(appt)}
-                                        className={`absolute left-1 right-1 p-2 rounded-sm cursor-pointer border-l-[3px] overflow-hidden z-10 transition-all active:scale-95
-                                            ${isCompleted 
-                                                ? 'bg-green-600 border-green-400 opacity-100 shadow-md' 
-                                                : `${bgSolidClass} ${borderSolidClass} opacity-100 shadow-md hover:brightness-110`
-                                            }
-                                        `}
+                                        className={`absolute left-1 right-1 p-2 rounded-sm cursor-pointer border-l-[3px] overflow-hidden z-10 transition-all active:scale-95 ${statusClasses}`}
                                         style={{ top: `${top}px`, height: `${height}px` }}
                                     >
                                         <div className="flex justify-between items-start">
-                                            <h4 className={`text-xs font-medium capitalize leading-tight truncate text-white`}>
+                                            <h4 className={`text-xs font-medium capitalize leading-tight truncate ${isCancelled ? 'text-neutral-500 line-through' : 'text-white'}`}>
                                                 {appt.customer_name.toLowerCase()}
                                             </h4>
                                             {isCompleted && <CheckCircle2 className="w-3 h-3 text-white shrink-0 ml-1" />}
+                                            {isCancelled && <span className="text-red-500 font-bold text-xs shrink-0 ml-1 leading-none">✕</span>}
                                         </div>
                                         {height >= 45 && (
-                                            <p className={`text-[10px] truncate mt-0.5 capitalize text-white/90`}>
+                                            <p className={`text-[10px] truncate mt-0.5 capitalize ${isCancelled ? 'text-neutral-600' : 'text-white/90'}`}>
                                                 {appt.services?.name?.toLowerCase() || 'Servicio'}
                                             </p>
                                         )}
-                                        <span className={`text-[9px] font-mono absolute bottom-1 right-1 text-white/50`}>
+                                        <span className={`text-[9px] font-mono absolute bottom-1 right-1 ${isCancelled ? 'text-neutral-600' : 'text-white/50'}`}>
                                             {format(new Date(appt.start_time), 'h:mm a')}
                                         </span>
                                     </div>

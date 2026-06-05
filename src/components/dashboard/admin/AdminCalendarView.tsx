@@ -46,7 +46,15 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     // Extract unique barbers for filtering
     const allBarbers = useMemo(() => {
         const map = new Map<string, { id: string, name: string, color: string }>();
-        const colors = ['bg-pink-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'bg-indigo-500', 'bg-cyan-500'];
+        const colors = [
+            'bg-blue-600',   // Azul rey
+            'bg-red-600',    // Rojo fuerte
+            'bg-orange-500', // Naranja brillante
+            'bg-purple-600', // Morado oscuro
+            'bg-teal-600',   // Verde agua
+            'bg-pink-600',   // Fucsia
+            'bg-yellow-600', // Mostaza
+        ];
         let colorIdx = 0;
         
         barbersList.forEach(b => {
@@ -112,7 +120,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
     // Filter appointments
     const filteredAppointments = useMemo(() => {
-        return appointments.filter(a => selectedBarbers.includes(a.barber_id) && a.status !== 'cancelled');
+        // Removemos el filtro a.status !== 'cancelled' para que pasen a la vista
+        return appointments.filter(a => selectedBarbers.includes(a.barber_id));
     }, [appointments, selectedBarbers]);
 
     const { startHour, endHour, barberColumns } = useMemo(() => {
