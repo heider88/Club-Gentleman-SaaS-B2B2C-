@@ -20,14 +20,14 @@ export const CompactHeader = ({
     setView: (v: string) => void;
 }) => {
     return (
-        <div className="flex items-center justify-between gap-4 bg-dash-panel border-b border-dash-border p-3 sticky top-0 z-40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-dash-panel border-b border-dash-border p-3 sticky top-0 z-40">
             {/* Selector de vista */}
-            <div className="flex bg-black/40 border border-dash-border/50 rounded-lg overflow-hidden shrink-0">
+            <div className="flex w-full sm:w-auto bg-black/40 border border-dash-border/50 rounded-lg overflow-hidden shrink-0">
                 {['daily', 'weekly'].map(v => (
                     <button 
                         key={v} 
                         onClick={() => setView(v)} 
-                        className={`px-3 py-1.5 text-[10px] md:text-xs font-bold uppercase transition-colors ${view === v ? 'bg-dash-text text-black' : 'text-dash-text-soft hover:bg-white/5'}`}
+                        className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-[10px] md:text-xs font-bold uppercase transition-colors ${view === v ? 'bg-dash-text text-black' : 'text-dash-text-soft hover:bg-white/5'}`}
                     >
                         {v === 'daily' ? 'Día' : 'Semana'}
                     </button>
@@ -35,7 +35,7 @@ export const CompactHeader = ({
             </div>
 
             {/* Filtros de Equipo (Radio o Checkbox visual según la vista) */}
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 py-1 items-center justify-end w-full">
+            <div className="flex overflow-x-auto scrollbar-hide gap-2 py-1 items-center justify-start sm:justify-end w-full">
                 {allBarbers.map(barber => {
                     const isSelected = selectedBarbers.includes(barber.id);
                     return (

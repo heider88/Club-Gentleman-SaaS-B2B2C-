@@ -74,15 +74,26 @@ export const WeeklyGrid = ({
     // Fallbacks de color por si acaso
     const colorHex = barber?.color || 'bg-dash-text'; 
     const borderColorClass = colorHex.replace('bg-', 'border-');
+    const bgTranslucentClass = colorHex.replace('bg-', 'bg-').concat('/20');
     const textColorClass = colorHex.replace('bg-', 'text-');
 
     return (
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
+            {/* Fondo de cuadrícula global */}
+            <div 
+                className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+                style={{ 
+                    backgroundImage: 'linear-gradient(var(--dash-border) 1px, transparent 1px)', 
+                    backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
+                    marginTop: '40px' // Offset para el header del día
+                }} 
+            />
+
             {/* Eje Y: Columna de Horas Fija */}
             <div className="w-10 md:w-12 shrink-0 bg-dash-panel border-r border-dash-border sticky left-0 z-30">
                 <div className="h-10 border-b border-dash-border sticky top-0 bg-dash-panel z-40" />
                 {timeSlots.map((time, idx) => (
-                    <div key={idx} className="relative border-b border-dash-border/30" style={{ height: ROW_HEIGHT }}>
+                    <div key={idx} className="relative border-b border-dash-border/30 bg-dash-panel" style={{ height: ROW_HEIGHT }}>
                         {time.getMinutes() === 0 && (
                             <span className="absolute -top-2 right-1.5 text-[8px] md:text-[9px] font-mono text-dash-text-muted">
                                 {format(time, 'HH:mm')}
@@ -137,9 +148,9 @@ export const WeeklyGrid = ({
                                     <div
                                         key={appt.id}
                                         onClick={() => onAppointmentTap(appt)}
-                                        className={`absolute w-[90%] left-[5%] rounded-sm cursor-pointer border-l-4 bg-zinc-900 shadow-md flex flex-col px-2 py-1 overflow-hidden z-10 active:scale-95 transition-all
-                                            ${borderColorClass}
-                                            ${isCompleted ? 'opacity-50 grayscale' : 'opacity-100 hover:brightness-110'}
+                                        className={`absolute w-[90%] left-[5%] rounded-sm cursor-pointer border-l-[3px] shadow-sm flex flex-col px-1.5 py-1 overflow-hidden z-10 active:scale-95 transition-all
+                                            ${bgTranslucentClass} ${borderColorClass}
+                                            ${isCompleted ? 'opacity-40 grayscale-[0.5]' : 'opacity-100 hover:brightness-110'}
                                         `}
                                         style={{
                                             top: `${top}px`,
@@ -147,13 +158,13 @@ export const WeeklyGrid = ({
                                         }}
                                     >
                                         <div className="flex items-center gap-1 mb-0.5">
-                                            <span className={`text-[9px] font-mono leading-none ${textColorClass}`}>
+                                            <span className={`text-[9px] font-mono leading-none ${isCompleted ? 'text-white/50' : textColorClass}`}>
                                                 {format(new Date(appt.start_time), 'HH:mm')}
                                             </span>
                                             {isCompleted && <span className="text-green-500 text-[8px] leading-none">✓</span>}
                                         </div>
                                         {height >= 30 && (
-                                            <span className="text-[10px] md:text-xs font-medium text-white/90 leading-tight truncate capitalize">
+                                            <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize ${isCompleted ? 'text-white/60' : 'text-white/95'}`}>
                                                 {appt.customer_name.split(' ')[0]}
                                             </span>
                                         )}
