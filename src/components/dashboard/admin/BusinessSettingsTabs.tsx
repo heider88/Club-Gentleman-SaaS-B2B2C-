@@ -455,28 +455,66 @@ export function BusinessSettingsTabs({
                                             ))}
                                         </div>
 
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 items-center">
                                             <input 
-                                                type="url"
-                                                id={`url-${section.id}`}
-                                                placeholder="Pega el enlace directo a una imagen (ej: https://...)"
-                                                className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none"
+                                                type="file"
+                                                accept="image/*"
+                                                id={`file-${section.id}`}
+                                                className="hidden"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+
+                                                    // Mock upload or use an action here if you want real upload.
+                                                    // Since BusinessSettings is a client component saving a JSON to DB, 
+                                                    // we need to upload the image to Supabase Storage first.
+                                                    
+                                                    const toastId = toast.loading("Subiendo imagen...");
+                                                    try {
+                                                        const formData = new FormData();
+                                                        formData.append("file", file);
+                                                        
+                                                        // Reusing the gallery upload action which returns the publicUrl or saves to DB.
+                                                        // Actually, we just want to upload to storage. Let's make a direct Supabase call
+                                                        // or use a new server action just for uploading. 
+                                                        // For simplicity, we will assume you have a generic upload endpoint or we just 
+                                                        // use the Supabase client here since it's a client component.
+                                                        
+                                                        const { createClient } = await import("@/lib/supabase/client");
+                                                        const supabase = createClient();
+                                                        
+                                                        const fileExt = file.name.split('.').pop();
+                                                        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+                                                        const filePath = `sections/${fileName}`;
+                                                        
+                                                        const { error: uploadError } = await supabase.storage
+                                                            .from('gallery') // Reuse gallery bucket for simplicity
+                                                            .upload(filePath, file);
+
+                                                        if (uploadError) throw uploadError;
+
+                                                        const { data: { publicUrl } } = supabase.storage
+                                                            .from('gallery')
+                                                            .getPublicUrl(filePath);
+
+                                                        updateSection(section.id, 'images', [...(section.images || []), publicUrl]);
+                                                        toast.success("Imagen subida", { id: toastId });
+                                                    } catch (error: any) {
+                                                        toast.error(`Error: ${error.message}`, { id: toastId });
+                                                    }
+                                                }}
                                             />
                                             <button 
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    const input = document.getElementById(`url-${section.id}`) as HTMLInputElement;
-                                                    if (input.value) {
-                                                        updateSection(section.id, 'images', [...(section.images || []), input.value]);
-                                                        input.value = '';
-                                                    }
+                                                    document.getElementById(`file-${section.id}`)?.click();
                                                 }}
-                                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl transition-all font-bold text-sm"
+                                                className="flex items-center justify-center gap-2 flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl transition-all font-bold text-sm border border-dashed border-white/20"
                                             >
-                                                Añadir
+                                                <ImageIcon className="w-4 h-4" /> Seleccionar Imagen desde el dispositivo
                                             </button>
                                         </div>
-                                        <p className="text-[10px] text-white/40">Pega enlaces directos a las imágenes para mostrarlas en una galería exclusiva de esta sección.</p>
+                                        <p className="text-[10px] text-white/40 text-center">Las imágenes se subirán automáticamente a tu almacenamiento en la nube.</p>
                                     </div>
                                 )}
                             </div>
