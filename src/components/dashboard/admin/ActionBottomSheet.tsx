@@ -53,7 +53,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: Appointme
                     <h3 className="text-xl font-oswald text-dash-text capitalize">{appt.customer_name.toLowerCase()}</h3>
                     <p className="text-sm text-dash-text-soft capitalize">{appt.services?.name?.toLowerCase() || 'Servicio General'}</p>
                     <p className="text-xs font-mono text-dash-text-muted mt-2">
-                        {format(new Date(appt.start_time), 'HH:mm')} - {format(new Date(appt.end_time), 'HH:mm')}
+                        {format(new Date(appt.start_time), 'h:mm a')} - {format(new Date(appt.end_time), 'h:mm a')}
                     </p>
                 </div>
 

@@ -81,7 +81,7 @@ export default async function CancelledAppointmentsPage() {
                                     {format(new Date(appt.start_time), "dd MMM yyyy", { locale: es })}
                                 </div>
                                 <div className="text-dash-text-muted text-xs font-mono mt-1">
-                                    {format(new Date(appt.start_time), "HH:mm")}
+                                    {format(new Date(appt.start_time), "h:mm a")}
                                 </div>
                             </div>
 

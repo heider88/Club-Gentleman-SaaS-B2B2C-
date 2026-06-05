@@ -60,7 +60,7 @@ export const DailyGrid = ({
             <div 
                 className="absolute inset-0 z-0 pointer-events-none"
                 style={{ 
-                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px)', 
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px)', 
                     backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
                     marginTop: '40px' // Offset para evadir el header sticky
                 }} 
@@ -74,7 +74,7 @@ export const DailyGrid = ({
                     <div key={idx} className="h-[60px] relative border-b border-dash-border/30 bg-dash-panel">
                         {time.getMinutes() === 0 && (
                             <span className="absolute -top-2.5 right-2 text-[9px] md:text-[10px] font-mono text-dash-text-muted">
-                                {format(time, 'HH:mm')}
+                                {format(time, 'h:mm a')}
                             </span>
                         )}
                     </div>
@@ -138,7 +138,7 @@ export const DailyGrid = ({
                                             </p>
                                         )}
                                         <span className={`text-[9px] font-mono absolute bottom-1 right-1 ${isCompleted ? 'text-white/30' : 'text-white/40'}`}>
-                                            {format(new Date(appt.start_time), 'HH:mm')}
+                                            {format(new Date(appt.start_time), 'h:mm a')}
                                         </span>
                                     </div>
                                 )

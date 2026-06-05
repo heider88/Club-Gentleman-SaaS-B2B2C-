@@ -181,7 +181,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
     const handleSlotTap = (barberId: string, time: Date) => {
         // En el futuro, podemos abrir un modal de creación con estos datos pre-cargados
-        toast.info(`Crear cita para barbero ${barberId} a las ${format(time, 'HH:mm')}`);
+        toast.info(`Crear cita para barbero ${barberId} a las ${format(time, 'h:mm a')}`);
     };
 
     return (

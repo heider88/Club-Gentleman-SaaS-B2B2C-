@@ -83,8 +83,8 @@ export function AppointmentRow({ appt, userRole }: { appt: AppointmentWithServic
             {/* Left: Time & Info */}
             <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                 <div className={`flex flex-col items-center justify-center shrink-0 min-w-[50px] md:min-w-[60px] border-r ${isCompleted ? 'border-green-900/30' : 'border-dash-border'} pr-3 md:pr-4`}>
-                    <span className={`font-oswald text-sm md:text-base leading-none ${textColor}`}>{format(new Date(appt.start_time), 'HH:mm')}</span>
-                    <span className={`font-oswald text-[10px] md:text-xs mt-1 ${isCompleted ? 'text-green-700/50' : 'text-dash-text-muted'}`}>{format(new Date(appt.end_time), 'HH:mm')}</span>
+                    <span className={`font-oswald text-sm md:text-base leading-none ${textColor}`}>{format(new Date(appt.start_time), 'h:mm a')}</span>
+                    <span className={`font-oswald text-[10px] md:text-xs mt-1 ${isCompleted ? 'text-green-700/50' : 'text-dash-text-muted'}`}>{format(new Date(appt.end_time), 'h:mm a')}</span>
                 </div>
                 
                 <div className="flex flex-col min-w-0 flex-1 py-1">

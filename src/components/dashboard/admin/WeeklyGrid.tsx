@@ -83,7 +83,7 @@ export const WeeklyGrid = ({
             <div 
                 className="absolute inset-0 z-0 pointer-events-none"
                 style={{ 
-                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px)', 
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px)', 
                     backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
                     marginTop: '40px' // Offset para el header del día
                 }} 
@@ -96,7 +96,7 @@ export const WeeklyGrid = ({
                     <div key={idx} className="relative border-b border-dash-border/30 bg-dash-panel" style={{ height: ROW_HEIGHT }}>
                         {time.getMinutes() === 0 && (
                             <span className="absolute -top-2 right-1.5 text-[8px] md:text-[9px] font-mono text-dash-text-muted">
-                                {format(time, 'HH:mm')}
+                                {format(time, 'h:mm a')}
                             </span>
                         )}
                     </div>
@@ -159,7 +159,7 @@ export const WeeklyGrid = ({
                                     >
                                         <div className="flex items-center gap-1 mb-0.5">
                                             <span className={`text-[9px] font-mono leading-none ${isCompleted ? 'text-white/50' : textColorClass}`}>
-                                                {format(new Date(appt.start_time), 'HH:mm')}
+                                                {format(new Date(appt.start_time), 'h:mm a')}
                                             </span>
                                             {isCompleted && <span className="text-green-500 text-[8px] leading-none">✓</span>}
                                         </div>

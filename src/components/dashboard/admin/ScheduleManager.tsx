@@ -250,7 +250,7 @@ export function ScheduleManager({ barbers, existingBlocks }: { barbers: any[], e
                                                 {format(startDate, "dd MMM yyyy", { locale: es })}
                                             </div>
                                             <div className="font-mono text-[10px] text-dash-text-soft mt-1">
-                                                {isFullDay ? 'TODO EL DÍA' : `${format(startDate, "HH:mm")} - ${format(endDate, "HH:mm")}`}
+                                                {isFullDay ? 'TODO EL DÍA' : `${format(startDate, "h:mm a")} - ${format(endDate, "h:mm a")}`}
                                             </div>
                                         </td>
                                         <td className="p-4">

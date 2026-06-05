@@ -202,11 +202,11 @@ export default function ProfilePage() {
                                         src={profile.avatar_url}
                                         alt="Avatar"
                                         fill
-                                        className="object-cover grayscale"
+                                        className="object-cover "
                                         unoptimized
                                     />
                                 ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-5xl grayscale opacity-50">
+                                    <div className="absolute inset-0 flex items-center justify-center text-5xl  opacity-50">
                                         🧑‍🎤
                                     </div>
                                 )}

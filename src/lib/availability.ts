@@ -95,7 +95,7 @@ export function generateTimeSlots(
         const isAvailable = !isOverlapping(slotStart, slotEnd)
 
         slots.push({
-            time: format(slotStart, 'HH:mm'),
+            time: format(slotStart, 'h:mm a'),
             available: isAvailable
         })
 
