@@ -521,11 +521,11 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                 {/* View Switcher Brutalista */}
                 <div className="flex bg-black/40 border border-dash-border/50 p-1 rounded-none">
                     {['daily', 'weekly', 'monthly'].map(v => (
-                        <button
+                        <button 
                             key={v}
-                            onClick={() => setView(v)}
-                            className={`px-6 py-2 text-[10px] font-bold uppercase tracking-[0.2em] rounded-none transition-all ${
-                                view === v ? 'bg-dash-text text-dash-bg shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel backdrop-blur-xl-alt'
+                            onClick={() => setView(v as 'daily' | 'weekly' | 'monthly')}
+                            className={`flex-1 px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${
+                                view === v ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text shadow-[0_0_15px_rgba(255,255,255,0.05)]' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel backdrop-blur-xl-alt'
                             }`}
                         >
                             {v === 'daily' ? 'Diario' : v === 'weekly' ? 'Semanal' : 'Mensual'}
@@ -545,7 +545,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                         <div className="bg-dash-panel backdrop-blur-xl border border-dash-border shadow-2xl relative">
                             <button 
                                 onClick={() => setSelectedAppt(null)}
-                                className="absolute -top-3 -right-3 w-8 h-8 bg-dash-text text-dash-bg font-bold flex items-center justify-center z-10 hover:scale-110 transition-transform"
+                                className="absolute -top-3 -right-3 w-8 h-8 bg-dash-text text-black font-bold flex items-center justify-center z-10 hover:scale-110 transition-transform"
                             >
                                 X
                             </button>

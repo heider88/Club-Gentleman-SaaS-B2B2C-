@@ -36,7 +36,7 @@ export default async function DashboardLayout({
 
     return (
         <DashboardThemeProvider>
-            <div className={`min-h-screen text-dash-text flex flex-col md:flex-row relative ${oswald.variable} ${jakarta.variable} font-jakarta overflow-hidden bg-black`}>
+            <div className={`min-h-screen text-dash-text flex flex-col md:flex-row relative ${oswald.variable} ${jakarta.variable} font-jakarta overflow-hidden`}>
                 
                 {/* Purple Gradient Background matches customer view */}
                 <div className="fixed inset-0 bg-gradient-to-r from-black to-[#6D3294] -z-20 pointer-events-none transform-gpu" />

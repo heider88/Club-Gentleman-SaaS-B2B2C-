@@ -134,14 +134,14 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-dash-border pb-6">
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <div className="flex bg-dash-panel border border-dash-border p-1">
-                        {(['daily', 'weekly', 'monthly'] as FilterType[]).map(f => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f)}
-                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-dash-text text-dash-bg' : 'text-dash-text-muted hover:text-dash-text'}`}
+                    <div className="flex bg-transparent border border-dash-border p-1">
+                        {['Hoy', 'Semana', 'Mes'].map(f => (
+                            <button 
+                                key={f} 
+                                onClick={() => setFilter(f as typeof filter)}
+                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}
                             >
-                                {f === 'daily' ? 'Diario' : f === 'weekly' ? 'Semanal' : 'Mensual'}
+                                {f}
                             </button>
                         ))}
                     </div>
