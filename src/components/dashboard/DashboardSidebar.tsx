@@ -60,7 +60,7 @@ export function DashboardSidebar({ role }: { role: string }) {
             </div>
 
             <aside className={cn(
-                "fixed bottom-0 left-0 right-0 h-16 bg-dash-panel border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:border-t-0 md:border-r flex md:flex-col justify-between md:justify-start transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden",
+                "fixed bottom-0 left-0 right-0 h-16 bg-dash-panel backdrop-blur-xl border-t border-dash-border z-50 md:sticky md:top-0 md:h-screen md:border-t-0 md:border-r flex md:flex-col justify-between md:justify-start transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden",
                 isCollapsed ? "md:w-0 md:opacity-0 md:border-r-0 md:translate-x-[-100%]" : "md:w-72 md:translate-x-0"
             )}>
                 {/* Header Lateral */}

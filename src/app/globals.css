@@ -93,14 +93,14 @@
   }
 
   .dark {
-    --dash-bg: #0a0a0a;
-    --dash-panel: #000000;
-    --dash-panel-alt: #18181b;
-    --dash-border: #27272a;
-    --dash-border-alt: #3f3f46;
+    --dash-bg: transparent;
+    --dash-panel: rgba(0, 0, 0, 0.4);
+    --dash-panel-alt: rgba(24, 24, 27, 0.5);
+    --dash-border: rgba(255, 255, 255, 0.08);
+    --dash-border-alt: rgba(255, 255, 255, 0.15);
     --dash-text: #ffffff;
-    --dash-text-muted: #71717a;
-    --dash-text-soft: #a1a1aa;
+    --dash-text-muted: #a1a1aa;
+    --dash-text-soft: #71717a;
   }
 }
 

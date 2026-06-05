@@ -175,7 +175,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     const renderDailyView = () => {
         if (filteredAppointments.length === 0) {
             return (
-                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1 flex flex-col items-center justify-center">
+                <div className="text-center py-20 bg-dash-panel backdrop-blur-xl border border-dash-border flex-1 flex flex-col items-center justify-center">
                     <p className="font-oswald text-4xl text-dash-text-soft/20 uppercase font-black mb-4">00</p>
                     <p className="font-oswald text-2xl text-dash-text-soft uppercase">Agenda Vacía</p>
                     <p className="text-xs font-bold uppercase tracking-widest text-dash-text-muted mt-2">No hay citas registradas para este día.</p>
@@ -183,7 +183,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
             )
         }
         return (
-            <div className="relative border border-dash-border bg-dash-panel flex flex-col flex-1 overflow-hidden">
+            <div className="relative border border-dash-border bg-dash-panel backdrop-blur-xl flex flex-col flex-1 overflow-hidden">
                 <div className="flex border-b border-dash-border bg-dash-bg z-20 sticky top-0">
                     <div className="w-16 md:w-20 shrink-0 border-r border-dash-border flex items-end justify-end pb-2 pr-2">
                         <span className="text-[10px] uppercase font-bold tracking-widest text-dash-text-soft">Hora</span>
@@ -194,7 +194,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                             const colorClass = barberInfo?.color || 'bg-dash-text';
                             return (
                             <div key={col.barberId} className="flex-1 min-w-[200px] md:min-w-[250px] p-4 flex items-center gap-3 border-r border-dash-border last:border-r-0">
-                                <div className="w-10 h-10 border border-dash-border-alt bg-dash-panel-alt overflow-hidden shrink-0">
+                                <div className="w-10 h-10 border border-dash-border-alt bg-dash-panel backdrop-blur-xl-alt overflow-hidden shrink-0">
                                     {col.avatarUrl ? (
                                         <img src={col.avatarUrl} alt={col.barberName} className="w-full h-full object-cover grayscale" />
                                     ) : (
@@ -214,7 +214,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                 </div>
 
                 <div className="flex-1 overflow-auto flex relative bg-dash-bg" style={{ backgroundImage: 'linear-gradient(var(--dash-border) 1px, transparent 1px)', backgroundSize: `100% ${ROW_HEIGHT}px` }}>
-                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border bg-dash-panel sticky left-0 z-10">
+                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border bg-dash-panel backdrop-blur-xl sticky left-0 z-10">
                         {timeSlots.map((time, idx) => (
                             <div key={idx} className="relative w-full border-b border-dash-border/50 text-right pr-2" style={{ height: ROW_HEIGHT }}>
                                 {time.getMinutes() === 0 && (
@@ -247,7 +247,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                             onClick={() => setSelectedAppt(appt)}
                                             className={`absolute left-1 right-1 border p-2 cursor-pointer transition-all duration-300 overflow-hidden group
                                                 ${isPending 
-                                                    ? 'bg-dash-panel border-dash-border hover:border-dash-text hover:shadow-lg z-10' 
+                                                    ? 'bg-dash-panel backdrop-blur-xl border-dash-border hover:border-dash-text hover:shadow-lg z-10' 
                                                     : isCancelled
                                                         ? 'bg-black/40 border-dash-border-alt/20 opacity-40 hover:opacity-70 grayscale z-0'
                                                         : 'bg-dash-bg border-dash-border-alt/30 opacity-60 hover:opacity-100 z-0'
@@ -297,7 +297,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
         if (filteredAppointments.length === 0) {
             return (
-                <div className="text-center py-20 bg-dash-panel border border-dash-border flex-1 flex flex-col items-center justify-center">
+                <div className="text-center py-20 bg-dash-panel backdrop-blur-xl border border-dash-border flex-1 flex flex-col items-center justify-center">
                     <p className="font-oswald text-4xl text-dash-text-soft/20 uppercase font-black mb-4">00</p>
                     <p className="font-oswald text-2xl text-dash-text-soft uppercase">Agenda Vacía</p>
                     <p className="text-xs font-bold uppercase tracking-widest text-dash-text-muted mt-2">No hay citas registradas para esta semana.</p>
@@ -306,10 +306,10 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
         }
 
         return (
-            <div className="relative border border-dash-border bg-dash-panel flex flex-col flex-1 overflow-hidden">
+            <div className="relative border border-dash-border bg-dash-panel backdrop-blur-xl flex flex-col flex-1 overflow-hidden">
                 {/* Cabecera de Días (Editorial) */}
                 <div className="flex border-b-2 border-dash-border bg-dash-bg z-20 sticky top-0">
-                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border flex items-end justify-end pb-2 pr-2 bg-dash-panel">
+                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border flex items-end justify-end pb-2 pr-2 bg-dash-panel backdrop-blur-xl">
                         <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-dash-text-soft">Hora</span>
                     </div>
                     <div className="flex-1 flex overflow-x-auto scrollbar-hide">
@@ -330,7 +330,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                 </div>
 
                 <div className="flex-1 overflow-auto flex relative bg-dash-bg" style={{ backgroundImage: 'linear-gradient(var(--dash-border) 1px, transparent 1px)', backgroundSize: `100% ${ROW_HEIGHT}px` }}>
-                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border bg-dash-panel sticky left-0 z-10">
+                    <div className="w-16 md:w-20 shrink-0 border-r border-dash-border bg-dash-panel backdrop-blur-xl sticky left-0 z-10">
                         {timeSlots.map((time, idx) => (
                             <div key={idx} className="relative w-full border-b border-dash-border/50 text-right pr-2" style={{ height: ROW_HEIGHT }}>
                                 {time.getMinutes() === 0 && (
@@ -422,10 +422,10 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
         }
 
         return (
-            <div className="relative border border-dash-border bg-dash-panel flex flex-col flex-1 overflow-hidden">
+            <div className="relative border border-dash-border bg-dash-panel backdrop-blur-xl flex flex-col flex-1 overflow-hidden">
                 <div className="grid grid-cols-7 border-b border-dash-border bg-dash-bg">
                     {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
-                        <div key={day} className="p-3 text-center border-r border-dash-border last:border-r-0 bg-dash-panel/50">
+                        <div key={day} className="p-3 text-center border-r border-dash-border last:border-r-0 bg-dash-panel backdrop-blur-xl/50">
                             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-dash-text-muted">{day}</span>
                         </div>
                     ))}
@@ -453,7 +453,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                     params.set('view', 'daily')
                                     router.push(`${pathname}?${params.toString()}`)
                                 }}
-                                className={`bg-dash-panel p-2 flex flex-col gap-2 cursor-pointer hover:bg-white/[0.05] transition-colors group relative overflow-hidden ${isToday ? 'bg-dash-text/[0.02]' : ''}`}
+                                className={`bg-dash-panel backdrop-blur-xl p-2 flex flex-col gap-2 cursor-pointer hover:bg-white/[0.05] transition-colors group relative overflow-hidden ${isToday ? 'bg-dash-text/[0.02]' : ''}`}
                             >
                                 <span className={`absolute -bottom-4 -right-2 text-[60px] font-oswald font-black leading-none opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none ${isToday ? 'text-dash-text opacity-10' : 'text-white'}`}>
                                     {format(day, 'd')}
@@ -489,7 +489,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     return (
         <div className="flex flex-col gap-4 h-[70vh] md:h-[80vh]">
             {/* Header Controls: Filters and View Switcher */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-dash-panel border border-dash-border p-3 rounded-2xl">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-dash-panel backdrop-blur-xl border border-dash-border p-3 rounded-2xl">
                 
                 {/* Barber Filter Pills */}
                 <div className="flex flex-wrap gap-2 items-center">
@@ -502,7 +502,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                                 onClick={() => toggleBarber(barber.id)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-none border-b-2 transition-all duration-300 group
                                     ${isSelected 
-                                        ? `border-dash-text bg-dash-panel-alt/50 text-dash-text` 
+                                        ? `border-dash-text bg-dash-panel backdrop-blur-xl-alt/50 text-dash-text` 
                                         : `border-transparent bg-transparent text-dash-text-soft opacity-40 hover:opacity-100 hover:border-dash-border grayscale hover:grayscale-0`
                                     }`}
                             >
@@ -525,7 +525,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                             key={v}
                             onClick={() => setView(v)}
                             className={`px-6 py-2 text-[10px] font-bold uppercase tracking-[0.2em] rounded-none transition-all ${
-                                view === v ? 'bg-dash-text text-dash-bg shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel-alt'
+                                view === v ? 'bg-dash-text text-dash-bg shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-dash-text-muted hover:text-dash-text hover:bg-dash-panel backdrop-blur-xl-alt'
                             }`}
                         >
                             {v === 'daily' ? 'Diario' : v === 'weekly' ? 'Semanal' : 'Mensual'}
@@ -542,7 +542,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
             {selectedAppt && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedAppt(null)}>
                     <div className="w-full max-w-sm" onClick={e => e.stopPropagation()}>
-                        <div className="bg-dash-panel border border-dash-border shadow-2xl relative">
+                        <div className="bg-dash-panel backdrop-blur-xl border border-dash-border shadow-2xl relative">
                             <button 
                                 onClick={() => setSelectedAppt(null)}
                                 className="absolute -top-3 -right-3 w-8 h-8 bg-dash-text text-dash-bg font-bold flex items-center justify-center z-10 hover:scale-110 transition-transform"
