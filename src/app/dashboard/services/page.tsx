@@ -53,7 +53,8 @@ export default function ServicesPage() {
 
     useEffect(() => {
         fetchServices()
-    }, [fetchServices, supabase])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
