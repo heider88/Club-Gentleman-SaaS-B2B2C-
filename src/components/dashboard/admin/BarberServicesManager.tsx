@@ -20,7 +20,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
     const [loading, setLoading] = useState(true)
     const [isCreating, setIsCreating] = useState(false)
     const [saving, setSaving] = useState(false)
-    const [newService, setNewService] = useState({ name: "", price: 0, duration_minutes: 30 })
+    const [newService, setNewService] = useState({ name: "", price: 0, duration_minutes: 30, description: "" })
 
     const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
     const [editForm, setEditForm] = useState({ name: "", price: 0, duration_minutes: 30 })
@@ -69,7 +69,8 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
             barber_id: barberId,
             name: newService.name,
             price: newService.price,
-            duration_minutes: newService.duration_minutes
+            duration_minutes: newService.duration_minutes,
+            description: newService.description || null
         }
 
         const res = await manageBarberService('add', payload)
@@ -80,7 +81,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
             toast.success("Servicio añadido al barbero")
             setServices([res.data, ...services])
             setIsCreating(false)
-            setNewService({ name: "", price: 0, duration_minutes: 30 })
+            setNewService({ name: "", price: 0, duration_minutes: 30, description: "" })
         }
 
         setSaving(false)
@@ -178,6 +179,11 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                         type="text" required placeholder="Nombre (Ej. Corte Clásico)"
                         value={newService.name} onChange={e => setNewService({...newService, name: e.target.value})}
                         className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                    />
+                    <textarea 
+                        rows={2} placeholder="Descripción del servicio (Opcional)"
+                        value={newService.description} onChange={e => setNewService({...newService, description: e.target.value})}
+                        className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary resize-y"
                     />
                     <div className="flex gap-2">
                         <input 
@@ -282,6 +288,12 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
                                         type="text" required placeholder="Nombre (Ej. Corte Clásico)"
                                         value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})}
                                         className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary"
+                                    />
+                                    <textarea 
+                                        rows={2} placeholder="Descripción del servicio (Opcional)"
+                                        value={editData.description || ''} 
+                                        onChange={e => setEditData({...editData, description: e.target.value})}
+                                        className="w-full p-2 text-sm rounded bg-black/50 border border-white/10 text-white outline-none focus:border-primary resize-y"
                                     />
                                     <div className="flex gap-2">
                                         <input 
