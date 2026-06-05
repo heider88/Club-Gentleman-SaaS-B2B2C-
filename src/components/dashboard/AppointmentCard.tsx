@@ -154,7 +154,7 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                             </button>
                         )}
                             <button 
-                                onClick={() => handleStatusChange('confirmed')}
+                                onClick={() => updateStatus('completed')}
                                 className="flex-1 bg-dash-text text-black hover:opacity-80 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-[0.98] border border-transparent"
                             >
                             Finalizar y Cobrar
