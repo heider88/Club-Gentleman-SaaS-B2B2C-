@@ -47,7 +47,7 @@ export function DashboardSidebar({ role }: { role: string }) {
                 isCollapsed ? "left-0" : "-left-16"
             )}>
                     <button 
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        onClick={() => setIsCollapsed(false)}
                         className="flex items-center justify-center w-8 h-24 bg-dash-text hover:bg-primary text-black rounded-r-2xl shadow-[5px_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 group"
                     >
                     <div className="flex flex-col gap-1.5 items-center group-hover:scale-110 transition-transform">
