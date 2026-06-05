@@ -89,10 +89,20 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     }, [allBarbers, selectedBarbers]);
 
     const toggleBarber = (id: string) => {
-        setSelectedBarbers(prev => 
-            prev.includes(id) ? prev.filter(bId => bId !== id) : [...prev, id]
-        )
+        if (view === 'weekly') {
+            setSelectedBarbers([id]);
+        } else {
+            setSelectedBarbers(prev => 
+                prev.includes(id) && prev.length > 1 ? prev.filter(bId => bId !== id) : [...prev, id]
+            )
+        }
     }
+
+    React.useEffect(() => {
+        if (view === 'weekly' && selectedBarbers.length > 1) {
+            setSelectedBarbers([selectedBarbers[0]]);
+        }
+    }, [view]);
 
     const setView = (newView: string) => {
         const params = new URLSearchParams(searchParams.toString())
@@ -177,8 +187,6 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     return (
         <div className="flex flex-col h-[75vh] md:h-[80vh] bg-dash-panel border border-dash-border rounded-xl overflow-hidden shadow-2xl">
             <CompactHeader 
-                totalAppointments={appointments.length}
-                pendingCount={appointments.filter(a => a.status === 'pending').length}
                 allBarbers={allBarbers}
                 selectedBarbers={selectedBarbers}
                 toggleBarber={toggleBarber}
