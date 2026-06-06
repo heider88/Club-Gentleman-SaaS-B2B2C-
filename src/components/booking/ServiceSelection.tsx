@@ -32,13 +32,16 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
     return (
         <div className="flex flex-col gap-0 border-t border-b border-white/20 py-2">
             {barberServices.map((service, idx) => (
-                <motion.button
+                <motion.div
+                    role="button"
+                    tabIndex={0}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     key={service.id}
                     onClick={() => onSelect(service)}
-                    className="w-full text-left py-3 sm:py-4 px-3 sm:px-4 bg-transparent hover:bg-[#6D3294]/20 border-b border-white/[0.05] last:border-b-0 group transition-all duration-300 relative overflow-hidden"
+                    onKeyDown={(e) => e.key === 'Enter' && onSelect(service)}
+                    className="w-full text-left py-3 sm:py-4 px-3 sm:px-4 bg-transparent hover:bg-[#6D3294]/20 border-b border-white/[0.05] last:border-b-0 group transition-all duration-300 relative overflow-hidden cursor-pointer"
                 >
                     {/* Hover indicator line */}
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#6D3294] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -47,8 +50,10 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
                         <div className="flex flex-col flex-1 min-w-0">
                             <span className="font-oswald text-lg uppercase tracking-wider text-white/90 group-hover:text-white transition-colors leading-tight break-words">{service.name}</span>
                             
-                            {service.description && (
-                                <p className="text-[13px] font-jakarta text-white/70 mt-1.5 leading-relaxed group-hover:text-white/90 transition-colors whitespace-pre-wrap break-words">{service.description}</p>
+                            {service.description ? (
+                                <p className="text-[13px] font-jakarta text-white/70 mt-1.5 leading-relaxed group-hover:text-white/90 transition-colors whitespace-pre-wrap break-words block">{service.description}</p>
+                            ) : (
+                                <p className="text-[12px] font-jakarta text-white/30 mt-1.5 italic block">(No hay descripción para este corte)</p>
                             )}
                             
                             <div className="mt-2">
@@ -59,7 +64,7 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
                         </div>
                         <span className="font-mono text-base font-bold text-white group-hover:text-pink-400 transition-colors shrink-0 whitespace-nowrap">${service.price}</span>
                     </div>
-                </motion.button>
+                </motion.div>
             ))}
         </div>
     )
