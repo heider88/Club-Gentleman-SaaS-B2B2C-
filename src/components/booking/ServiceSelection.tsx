@@ -44,11 +44,11 @@ export function ServiceSelection({ services, barberId, onSelect }: ServiceSelect
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#6D3294] opacity-0 group-hover:opacity-100 transition-opacity" />
                     
                     <div className="flex justify-between items-start gap-3 mb-1">
-                        <div className="flex flex-col flex-1">
-                            <span className="font-oswald text-lg uppercase tracking-wider text-white/90 group-hover:text-white transition-colors leading-tight">{service.name}</span>
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <span className="font-oswald text-lg uppercase tracking-wider text-white/90 group-hover:text-white transition-colors leading-tight break-words">{service.name}</span>
                             
                             {service.description && (
-                                <p className="text-[13px] font-jakarta text-white/50 mt-1 leading-snug group-hover:text-white/70 transition-colors whitespace-pre-wrap">{service.description}</p>
+                                <p className="text-[13px] font-jakarta text-white/70 mt-1.5 leading-relaxed group-hover:text-white/90 transition-colors whitespace-pre-wrap break-words">{service.description}</p>
                             )}
                             
                             <div className="mt-2">

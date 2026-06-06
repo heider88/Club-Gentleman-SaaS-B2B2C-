@@ -198,6 +198,7 @@ export async function importServicesToBarber(barberId: string, servicesToImport:
         const { data, error } = await adminClient.from('services').insert(newServices).select();
         if (error) return { error: error.message };
         
+        revalidatePath('/');
         return { success: true, data };
     }  
     catch (err: unknown) {
