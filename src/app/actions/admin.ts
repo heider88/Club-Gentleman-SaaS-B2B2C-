@@ -95,7 +95,10 @@ export async function deleteEmployee(userId: string) {
     }
 }
 
-// -- NUEVO: Gestión de Bloqueos de Agenda y Horario de Tienda --
+export async function refreshLandingPage() {
+    revalidatePath('/');
+    return { success: true };
+}
 
 export async function createAvailabilityBlock(payload: { barber_id: string | null, start_time: string, end_time: string, reason: string | null, is_global: boolean }) {
     try {
@@ -144,26 +147,30 @@ export async function manageBarberService(action: 'add' | 'delete' | 'update', p
         await requireAdmin();
         const adminClient = createAdminClient();
         
+        let result;
         if (action === 'add') {
             const { data, error } = await adminClient.from('services').insert(payload).select().single();
             if (error) return { error: error.message };
-            return { success: true, data };
-        }
-        
-        if (action === 'update') {
+            result = { success: true, data };
+        } else if (action === 'update') {
             const { id, ...updates } = payload;
             const { data, error } = await adminClient.from('services').update(updates).eq('id', id).select().single();
             if (error) return { error: error.message };
-            return { success: true, data };
-        }
-        
-        if (action === 'delete') {
+            result = { success: true, data };
+        } else if (action === 'delete') {
             const { error } = await adminClient.from('services').delete().eq('id', payload.id);
             if (error) return { error: error.message };
-            return { success: true };
+            result = { success: true };
+        } else {
+            return { error: "Acción no reconocida." };
         }
         
-        return { error: "Acción no reconocida." };
+        // Revalidar la landing page y el dashboard para que los cambios se reflejen de inmediato
+        revalidatePath('/');
+        revalidatePath('/dashboard/admin/services');
+        revalidatePath(`/dashboard/admin/barber/${payload.barber_id}`);
+        
+        return result;
     }  
     catch (err: unknown) {
         console.error("Action Error in manageBarberService:", err);

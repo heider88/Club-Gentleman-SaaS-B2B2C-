@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import { refreshLandingPage } from "@/app/actions/admin"
 import { Plus, Edit2, Trash2, Scissors, Save, X, Ban } from "lucide-react"
 
 interface Service {
@@ -113,6 +114,9 @@ export default function ServicesPage() {
         setSaving(false)
         setIsEditing(false)
         fetchServices()
+        
+        // Trigger landing page cache revalidation to update client view immediately
+        refreshLandingPage().catch(console.error)
     }
 
     const handleDelete = async (serviceId: string) => {
