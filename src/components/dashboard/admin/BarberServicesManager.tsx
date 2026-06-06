@@ -35,7 +35,7 @@ export function BarberServicesManager({ barberId, globalServices }: { barberId: 
             setLoading(true)
             const { data } = await supabase
                 .from('services')
-                .select('id, name, price, duration_minutes')
+                .select('id, name, price, duration_minutes, description')
                 .eq('barber_id', barberId)
                 .order('created_at', { ascending: false })
             
