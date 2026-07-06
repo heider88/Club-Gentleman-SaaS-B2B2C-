@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/auth/adminClient';
-import { resend } from '@/lib/resend';
+import { mailClient, EMAIL_FROM } from '@/lib/mail';
 import { BookingReminder } from '@/components/emails/BookingReminder';
 import React from 'react';
 import { render } from '@react-email/render';
@@ -63,12 +63,12 @@ export async function GET(request: Request) {
                         })
                     );
 
-                    const { error: resendError } = await resend.emails.send({
-                        from: "onboarding@resend.dev", // Cambiar a 'citas@tudominio.com' cuando haya dominio
+                    const { error: resendError } = await mailClient.sendMail({
+                        from: EMAIL_FROM,
                         to: appt.customer_email,
                         subject: `⏰ Recordatorio de tu cita para hoy - Club Gentleman`,
                         html: emailHtml,
-                    });
+                    }).then(() => ({ error: null })).catch((err) => ({ error: err }));
 
                     if (resendError) {
                         console.error(`Fallo enviando recordatorio a ${appt.customer_email}:`, resendError);

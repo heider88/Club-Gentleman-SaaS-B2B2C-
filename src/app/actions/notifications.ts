@@ -1,6 +1,6 @@
 "use server";
 
-import { resend } from "@/lib/resend";
+import { mailClient, EMAIL_FROM } from "@/lib/mail";
 import { BookingConfirmation } from "@/components/emails/BookingConfirmation";
 import React from "react";
 import { render } from "@react-email/render";
@@ -65,12 +65,12 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         );
 
         console.log("Despachando correo a Resend...");
-        const { error } = await resend.emails.send({
-            from: "onboarding@resend.dev", // Cambiar a 'citas@tudominio.com' cuando haya dominio verificado
+        const { error } = await mailClient.sendMail({
+            from: EMAIL_FROM,
             to: payload.email,
             subject: `Confirmación de cita - ${payload.serviceName}`,
             html: emailHtml,
-        });
+        }).then(() => ({ error: null })).catch((err) => ({ error: err }));
 
         if (error) {
             console.error("Resend disparó un fallo:", error);
