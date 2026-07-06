@@ -72,6 +72,21 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
             html: emailHtml,
         }).then(() => ({ error: null })).catch((err) => ({ error: err }));
 
+        // ---- 2. ENVÍO DE CORREO AL ADMINISTRADOR (BARBERÍA) ----
+        console.log("Despachando correo de aviso al administrador...");
+        const adminEmail = process.env.ADMIN_EMAIL || "clubgentleman156@gmail.com";
+        const { error: adminError } = await mailClient.sendMail({
+            from: EMAIL_FROM,
+            to: adminEmail,
+            subject: `🎉 NUEVA RESERVA: ${payload.customerName} - ${payload.date} ${payload.time}`,
+            html: emailHtml,
+        }).then(() => ({ error: null })).catch((err) => ({ error: err }));
+
+        if (adminError) {
+            console.error("Fallo al enviar correo al administrador:", adminError);
+            // No lanzamos el error para no asustar al cliente si su correo sí se envió
+        }
+
         if (error) {
             console.error("Resend disparó un fallo:", error);
             throw error;
