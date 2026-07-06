@@ -123,7 +123,7 @@ export const BookingConfirmation = ({
 
 // Styles for Urban Dark aesthetics
 const main = {
-    backgroundColor: "#0a0a0a",
+    backgroundColor: "#1a0b26", // Dark purple background
     fontFamily:
         '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 };
@@ -138,7 +138,7 @@ const container = {
 const headerSection = {
     padding: "32px 20px",
     textAlign: "center" as const,
-    borderBottom: "1px solid #262626",
+    borderBottom: "1px solid rgba(109, 50, 148, 0.4)", // Purple border
 };
 
 const logoText = {
@@ -179,8 +179,8 @@ const paragraph = {
 };
 
 const card = {
-    backgroundColor: "#171717",
-    border: "1px solid #262626",
+    backgroundColor: "rgba(23, 23, 23, 0.8)",
+    border: "1px solid rgba(109, 50, 148, 0.2)",
     borderRadius: "12px",
     padding: "24px",
     margin: "32px 0",
@@ -214,8 +214,8 @@ const locationSection = {
     textAlign: "center" as const,
     marginTop: "40px",
     padding: "24px",
-    backgroundColor: "#171717",
-    border: "1px solid #262626",
+    backgroundColor: "rgba(23, 23, 23, 0.8)",
+    border: "1px solid rgba(109, 50, 148, 0.2)",
     borderRadius: "12px",
 };
 
@@ -226,9 +226,9 @@ const locationText = {
 };
 
 const button = {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#6D3294", // Primary purple button
     borderRadius: "8px",
-    color: "#0a0a0a",
+    color: "#ffffff",
     fontSize: "15px",
     textDecoration: "none",
     textAlign: "center" as const,
