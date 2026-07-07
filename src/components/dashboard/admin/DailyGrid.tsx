@@ -1,6 +1,6 @@
 "use client"
 
-import { format } from "date-fns"
+import { format, differenceInMinutes } from "date-fns"
 import { CheckCircle2 } from "lucide-react"
 
 type AppointmentWithService = {
@@ -112,7 +112,7 @@ export const DailyGrid = ({
                             {/* Bloques de Citas */}
                             {col.appointments.map(appt => {
                                 const isCompleted = appt.status === 'completed';
-                                const duration = appt.services?.duration_minutes || 30;
+                                const duration = Math.max(differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time)), 15); // min 15 mins to be visible
                                 const height = duration * PIXELS_PER_MINUTE; 
                                 const top = calculateTopMins(appt.start_time);
 

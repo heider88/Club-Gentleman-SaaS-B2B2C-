@@ -1,6 +1,6 @@
 "use client"
 
-import { format, isSameDay } from "date-fns"
+import { format, isSameDay, differenceInMinutes } from "date-fns"
 import { es } from "date-fns/locale"
 
 type AppointmentWithService = {
@@ -147,7 +147,7 @@ export const WeeklyGrid = ({
                             {overlappingInfo.map(info => {
                                 const { appt, count, index } = info;
                                 const isCompleted = appt.status === 'completed';
-                                const duration = appt.services?.duration_minutes || 30;
+                                const duration = Math.max(differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time)), 15); // min 15 mins
                                 
                                 const top = calculateTopMins(appt.start_time);
                                 const height = duration * PIXELS_PER_MINUTE;
