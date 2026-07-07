@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
+import { sendRescheduleNotifications } from "./notifications";
 
 // Inicializa Redis y RateLimiter para proteger la DB contra spam
 let ratelimit: Ratelimit | null = null;
@@ -177,7 +178,14 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
         // 1. Fetch current appointment
         const { data: appt, error: fetchError } = await adminClient
             .from('appointments')
-            .select('barber_id, status')
+            .select(`
+                barber_id, 
+                status,
+                customer_name,
+                customer_email,
+                customer_phone,
+                services(name)
+            `)
             .eq('id', appointmentId)
             .single();
 
@@ -212,6 +220,45 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
                 return { success: false, error: "El nuevo horario entra en conflicto con otra cita (Cita duplicada)." };
             }
             return { success: false, error: error.message };
+        }
+
+        // Fetch the barber name for the email
+        const targetBarberId = newBarberId || appt.barber_id;
+        let barberName = "Tu Barbero";
+        const { data: barberProfile } = await adminClient
+            .from('profiles')
+            .select('full_name')
+            .eq('id', targetBarberId)
+            .single();
+            
+        if (barberProfile && barberProfile.full_name) {
+            barberName = barberProfile.full_name;
+        }
+
+        // Format dates for the email (assuming Bogota timezone or let the email template handle it. The DB saves UTC. Let's format locally)
+        const dateObj = new Date(newStartTime);
+        const bogotaFormatterDate = new Intl.DateTimeFormat('es-CO', {
+            timeZone: 'America/Bogota',
+            year: 'numeric', month: 'long', day: 'numeric',
+        });
+        const bogotaFormatterTime = new Intl.DateTimeFormat('es-CO', {
+            timeZone: 'America/Bogota',
+            hour: 'numeric', minute: 'numeric',
+            hour12: true
+        });
+
+        // Send Email
+        if (appt.customer_email) {
+            // We ignore errors in email sending so it doesn't fail the reschedule
+            sendRescheduleNotifications({
+                customerName: appt.customer_name,
+                email: appt.customer_email,
+                phone: appt.customer_phone || "",
+                serviceName: (appt.services as any)?.name || "Servicio General",
+                barberName: barberName,
+                date: bogotaFormatterDate.format(dateObj),
+                time: bogotaFormatterTime.format(dateObj)
+            }).catch(console.error);
         }
 
         return { success: true };

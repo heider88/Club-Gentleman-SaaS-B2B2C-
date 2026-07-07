@@ -100,3 +100,70 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         return { emailSent: false, error: "Failed to send email" };
     }
 }
+
+import { BookingReschedule } from "@/components/emails/BookingReschedule";
+
+export async function sendRescheduleNotifications(payload: BookingNotificationPayload) {
+    console.log('--- RESCHEDULE NOTIFICATIONS ACTION TRIGGERED --- / Email:', payload.email);
+
+    if (ratelimit) {
+        const headersList = await headers();
+        const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "127.0.0.1";
+        
+        const { success } = await ratelimit.limit(`ratelimit_notifications_${ip}`);
+        
+        if (!success) {
+            console.error(`[SEGURIDAD] Rate limit excedido para IP: ${ip}. Bloqueando envío de Email.`);
+            return {
+                emailSent: false,
+                error: "Rate limit exceeded"
+            };
+        }
+    }
+
+    try {
+        console.log("Renderizando email HTML manualmente para reagendamiento...");
+        const emailHtml = await render(
+            React.createElement(BookingReschedule, {
+                customerName: payload.customerName,
+                serviceName: payload.serviceName,
+                barberName: payload.barberName,
+                date: payload.date,
+                time: payload.time
+            })
+        );
+
+        console.log("Despachando correo a Resend...");
+        const { error } = await mailClient.sendMail({
+            from: EMAIL_FROM,
+            to: payload.email,
+            subject: `Cita Reagendada - ${payload.serviceName}`,
+            html: emailHtml,
+        }).then(() => ({ error: null })).catch((err) => ({ error: err }));
+
+        console.log("Despachando correo de aviso al administrador...");
+        const adminEmail = process.env.ADMIN_EMAIL || "clubgentleman156@gmail.com";
+        const { error: adminError } = await mailClient.sendMail({
+            from: EMAIL_FROM,
+            to: adminEmail,
+            subject: `🔄 CITA REAGENDADA: ${payload.customerName} - Nueva fecha: ${payload.date} ${payload.time}`,
+            html: emailHtml,
+        }).then(() => ({ error: null })).catch((err) => ({ error: err }));
+
+        if (adminError) {
+            console.error("Fallo al enviar correo al administrador:", adminError);
+        }
+
+        if (error) {
+            console.error("Fallo al enviar a cliente:", error);
+            throw error;
+        }
+
+        console.log(`[REPORTE] -> Reschedule Email: OK`);
+        return { emailSent: true };
+
+    } catch (err) {
+        console.error("Fallo interno al enviar correo de reagendamiento:", err);
+        return { emailSent: false, error: "Failed to send email" };
+    }
+}
