@@ -249,16 +249,20 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
 
         // Send Email
         if (appt.customer_email) {
-            // We ignore errors in email sending so it doesn't fail the reschedule
-            sendRescheduleNotifications({
-                customerName: appt.customer_name,
-                email: appt.customer_email,
-                phone: appt.customer_phone || "",
-                serviceName: (appt.services as any)?.name || "Servicio General",
-                barberName: barberName,
-                date: bogotaFormatterDate.format(dateObj),
-                time: bogotaFormatterTime.format(dateObj)
-            }).catch(console.error);
+            try {
+                // Se debe usar await para que Next.js no mate el proceso antes de enviar el correo
+                await sendRescheduleNotifications({
+                    customerName: appt.customer_name,
+                    email: appt.customer_email,
+                    phone: appt.customer_phone || "",
+                    serviceName: (appt.services as any)?.name || "Servicio General",
+                    barberName: barberName,
+                    date: bogotaFormatterDate.format(dateObj),
+                    time: bogotaFormatterTime.format(dateObj)
+                });
+            } catch (emailError) {
+                console.error("Error enviando notificaciones de reagendamiento:", emailError);
+            }
         }
 
         return { success: true };
