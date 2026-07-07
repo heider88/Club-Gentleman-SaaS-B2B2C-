@@ -168,3 +168,49 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
         return { success: false, error: "Error inesperado al intentar actualizar la cita." };
     }
 }
+
+export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string) {
+    try {
+        const { userId, role } = await getUserRole();
+        const adminClient = createAdminClient();
+
+        // 1. Fetch current appointment
+        const { data: appt, error: fetchError } = await adminClient
+            .from('appointments')
+            .select('barber_id, status')
+            .eq('id', appointmentId)
+            .single();
+
+        if (fetchError || !appt) return { success: false, error: "Cita no encontrada." };
+        if (appt.status === 'completed' || appt.status === 'cancelled') {
+            return { success: false, error: "No se puede reagendar una cita ya completada o cancelada." };
+        }
+
+        // Only Admin or the assigned Barber can reschedule
+        if (role !== 'admin' && appt.barber_id !== userId) {
+            return { success: false, error: "No tienes permiso para reagendar esta cita." };
+        }
+
+        // 2. Perform reschedule update
+        const { error } = await adminClient
+            .from('appointments')
+            .update({ 
+                start_time: newStartTime, 
+                end_time: newEndTime,
+                status: 'pending' // Optional: reset status to pending when rescheduled
+            })
+            .eq('id', appointmentId);
+
+        if (error) {
+            if (error.code === '23P01') {
+                return { success: false, error: "El nuevo horario entra en conflicto con otra cita (Cita duplicada)." };
+            }
+            return { success: false, error: error.message };
+        }
+
+        return { success: true };
+    } catch (err: unknown) {
+        console.error("Action Error in rescheduleAppointment:", err);
+        return { success: false, error: "Error inesperado al intentar reagendar la cita." };
+    }
+}
