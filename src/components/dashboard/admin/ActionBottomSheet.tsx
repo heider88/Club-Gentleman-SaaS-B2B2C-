@@ -1,6 +1,6 @@
 "use client"
 
-import { format, differenceInMinutes, addMinutes } from "date-fns"
+import { format, differenceInMinutes, addMinutes, parse } from "date-fns"
 import { es } from "date-fns/locale"
 import { CheckCircle2, UserX, Edit, X, CalendarClock, ChevronLeft } from "lucide-react"
 import { useState } from "react"
@@ -23,11 +23,15 @@ type AppointmentWithService = {
     } | null;
 }
 
-export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: AppointmentWithService | null, onClose: () => void, onAction: (action: string, id: string) => Promise<void> }) => {
+export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { appt: AppointmentWithService | null, onClose: () => void, onAction: (action: string, id: string) => Promise<void>, barbers?: { id: string, name: string, color: string }[] }) => {
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [view, setView] = useState<'menu' | 'reschedule'>('menu');
+    const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
 
     if (!appt) return null;
+
+    // Set initial barber when opening reschedule view
+    const currentBarberId = selectedBarberId || appt.barber_id;
 
     const handleAction = async (action: string) => {
         setLoadingAction(action);
@@ -45,12 +49,11 @@ export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: Appointme
         setLoadingAction('reschedule');
         try {
             const duration = appt.services?.duration_minutes || differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time));
-            const [hours, mins] = timeStr.split(':').map(Number);
-            const newStart = new Date(date);
-            newStart.setHours(hours, mins, 0, 0);
+            
+            const newStart = parse(timeStr, 'h:mm a', new Date(date));
             const newEnd = addMinutes(newStart, duration);
 
-            const result = await rescheduleAppointment(appt.id, newStart.toISOString(), newEnd.toISOString());
+            const result = await rescheduleAppointment(appt.id, newStart.toISOString(), newEnd.toISOString(), currentBarberId);
             if (result?.success) {
                 toast.success("Cita reagendada exitosamente");
                 await onAction('reschedule', appt.id); // Para refrescar
@@ -130,7 +133,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: Appointme
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center gap-3 mb-6">
+                        <div className="flex items-center gap-3 mb-4">
                             <button 
                                 onClick={() => setView('menu')}
                                 className="p-2 bg-dash-panel-alt rounded-lg hover:bg-white/10 text-dash-text transition-colors"
@@ -143,6 +146,21 @@ export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: Appointme
                             </div>
                         </div>
 
+                        {barbers.length > 0 && (
+                            <div className="mb-6">
+                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Asignar a:</label>
+                                <select 
+                                    value={currentBarberId} 
+                                    onChange={(e) => setSelectedBarberId(e.target.value)}
+                                    className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-2.5 focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                >
+                                    {barbers.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
                         <div className="-mx-5 sm:mx-0 px-5 sm:px-0">
                             {loadingAction === 'reschedule' ? (
                                 <div className="py-12 flex flex-col items-center justify-center gap-4">
@@ -151,7 +169,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction }: { appt: Appointme
                                 </div>
                             ) : (
                                 <CalendarView 
-                                    barberId={appt.barber_id} 
+                                    barberId={currentBarberId} 
                                     date={new Date(appt.start_time)}
                                     durationMinutes={appt.services?.duration_minutes || differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time))}
                                     onSelect={handleReschedule}

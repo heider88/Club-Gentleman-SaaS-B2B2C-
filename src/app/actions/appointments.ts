@@ -169,7 +169,7 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
     }
 }
 
-export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string) {
+export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string, newBarberId?: string) {
     try {
         const { userId, role } = await getUserRole();
         const adminClient = createAdminClient();
@@ -190,15 +190,21 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
         if (role !== 'admin' && appt.barber_id !== userId) {
             return { success: false, error: "No tienes permiso para reagendar esta cita." };
         }
+        
+        const updateData: any = { 
+            start_time: newStartTime, 
+            end_time: newEndTime,
+            status: 'pending' // Optional: reset status to pending when rescheduled
+        };
+        
+        if (newBarberId) {
+            updateData.barber_id = newBarberId;
+        }
 
         // 2. Perform reschedule update
         const { error } = await adminClient
             .from('appointments')
-            .update({ 
-                start_time: newStartTime, 
-                end_time: newEndTime,
-                status: 'pending' // Optional: reset status to pending when rescheduled
-            })
+            .update(updateData)
             .eq('id', appointmentId);
 
         if (error) {

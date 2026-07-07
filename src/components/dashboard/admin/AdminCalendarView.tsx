@@ -235,6 +235,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
 
             <ActionBottomSheet 
                 appt={selectedAppt}
+                barbers={Array.from(allBarbers.values())}
                 onClose={() => setSelectedAppt(null)}
                 onAction={handleAction}
             />
