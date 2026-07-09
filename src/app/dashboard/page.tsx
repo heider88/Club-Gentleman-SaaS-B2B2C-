@@ -74,7 +74,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
     // En Bogotá (UTC-5), el día comienza a las 05:00:00 UTC y termina a las 04:59:59 del día siguiente
     let queryStart = `${dateStr}T05:00:00.000Z`;
-    let endMs = new Date(queryStart).getTime() + (24 * 60 * 60 * 1000) - 1;
+    const endMs = new Date(queryStart).getTime() + (24 * 60 * 60 * 1000) - 1;
     let queryEnd = new Date(endMs).toISOString();
 
     const view = params.view || 'daily';
