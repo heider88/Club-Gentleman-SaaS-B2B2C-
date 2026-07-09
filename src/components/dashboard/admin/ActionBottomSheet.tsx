@@ -7,6 +7,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { CalendarView } from "@/components/booking/CalendarView"
 import { rescheduleAppointment } from "@/app/actions/appointments"
+import { createClient } from "@/lib/supabase/client"
 
 type AppointmentWithService = {
     id: string;
@@ -25,8 +26,14 @@ type AppointmentWithService = {
 
 export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { appt: AppointmentWithService | null, onClose: () => void, onAction: (action: string, id: string) => Promise<void>, barbers?: { id: string, name: string, color: string }[] }) => {
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
-    const [view, setView] = useState<'menu' | 'reschedule'>('menu');
+    const [view, setView] = useState<'menu' | 'reschedule' | 'edit'>('menu');
     const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
+    
+    // Default values for edit form (prevent undefined on initial render if appt is somehow null even with the check)
+    const [editForm, setEditForm] = useState({ 
+        name: appt?.customer_name || '', 
+        phone: appt?.customer_phone || '' 
+    });
 
     if (!appt) return null;
 
@@ -67,6 +74,32 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
             setLoadingAction(null);
         }
     }
+
+    const handleSaveDetails = async () => {
+        if (!editForm.name.trim()) return toast.error("El nombre es requerido");
+        
+        setLoadingAction('edit');
+        try {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from('appointments')
+                .update({ 
+                    customer_name: editForm.name.trim(),
+                    customer_phone: editForm.phone.trim()
+                })
+                .eq('id', appt.id);
+                
+            if (error) throw error;
+            
+            toast.success("Detalles actualizados exitosamente");
+            await onAction('edit', appt.id);
+            onClose();
+        } catch (error) {
+            toast.error("Error al actualizar los detalles");
+        } finally {
+            setLoadingAction(null);
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
@@ -112,10 +145,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
                             </button>
 
                             <button 
-                                onClick={() => {
-                                    toast.info("Funcionalidad de edición próximamente");
-                                    onClose();
-                                }} 
+                                onClick={() => setView('edit')} 
                                 className="w-full py-3.5 bg-white/5 text-dash-text font-bold text-xs uppercase tracking-widest rounded-md border border-dash-border active:scale-95 transition-transform flex justify-center items-center gap-2"
                             >
                                 <Edit className="w-4 h-4" /> Editar Detalles
@@ -177,7 +207,54 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
                             )}
                         </div>
                     </>
-                )}
+                ) : view === 'edit' ? (
+                    <>
+                        <div className="flex items-center gap-3 mb-6">
+                            <button 
+                                onClick={() => setView('menu')}
+                                className="p-2 bg-dash-panel-alt rounded-lg hover:bg-white/10 text-dash-text transition-colors"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <div>
+                                <h3 className="text-lg font-oswald text-dash-text">Editar Detalles</h3>
+                                <p className="text-xs text-dash-text-soft">Modifica la información del cliente</p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-5">
+                            <div>
+                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Nombre del Cliente</label>
+                                <input 
+                                    type="text" 
+                                    value={editForm.name} 
+                                    onChange={e => setEditForm({...editForm, name: e.target.value})}
+                                    className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-3.5 outline-none focus:border-primary transition-colors"
+                                    placeholder="Nombre completo"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Teléfono</label>
+                                <input 
+                                    type="text" 
+                                    value={editForm.phone} 
+                                    onChange={e => setEditForm({...editForm, phone: e.target.value})}
+                                    className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-3.5 outline-none focus:border-primary transition-colors"
+                                    placeholder="Número de teléfono"
+                                />
+                            </div>
+                            
+                            <button 
+                                onClick={handleSaveDetails}
+                                disabled={!!loadingAction}
+                                className="w-full mt-2 py-4 bg-primary text-black font-bold text-xs uppercase tracking-widest rounded-md flex justify-center items-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                            >
+                                {loadingAction === 'edit' ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"/> : <CheckCircle2 className="w-4 h-4" />}
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </>
+                ) : null}
             </div>
         </div>
     )
