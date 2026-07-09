@@ -24,7 +24,7 @@ type AppointmentWithService = {
     } | null;
 }
 
-export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { appt: AppointmentWithService | null, onClose: () => void, onAction: (action: string, id: string) => Promise<void>, barbers?: { id: string, name: string, color: string }[] }) => {
+export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdmin = false }: { appt: AppointmentWithService | null, onClose: () => void, onAction: (action: string, id: string) => Promise<void>, barbers?: { id: string, name: string, color: string }[], isAdmin?: boolean }) => {
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [view, setView] = useState<'menu' | 'reschedule' | 'edit'>('menu');
     const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
@@ -186,7 +186,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
                             </div>
                         </div>
 
-                        {barbers.length > 0 && (
+                        {isAdmin && barbers.length > 0 && (
                             <div className="mb-6">
                                 <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Asignar a:</label>
                                 <select 

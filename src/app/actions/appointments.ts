@@ -257,8 +257,13 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
             status: 'pending' // Optional: reset status to pending when rescheduled
         };
         
-        if (newBarberId) {
-            updateData.barber_id = newBarberId;
+        // Security check: Only admins can reassign barbers
+        if (newBarberId && newBarberId !== appt.barber_id) {
+            if (role === 'admin') {
+                updateData.barber_id = newBarberId;
+            } else {
+                return { success: false, error: "No tienes permiso para reasignar esta cita a otro barbero." };
+            }
         }
 
         // 2. Perform reschedule update

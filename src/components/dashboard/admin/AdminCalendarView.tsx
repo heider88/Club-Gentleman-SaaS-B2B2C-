@@ -238,6 +238,7 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
                 barbers={Array.from(allBarbers.values())}
                 onClose={() => setSelectedAppt(null)}
                 onAction={handleAction}
+                isAdmin={userRole === 'admin'}
             />
         </div>
     )
