@@ -59,7 +59,12 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         if (profileError || !barberProfile) return { success: false, error: "Profesional no encontrado." };
 
         const schedule = barberProfile.schedule_settings as {
-            workDays: number[], startHour: string|number, endHour: string|number, lunchStart: string|number, lunchEnd: string|number
+            workDays: number[], 
+            startHour?: string|number, 
+            endHour?: string|number, 
+            lunchStart?: string|number, 
+            lunchEnd?: string|number,
+            disabledSlots?: Record<number, string[]> | string[]
         };
 
         const startDateUTC = new Date(validated.data.startTime);
@@ -86,14 +91,15 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         const dayOfWeek = bogotaDate.getDay();
         const startHourNum = bogotaDate.getHours() + (bogotaDate.getMinutes() / 60);
 
-        const parseToNum = (val: string | number) => {
+        const parseToNum = (val?: string | number) => {
+            if (val === undefined || val === null) return null;
             if (typeof val === 'number') return val;
             const [h, m] = val.split(':').map(Number);
             return (h || 0) + (m || 0)/60;
         }
 
-        const sStart = parseToNum(schedule.startHour);
-        const sEnd = parseToNum(schedule.endHour);
+        const sStart = parseToNum(schedule.startHour) ?? 0;
+        const sEnd = parseToNum(schedule.endHour) ?? 24;
         const lStart = parseToNum(schedule.lunchStart);
         const lEnd = parseToNum(schedule.lunchEnd);
 
@@ -106,8 +112,22 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         if (startHourNum < sStart || startHourNum >= sEnd) {
             return { success: false, error: "El horario seleccionado está fuera del horario laboral." };
         }
-        if (startHourNum >= lStart && startHourNum < lEnd) {
+        if (lStart !== null && lEnd !== null && startHourNum >= lStart && startHourNum < lEnd) {
             return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
+        }
+
+        // Validación de disabledSlots (15-min granular)
+        if (schedule.disabledSlots) {
+            const timeString = `${bogotaDate.getHours().toString().padStart(2, '0')}:${bogotaDate.getMinutes().toString().padStart(2, '0')}`;
+            let disabledForDay: string[] = [];
+            if (Array.isArray(schedule.disabledSlots)) {
+                disabledForDay = schedule.disabledSlots;
+            } else {
+                disabledForDay = (schedule.disabledSlots as Record<number, string[]>)[dayOfWeek] || [];
+            }
+            if (disabledForDay.includes(timeString)) {
+                return { success: false, error: "El horario seleccionado está deshabilitado manualmente por el profesional." };
+            }
         }
 
         // 3. Inserción Segura
