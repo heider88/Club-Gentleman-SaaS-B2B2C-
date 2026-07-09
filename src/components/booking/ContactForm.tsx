@@ -72,18 +72,6 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
                 return;
             }
 
-            console.log('--- ENVIANDO ACCIÓN DESDE EL CLIENTE (Sin Bloquear UI) ---');
-            // Fire and forget: No hacemos await para no bloquear al usuario si el correo/whatsapp tarda
-            sendBookingNotifications({
-                customerName: data.name,
-                email: data.email,
-                phone: data.phone,
-                serviceName: bookingData.serviceName || "Servicio VIP",
-                barberName: bookingData.barberName || "Profesional",
-                date: bookingData.date.toISOString().split('T')[0],
-                time: bookingData.time
-            }).catch(console.error);
-
             onSuccess();
         }  
     catch (err: unknown) {
