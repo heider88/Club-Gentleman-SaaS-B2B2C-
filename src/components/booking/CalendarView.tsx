@@ -28,9 +28,10 @@ interface CalendarViewProps {
     date: Date | null;
     durationMinutes: number;
     onSelect: (time: string, date: Date) => void;
+    allowPastTimes?: boolean; // Prop opcional para que los admins agenden en el pasado
 }
 
-export function CalendarView({ barberId, date: initialDate, durationMinutes, onSelect }: CalendarViewProps) {
+export function CalendarView({ barberId, date: initialDate, durationMinutes, onSelect, allowPastTimes = false }: CalendarViewProps) {
     const [slots, setSlots] = useState<TimeSlot[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -156,8 +157,8 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                 if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
             }
 
-            // Check if in past (if today)
-            if (isSameDay(selectedDate, new Date()) && isBefore(slotStart, new Date())) return true;
+            // Check if in past (if today) unless explicitly allowed
+            if (!allowPastTimes && isSameDay(selectedDate, new Date()) && isBefore(slotStart, new Date())) return true;
 
             return false;
         }

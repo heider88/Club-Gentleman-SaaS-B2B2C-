@@ -205,6 +205,7 @@ export function AdminBookingModal() {
                                                 barberId={selectedBarberId}
                                                 date={selectedDate}
                                                 durationMinutes={selectedService.duration_minutes as number}
+                                                allowPastTimes={true}
                                                 onSelect={(time, date) => {
                                                     setSelectedTime(time)
                                                     setSelectedDate(date)
