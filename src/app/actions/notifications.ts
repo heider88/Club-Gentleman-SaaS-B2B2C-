@@ -64,7 +64,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
             })
         );
 
-        console.log("Despachando correo a Resend...");
+        console.log("Despachando correo...");
         const { error } = await mailClient.sendMail({
             from: EMAIL_FROM,
             to: payload.email,
@@ -88,7 +88,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         }
 
         if (error) {
-            console.error("Resend disparó un fallo:", error);
+            console.error("Falló el envío del correo:", error);
             throw error;
         }
 
@@ -133,7 +133,7 @@ export async function sendRescheduleNotifications(payload: BookingNotificationPa
             })
         );
 
-        console.log("Despachando correo a Resend...");
+        console.log("Despachando correo...");
         const { error } = await mailClient.sendMail({
             from: EMAIL_FROM,
             to: payload.email,
