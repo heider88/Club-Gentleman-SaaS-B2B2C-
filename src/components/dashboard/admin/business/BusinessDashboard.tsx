@@ -44,7 +44,8 @@ interface AppointmentRecord {
 export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], defaultTab: string }) {
     const supabase = createClient()
     const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('monthly')
-    const [appointments, setAppointments] = useState<AppointmentRecord[]>([])
+    const [selectedBarberId, setSelectedBarberId] = useState<string>('all')
+    const [allAppointments, setAllAppointments] = useState<AppointmentRecord[]>([])
     const [loading, setLoading] = useState(true)
     const [currentTab, setCurrentTab] = useState(defaultTab)
 
@@ -70,15 +71,20 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                 .lte('start_time', endDate.toISOString())
 
             if (!error && data) {
-                setAppointments(data as any[])
+                setAllAppointments(data as any[])
             } else {
-                setAppointments([])
+                setAllAppointments([])
             }
             setLoading(false)
         }
         
         fetchAppointments()
     }, [timeRange, supabase])
+
+    // Filter appointments based on selected barber
+    const appointments = selectedBarberId === 'all' 
+        ? allAppointments 
+        : allAppointments.filter(a => a.barber_id === selectedBarberId)
 
     // Calculate global stats for the persistent header
     const completedAppts = appointments.filter(a => a.status === 'completed')
@@ -1139,14 +1145,31 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
 
     return (
         <div className="w-full space-y-8 relative z-10">
-            {/* Control Principal (Periodo de Tiempo) */}
-            <div className="flex justify-end">
-                <div className="inline-flex bg-black/40 border border-white/10 rounded-none p-1 shadow-lg">
+            {/* Control Principal (Periodo de Tiempo y Colaborador) */}
+            <div className="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-4">
+                
+                {/* Selector de Colaborador */}
+                <select 
+                    value={selectedBarberId}
+                    onChange={(e) => setSelectedBarberId(e.target.value)}
+                    className="bg-black/40 border border-white/10 rounded-none p-2 text-xs font-bold uppercase tracking-widest text-white/70 outline-none focus:border-primary/50 transition-colors cursor-pointer appearance-none shadow-lg h-[34px] px-4"
+                    style={{ backgroundImage: 'linear-gradient(45deg, transparent 50%, gray 50%), linear-gradient(135deg, gray 50%, transparent 50%)', backgroundPosition: 'calc(100% - 12px) calc(1em + 2px), calc(100% - 8px) calc(1em + 2px)', backgroundSize: '4px 4px, 4px 4px', backgroundRepeat: 'no-repeat' }}
+                >
+                    <option value="all">Todos los Colaboradores</option>
+                    {barbers.map(barber => (
+                        <option key={barber.id} value={barber.id}>
+                            {barber.full_name || 'Sin Nombre'}
+                        </option>
+                    ))}
+                </select>
+
+                {/* Selector de Periodo */}
+                <div className="inline-flex bg-black/40 border border-white/10 rounded-none p-1 shadow-lg h-[34px]">
                     {['daily', 'weekly', 'monthly'].map((tr) => (
                         <button
                             key={tr}
                             onClick={() => setTimeRange(tr as any)}
-                            className={`px-6 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-none ${
+                            className={`px-6 py-0 flex items-center text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-none h-full ${
                                 timeRange === tr 
                                 ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
                                 : 'text-white/50 hover:text-white hover:bg-white/5'
