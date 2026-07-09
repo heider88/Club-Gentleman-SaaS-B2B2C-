@@ -14,11 +14,12 @@ interface TimeSlot {
 }
 
 interface ScheduleSettings {
-    startHour: string | number;
-    endHour: string | number;
-    lunchStart: string | number;
-    lunchEnd: string | number;
+    startHour?: string | number;
+    endHour?: string | number;
+    lunchStart?: string | number;
+    lunchEnd?: string | number;
     workDays: number[];
+    disabledSlots?: string[];
 }
 
 interface CalendarViewProps {
@@ -115,15 +116,29 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         const dayBlocks = allBlocks.filter(b => isSameDay(new Date(b.start_time), selectedDate));
 
         const isColliding = (slotStart: Date, slotEnd: Date) => {
-            // Check lunch
-            const ls = parseTimeSetting(scheduleSettings.lunchStart);
-            const le = parseTimeSetting(scheduleSettings.lunchEnd);
-            const lunchStart = new Date(selectedDate);
-            lunchStart.setHours(ls.hours, ls.minutes, 0, 0);
-            const lunchEnd = new Date(selectedDate);
-            lunchEnd.setHours(le.hours, le.minutes, 0, 0);
+            // Check manual disabled slots
+            if (scheduleSettings.disabledSlots && scheduleSettings.disabledSlots.length > 0) {
+                let checkTime = new Date(slotStart);
+                while (isBefore(checkTime, slotEnd)) {
+                    const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
+                    if (scheduleSettings.disabledSlots.includes(timeString)) {
+                        return true;
+                    }
+                    checkTime = addMinutes(checkTime, 15);
+                }
+            }
 
-            if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
+            // Check lunch
+            if (scheduleSettings.lunchStart && scheduleSettings.lunchEnd) {
+                const ls = parseTimeSetting(scheduleSettings.lunchStart);
+                const le = parseTimeSetting(scheduleSettings.lunchEnd);
+                const lunchStart = new Date(selectedDate);
+                lunchStart.setHours(ls.hours, ls.minutes, 0, 0);
+                const lunchEnd = new Date(selectedDate);
+                lunchEnd.setHours(le.hours, le.minutes, 0, 0);
+
+                if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
+            }
 
             // Check appointments
             for (const appt of dayAppointments) {
@@ -146,12 +161,12 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         }
 
         let current = new Date(selectedDate);
-        const sh = parseTimeSetting(scheduleSettings.startHour);
-        const eh = parseTimeSetting(scheduleSettings.endHour);
+        const sh = scheduleSettings.startHour !== undefined ? parseTimeSetting(scheduleSettings.startHour) : { hours: 0, minutes: 0 };
+        const eh = scheduleSettings.endHour !== undefined ? parseTimeSetting(scheduleSettings.endHour) : { hours: 23, minutes: 59 };
         
         current.setHours(sh.hours, sh.minutes, 0, 0);
         const endTime = new Date(selectedDate);
-        endTime.setHours(eh.hours, eh.minutes, 0, 0);
+        endTime.setHours(eh.hours, eh.minutes, 59, 999);
 
         const dayOfWeek = selectedDate.getDay();
         if (!scheduleSettings.workDays.includes(dayOfWeek)) {

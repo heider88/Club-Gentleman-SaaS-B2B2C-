@@ -6,19 +6,17 @@ export interface TimeSlot {
 }
 
 export interface ScheduleSettings {
-    startHour: string | number
-    endHour: string | number
-    lunchStart: string | number
-    lunchEnd: string | number
     workDays: number[] // 0=Sun, 1=Mon, etc.
+    disabledSlots?: string[] // "HH:mm" formatted disabled 15-min slots
+    startHour?: string | number // Kept for backward compatibility
+    endHour?: string | number
+    lunchStart?: string | number
+    lunchEnd?: string | number
 }
 
 export const DEFAULT_SCHEDULE: ScheduleSettings = {
-    startHour: "09:00",
-    endHour: "19:00",
-    lunchStart: "13:00",
-    lunchEnd: "14:00",
-    workDays: [1, 2, 3, 4, 5, 6] // Mon-Sat
+    workDays: [1, 2, 3, 4, 5, 6], // Mon-Sat
+    disabledSlots: []
 }
 
 // Represent an occupied block of time (either an appointment or manual block)
@@ -71,32 +69,61 @@ export function generateTimeSlots(
     }
 
     // 2. Setup start/end times for the day
-    const start = parseTimeSetting(schedule.startHour)
-    const end = parseTimeSetting(schedule.endHour)
-    const lStart = parseTimeSetting(schedule.lunchStart)
-    const lEnd = parseTimeSetting(schedule.lunchEnd)
+    const start = schedule.startHour !== undefined ? parseTimeSetting(schedule.startHour) : { hours: 0, minutes: 0 }
+    const end = schedule.endHour !== undefined ? parseTimeSetting(schedule.endHour) : { hours: 23, minutes: 59 }
+    
+    // For legacy lunch settings
+    const lStart = schedule.lunchStart !== undefined ? parseTimeSetting(schedule.lunchStart) : null
+    const lEnd = schedule.lunchEnd !== undefined ? parseTimeSetting(schedule.lunchEnd) : null
 
     let currentTime = new Date(date)
     currentTime.setHours(start.hours, start.minutes, 0, 0)
 
     const endTime = new Date(date)
-    endTime.setHours(end.hours, end.minutes, 0, 0)
+    endTime.setHours(end.hours, end.minutes, 59, 999)
 
-    const lunchStart = new Date(date)
-    lunchStart.setHours(lStart.hours, lStart.minutes, 0, 0)
-    
-    const lunchEnd = new Date(date)
-    lunchEnd.setHours(lEnd.hours, lEnd.minutes, 0, 0)
+    let lunchStart: Date | null = null
+    let lunchEnd: Date | null = null
+    if (lStart && lEnd) {
+        lunchStart = new Date(date)
+        lunchStart.setHours(lStart.hours, lStart.minutes, 0, 0)
+        
+        lunchEnd = new Date(date)
+        lunchEnd.setHours(lEnd.hours, lEnd.minutes, 0, 0)
+    }
 
-    // Grid step in minutes. Can be adjusted to 15 or 30.
-    const stepMinutes = 30
+    // Grid step in minutes.
+    const stepMinutes = 15
+
+    // Check if slot string (HH:mm) is manually disabled by admin
+    const isDisabledManually = (slotStart: Date, slotEnd: Date) => {
+        if (!schedule.disabledSlots || schedule.disabledSlots.length === 0) return false;
+
+        // A service might span multiple 15-minute intervals. 
+        // We need to check if ANY 15-minute block within the service duration is disabled.
+        let checkTime = new Date(slotStart);
+        while (checkTime < slotEnd) {
+            const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
+            if (schedule.disabledSlots.includes(timeString)) {
+                return true;
+            }
+            checkTime = addMinutes(checkTime, 15);
+        }
+        return false;
+    }
 
     // Helper to check if a proposed slot [start, end] overlaps with lunch or any occupied block
     const isOverlapping = (slotStart: Date, slotEnd: Date) => {
-        // Overlap with lunch?
-        // True if (slotStart < lunchEnd) AND (slotEnd > lunchStart)
-        if (slotStart < lunchEnd && slotEnd > lunchStart) {
+        // Overlap with manual disabled slot?
+        if (isDisabledManually(slotStart, slotEnd)) {
             return true;
+        }
+
+        // Overlap with lunch? (Legacy fallback)
+        if (lunchStart && lunchEnd) {
+            if (slotStart < lunchEnd && slotEnd > lunchStart) {
+                return true;
+            }
         }
 
         // Overlap with any appointment/block?

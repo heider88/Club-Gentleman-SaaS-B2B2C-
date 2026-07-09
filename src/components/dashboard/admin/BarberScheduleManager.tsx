@@ -5,23 +5,20 @@ import { toast } from "sonner"
 import { Save } from "lucide-react"
 import { updateBarberProfile } from "@/app/actions/admin"
 
-import { formatTimeInput } from "@/lib/availability"
-
 // Types for Schedule Settings JSONB
 export interface ScheduleSettings {
     workDays: number[] // 0 = Domingo, 1 = Lunes...
-    startHour: string | number
-    endHour: string | number
-    lunchStart: string | number
-    lunchEnd: string | number
+    disabledSlots: string[]
+    // Keeping optional fields for backward compatibility
+    startHour?: string | number
+    endHour?: string | number
+    lunchStart?: string | number
+    lunchEnd?: string | number
 }
 
 const DEFAULT_SCHEDULE: ScheduleSettings = {
     workDays: [1, 2, 3, 4, 5, 6],
-    startHour: "09:00",
-    endHour: "19:00",
-    lunchStart: "13:00",
-    lunchEnd: "14:00"
+    disabledSlots: [],
 }
 
 const DAYS = [
@@ -30,13 +27,25 @@ const DAYS = [
     { id: 0, label: 'Dom' }
 ]
 
+// Generar todos los intervalos de 15 minutos para las 24 horas
+const ALL_SLOTS: string[] = []
+for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 15) {
+        ALL_SLOTS.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`)
+    }
+}
+
 export function BarberScheduleManager({ barberId, initialSettings }: { barberId: string, initialSettings: any }) {
     const [saving, setSaving] = useState(false)
     
     // Parse the jsonb, fallback to default if missing or invalid
     const [settings, setSettings] = useState<ScheduleSettings>(() => {
         if (initialSettings && typeof initialSettings === 'object' && Array.isArray(initialSettings.workDays)) {
-            return initialSettings as ScheduleSettings
+            return {
+                ...DEFAULT_SCHEDULE,
+                ...initialSettings,
+                disabledSlots: initialSettings.disabledSlots || []
+            } as ScheduleSettings
         }
         return DEFAULT_SCHEDULE
     })
@@ -50,15 +59,28 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
         }))
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        setSettings(prev => ({ ...prev, [name]: value }))
+    const toggleSlot = (slot: string) => {
+        setSettings(prev => {
+            const disabledSlots = prev.disabledSlots || [];
+            return {
+                ...prev,
+                disabledSlots: disabledSlots.includes(slot)
+                    ? disabledSlots.filter(s => s !== slot)
+                    : [...disabledSlots, slot]
+            }
+        })
     }
 
     const handleSave = async () => {
         setSaving(true)
         
-        const result = await updateBarberProfile(barberId, { schedule_settings: settings })
+        // Remove legacy fields if we don't want them, but let's just keep them or omit them
+        const dataToSave = {
+            workDays: settings.workDays,
+            disabledSlots: settings.disabledSlots
+        }
+        
+        const result = await updateBarberProfile(barberId, { schedule_settings: dataToSave })
 
         if (result.error) {
             toast.error("Error al guardar horario", { description: result.error })
@@ -88,22 +110,30 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Hora Inicio</label>
-                    <input type="time" name="startHour" value={formatTimeInput(settings.startHour)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Hora Fin</label>
-                    <input type="time" name="endHour" value={formatTimeInput(settings.endHour)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 text-orange-400">Inicio Almuerzo</label>
-                    <input type="time" name="lunchStart" value={formatTimeInput(settings.lunchStart)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 text-orange-400">Fin Almuerzo</label>
-                    <input type="time" name="lunchEnd" value={formatTimeInput(settings.lunchEnd)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
+            <div className="space-y-3">
+                <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 flex items-center justify-between">
+                    <span>Horas Disponibles (15 min)</span>
+                    <span className="text-white/30 text-[10px] normal-case font-normal">Click para inhabilitar</span>
+                </label>
+                <div className="h-64 overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                        {ALL_SLOTS.map(slot => {
+                            const isEnabled = !(settings.disabledSlots || []).includes(slot);
+                            return (
+                                <button
+                                    key={slot}
+                                    onClick={() => toggleSlot(slot)}
+                                    className={`py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                        isEnabled 
+                                            ? 'bg-green-500/20 text-green-400 border border-green-500/20 hover:bg-green-500/30' 
+                                            : 'bg-white/5 text-white/30 border border-white/10 line-through opacity-50 hover:opacity-100 hover:bg-white/10'
+                                    }`}
+                                >
+                                    {slot}
+                                </button>
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
 
