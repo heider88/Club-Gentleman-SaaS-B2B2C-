@@ -99,7 +99,13 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
                     type="date" 
                     value={currentDateStr}
                     onChange={handleDateChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onClick={(e) => {
+                        // Fuerza a que el calendario se abra al dar clic en la computadora
+                        if ('showPicker' in HTMLInputElement.prototype) {
+                            try { e.currentTarget.showPicker(); } catch (err) {}
+                        }
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 
                 {isPending ? (
