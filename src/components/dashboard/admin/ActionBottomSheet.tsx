@@ -2,7 +2,7 @@
 
 import { format, differenceInMinutes, addMinutes, parse } from "date-fns"
 import { es } from "date-fns/locale"
-import { CheckCircle2, UserX, Edit, X, CalendarClock, ChevronLeft } from "lucide-react"
+import { CheckCircle2, UserX, Edit, X, CalendarClock, ChevronLeft, MessageCircle } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { CalendarView } from "@/components/booking/CalendarView"
@@ -122,6 +122,16 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
                             <p className="text-xs font-mono text-dash-text-muted mt-2">
                                 {format(new Date(appt.start_time), 'h:mm a')} - {format(new Date(appt.end_time), 'h:mm a')}
                             </p>
+                            {appt.customer_phone && appt.customer_phone !== "N/A" && (
+                                <a 
+                                    href={`https://wa.me/${appt.customer_phone.replace(/\D/g, '')}?text=Hola%20${encodeURIComponent(appt.customer_name.split(' ')[0])},%20te%20escribimos%20de%20la%20barber%C3%ADa`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-4 w-full py-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-bold text-xs uppercase tracking-widest rounded-md border border-[#25D366]/30 active:scale-95 transition-all flex justify-center items-center gap-2"
+                                >
+                                    <MessageCircle className="w-4 h-4" /> Contactar por WhatsApp
+                                </a>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-3">
