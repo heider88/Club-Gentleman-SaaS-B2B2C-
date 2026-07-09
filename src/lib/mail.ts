@@ -8,6 +8,10 @@ export const mailClient = nodemailer.createTransport({
         user: process.env.ZEPTOMAIL_SMTP_USER || "emailapikey",
         pass: process.env.ZEPTOMAIL_SMTP_PASS,
     },
+    tls: {
+        rejectUnauthorized: false
+    }
 });
 
 export const EMAIL_FROM = process.env.EMAIL_FROM || "reservas@clubgentlemanformen.com";
+
