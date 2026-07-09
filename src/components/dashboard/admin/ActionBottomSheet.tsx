@@ -161,7 +161,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [] }: { a
                             </button>
                         </div>
                     </>
-                ) : (
+                ) : view === 'reschedule' ? (
                     <>
                         <div className="flex items-center gap-3 mb-4">
                             <button 
