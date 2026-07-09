@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
-import { sendRescheduleNotifications } from "./notifications";
+import { sendRescheduleNotifications, sendBookingNotifications } from "./notifications";
 
 // Inicializa Redis y RateLimiter para proteger la DB contra spam
 let ratelimit: Ratelimit | null = null;
@@ -148,6 +148,35 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             }
             console.error("Insert error:", error);
             return { success: false, error: "Error interno al procesar la cita." };
+        }
+
+        // 4. Send Confirmation Email (Non-blocking)
+        try {
+            // Get Barber Name
+            const { data: barberProfile } = await adminClient.from('profiles').select('full_name').eq('id', validated.data.barberId).single();
+            const barberName = barberProfile?.full_name || "Tu Barbero";
+
+            // Get Service Name
+            const { data: serviceObj } = await adminClient.from('services').select('name').eq('id', validated.data.serviceId).single();
+            const serviceName = serviceObj?.name || "Servicio General";
+
+            // Format Dates
+            const dateObj = new Date(validated.data.startTime);
+            const bogotaFormatterDate = new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', year: 'numeric', month: 'long', day: 'numeric' });
+            const bogotaFormatterTime = new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', hour: 'numeric', minute: 'numeric', hour12: true });
+
+            await sendBookingNotifications({
+                customerName: validated.data.customerName,
+                email: validated.data.customerEmail,
+                phone: validated.data.customerPhone,
+                serviceName: serviceName,
+                barberName: barberName,
+                date: bogotaFormatterDate.format(dateObj),
+                time: bogotaFormatterTime.format(dateObj)
+            });
+        } catch (emailError) {
+            console.error("Error dispatching booking confirmation email:", emailError);
+            // We don't fail the booking if email fails
         }
         
         return { success: true };
