@@ -158,7 +158,27 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             }
 
             // Check if in past (if today) unless explicitly allowed
-            if (!allowPastTimes && isSameDay(selectedDate, new Date()) && isBefore(slotStart, new Date())) return true;
+            if (!allowPastTimes) {
+                // Timezone fix para Bogotá al evaluar el momento "actual"
+                const now = new Date();
+                const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'America/Bogota',
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', second: 'numeric',
+                    hour12: false
+                });
+                const parts = bogotaFormatter.formatToParts(now);
+                const b: any = {};
+                parts.forEach(p => b[p.type] = p.value);
+                const localNow = new Date(b.year, b.month - 1, b.day, b.hour, b.minute, b.second);
+
+                const localSelectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                const isTodayLocal = localSelectedDate.getTime() === new Date(localNow.getFullYear(), localNow.getMonth(), localNow.getDate()).getTime();
+
+                if (isTodayLocal && isBefore(slotStart, localNow)) {
+                    return true;
+                }
+            }
 
             return false;
         }
