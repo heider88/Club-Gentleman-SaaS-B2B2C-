@@ -17,7 +17,9 @@ type AppointmentWithService = {
     customer_phone: string;
     status: string;
     barber_id: string;
+    service_id?: string;
     services: {
+        id?: string;
         name: string;
         price: number;
         duration_minutes?: number;
@@ -28,17 +30,28 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [view, setView] = useState<'menu' | 'reschedule' | 'edit'>('menu');
     const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
+    const [availableServices, setAvailableServices] = useState<any[]>([]);
+    const [loadingServices, setLoadingServices] = useState(false);
     
     // Default values for edit form (prevent undefined on initial render if appt is somehow null even with the check)
     const [editForm, setEditForm] = useState({ 
         name: appt?.customer_name || '', 
-        phone: appt?.customer_phone || '' 
+        phone: appt?.customer_phone || '',
+        service_id: appt?.service_id || appt?.services?.id || ''
     });
 
     if (!appt) return null;
 
-    // Set initial barber when opening reschedule view
     const currentBarberId = selectedBarberId || appt.barber_id;
+
+    // Fetch services specifically for editing
+    const loadServices = async () => {
+        setLoadingServices(true);
+        const supabase = createClient();
+        const { data } = await supabase.from('services').select('id, name, price, duration_minutes').eq('barber_id', currentBarberId);
+        if (data) setAvailableServices(data);
+        setLoadingServices(false);
+    };
 
     const handleAction = async (action: string) => {
         setLoadingAction(action);
@@ -75,17 +88,31 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
         }
     }
 
-    const handleSaveDetails = async () => {
+        const handleSaveDetails = async () => {
         if (!editForm.name.trim()) return toast.error("El nombre es requerido");
+        if (!editForm.service_id) return toast.error("El servicio es requerido");
         
         setLoadingAction('edit');
         try {
             const supabase = createClient();
+            
+            // 1. Get the new service details if it changed to calculate the new end_time
+            let newEndTime = appt.end_time;
+            if (editForm.service_id !== appt.service_id && availableServices.length > 0) {
+                const selectedService = availableServices.find(s => s.id === editForm.service_id);
+                if (selectedService) {
+                    const duration = selectedService.duration_minutes || 30;
+                    newEndTime = addMinutes(new Date(appt.start_time), duration).toISOString();
+                }
+            }
+
             const { error } = await supabase
                 .from('appointments')
                 .update({ 
                     customer_name: editForm.name.trim(),
-                    customer_phone: editForm.phone.trim()
+                    customer_phone: editForm.phone.trim(),
+                    service_id: editForm.service_id,
+                    end_time: newEndTime
                 })
                 .eq('id', appt.id);
                 
@@ -155,7 +182,12 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                             </button>
 
                             <button 
-                                onClick={() => setView('edit')} 
+                                onClick={() => {
+                                    setView('edit');
+                                    if (availableServices.length === 0) {
+                                        loadServices();
+                                    }
+                                }} 
                                 className="w-full py-3.5 bg-white/5 text-dash-text font-bold text-xs uppercase tracking-widest rounded-md border border-dash-border active:scale-95 transition-transform flex justify-center items-center gap-2"
                             >
                                 <Edit className="w-4 h-4" /> Editar Detalles
@@ -252,6 +284,20 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                                     className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-3.5 outline-none focus:border-primary transition-colors"
                                     placeholder="Número de teléfono"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Servicio</label>
+                                <select 
+                                    value={editForm.service_id} 
+                                    onChange={e => setEditForm({...editForm, service_id: e.target.value})}
+                                    disabled={loadingServices}
+                                    className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-3.5 outline-none focus:border-primary transition-colors appearance-none disabled:opacity-50"
+                                >
+                                    <option value="" disabled>{loadingServices ? "Cargando servicios..." : "Selecciona un servicio"}</option>
+                                    {availableServices.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name} - ${s.price}</option>
+                                    ))}
+                                </select>
                             </div>
                             
                             <button 

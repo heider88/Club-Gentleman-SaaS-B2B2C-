@@ -19,11 +19,13 @@ type AppointmentWithService = {
     customer_phone: string;
     status: string;
     barber_id: string; 
+    service_id?: string;
     profiles?: {
         full_name: string;
         avatar_url: string | null;
     } | null;
     services: {
+        id?: string;
         name: string;
         duration_minutes: number;
         price: number;

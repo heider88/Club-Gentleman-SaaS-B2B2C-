@@ -130,11 +130,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             customer_phone,
             status,
             barber_id,
+            service_id,
             profiles (
                 full_name,
                 avatar_url
             ),
             services (
+                id,
                 name,
                 duration_minutes,
                 price
