@@ -8,6 +8,8 @@ import { toast } from "sonner"
 import { format, parse } from "date-fns"
 import { useRouter } from "next/navigation"
 
+import { createAppointmentAction } from "@/app/actions/appointments"
+
 export function InternalBookingModal({ barberId }: { barberId: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const [services, setServices] = useState<any[]>([])
@@ -47,26 +49,24 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
         // El formato de selectedTime viene del CalendarView ("h:mm a") (ej: "3:30 PM")
         // Usaremos parse de date-fns para reconstruir la fecha
         const startDateTime = parse(selectedTime, 'h:mm a', selectedDate)
-        
         const endDateTime = new Date(startDateTime.getTime() + (selectedService.duration_minutes as number) * 60000)
 
-        const { error } = await supabase.from('appointments').insert([{
-            barber_id: barberId,
-            service_id: selectedService.id,
-            customer_name: customerName || "Cliente",
-            customer_phone: customerPhone || "N/A",
-            customer_email: customerEmail || "local@barberia.app",
-            start_time: startDateTime.toISOString(),
-            end_time: endDateTime.toISOString(),
-            status: 'pending'
-        }])
+        const result = await createAppointmentAction({
+            barberId: barberId,
+            serviceId: selectedService.id,
+            customerName: customerName || "Cliente",
+            customerPhone: customerPhone || "N/A",
+            customerEmail: customerEmail || "local@barberia.app",
+            startTime: startDateTime.toISOString(),
+            endTime: endDateTime.toISOString()
+        })
 
         setIsSaving(false)
 
-        if (error) {
-            toast.error("No se pudo agendar la cita.", { description: error.message })
+        if (!result.success) {
+            toast.error("No se pudo agendar la cita.", { description: result.error })
         } else {
-            toast.success("Cita agregada a la agenda.")
+            toast.success("Cita agregada a la agenda y correo enviado.")
             setIsOpen(false)
             resetForm()
             router.refresh()

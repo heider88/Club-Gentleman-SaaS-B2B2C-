@@ -8,6 +8,8 @@ import { toast } from "sonner"
 import { format, parse } from "date-fns"
 import { useRouter } from "next/navigation"
 
+import { createAppointmentAction } from "@/app/actions/appointments"
+
 export function AdminBookingModal() {
     const [isOpen, setIsOpen] = useState(false)
     
@@ -67,23 +69,22 @@ export function AdminBookingModal() {
         const startDateTime = parse(selectedTime, 'h:mm a', selectedDate)
         const endDateTime = new Date(startDateTime.getTime() + (selectedService.duration_minutes as number) * 60000)
 
-        const { error } = await supabase.from('appointments').insert([{
-            barber_id: selectedBarberId,
-            service_id: selectedService.id,
-            customer_name: customerName || "Cliente",
-            customer_phone: customerPhone || "N/A",
-            customer_email: customerEmail || "local@barberia.app",
-            start_time: startDateTime.toISOString(),
-            end_time: endDateTime.toISOString(),
-            status: 'pending'
-        }])
+        const result = await createAppointmentAction({
+            barberId: selectedBarberId,
+            serviceId: selectedService.id,
+            customerName: customerName || "Cliente",
+            customerPhone: customerPhone || "N/A",
+            customerEmail: customerEmail || "local@barberia.app",
+            startTime: startDateTime.toISOString(),
+            endTime: endDateTime.toISOString()
+        })
 
         setIsSaving(false)
 
-        if (error) {
-            toast.error("No se pudo agendar la cita.", { description: error.message })
+        if (!result.success) {
+            toast.error("No se pudo agendar la cita.", { description: result.error })
         } else {
-            toast.success("Cita agregada a la agenda general.")
+            toast.success("Cita agregada a la agenda general y correo enviado.")
             setIsOpen(false)
             resetForm()
             router.refresh()
