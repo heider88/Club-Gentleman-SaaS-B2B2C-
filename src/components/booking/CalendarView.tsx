@@ -55,10 +55,10 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         }
     }
 
-    // Fechas siguientes (14 días)
+    // Fechas siguientes (45 días = mes y medio)
     const days = useMemo(() => {
         const daysArr = []
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < 45; i++) {
             daysArr.push(addDays(new Date(), i))
         }
         return daysArr
@@ -72,9 +72,9 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             setLoading(true);
             setError(null);
             
-            // Calculamos el rango desde hoy hasta 14 días adelante
+            // Calculamos el rango desde hoy hasta 45 días adelante
             const startRangeStr = startOfDay(new Date()).toISOString();
-            const endRangeStr = endOfDay(addDays(new Date(), 14)).toISOString();
+            const endRangeStr = endOfDay(addDays(new Date(), 45)).toISOString();
 
             try {
                 const response = await getBarberAvailabilityData(barberId, startRangeStr, endRangeStr);
