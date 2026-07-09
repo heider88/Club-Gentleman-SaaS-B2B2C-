@@ -6,6 +6,7 @@ import { es } from "date-fns/locale"
 import { motion } from "framer-motion"
 import { ChevronRight, CalendarX2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { parseTimeSetting } from "@/lib/availability"
 
 interface TimeSlot {
     time: string;
@@ -13,10 +14,10 @@ interface TimeSlot {
 }
 
 interface ScheduleSettings {
-    startHour: number;
-    endHour: number;
-    lunchStart: number;
-    lunchEnd: number;
+    startHour: string | number;
+    endHour: string | number;
+    lunchStart: string | number;
+    lunchEnd: string | number;
     workDays: number[];
 }
 
@@ -84,7 +85,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                 ]);
 
                 // Fallback de seguridad extrema si el barbero aún no tiene configurado un horario
-                const defaultFallbackSettings: ScheduleSettings = { startHour: 9, endHour: 19, lunchStart: 13, lunchEnd: 14, workDays: [1, 2, 3, 4, 5, 6] };
+                const defaultFallbackSettings: ScheduleSettings = { startHour: "09:00", endHour: "19:00", lunchStart: "13:00", lunchEnd: "14:00", workDays: [1, 2, 3, 4, 5, 6] };
                 const settings = barberProfileRes.data?.schedule_settings || defaultFallbackSettings;
 
                 if (appointmentsRes.error) throw appointmentsRes.error;
@@ -115,10 +116,12 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
         const isColliding = (slotStart: Date, slotEnd: Date) => {
             // Check lunch
+            const ls = parseTimeSetting(scheduleSettings.lunchStart);
+            const le = parseTimeSetting(scheduleSettings.lunchEnd);
             const lunchStart = new Date(selectedDate);
-            lunchStart.setHours(scheduleSettings.lunchStart, 0, 0, 0);
+            lunchStart.setHours(ls.hours, ls.minutes, 0, 0);
             const lunchEnd = new Date(selectedDate);
-            lunchEnd.setHours(scheduleSettings.lunchEnd, 0, 0, 0);
+            lunchEnd.setHours(le.hours, le.minutes, 0, 0);
 
             if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
 
@@ -143,9 +146,12 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         }
 
         let current = new Date(selectedDate);
-        current.setHours(scheduleSettings.startHour, 0, 0, 0);
+        const sh = parseTimeSetting(scheduleSettings.startHour);
+        const eh = parseTimeSetting(scheduleSettings.endHour);
+        
+        current.setHours(sh.hours, sh.minutes, 0, 0);
         const endTime = new Date(selectedDate);
-        endTime.setHours(scheduleSettings.endHour, 0, 0, 0);
+        endTime.setHours(eh.hours, eh.minutes, 0, 0);
 
         const dayOfWeek = selectedDate.getDay();
         if (!scheduleSettings.workDays.includes(dayOfWeek)) {

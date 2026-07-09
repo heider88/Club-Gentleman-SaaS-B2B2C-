@@ -7,11 +7,11 @@ export type Json =
     | Json[]
 
 export interface ScheduleSettings {
-    workDays: number[];
-    startHour: number;
-    endHour: number;
-    lunchStart: number;
-    lunchEnd: number;
+    startHour: string | number
+    endHour: string | number
+    lunchStart: string | number
+    lunchEnd: string | number
+    workDays: number[]
 }
 
 export interface Database {

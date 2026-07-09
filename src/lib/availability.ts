@@ -6,18 +6,18 @@ export interface TimeSlot {
 }
 
 export interface ScheduleSettings {
-    startHour: number
-    endHour: number
-    lunchStart: number
-    lunchEnd: number
+    startHour: string | number
+    endHour: string | number
+    lunchStart: string | number
+    lunchEnd: string | number
     workDays: number[] // 0=Sun, 1=Mon, etc.
 }
 
 export const DEFAULT_SCHEDULE: ScheduleSettings = {
-    startHour: 9,
-    endHour: 19,
-    lunchStart: 13,
-    lunchEnd: 14,
+    startHour: "09:00",
+    endHour: "19:00",
+    lunchStart: "13:00",
+    lunchEnd: "14:00",
     workDays: [1, 2, 3, 4, 5, 6] // Mon-Sat
 }
 
@@ -25,6 +25,26 @@ export const DEFAULT_SCHEDULE: ScheduleSettings = {
 export interface OccupiedBlock {
     start: Date;
     end: Date;
+}
+
+export function parseTimeSetting(val: string | number): { hours: number, minutes: number } {
+    if (typeof val === 'number') {
+        const hours = Math.floor(val);
+        const minutes = Math.round((val - hours) * 60);
+        return { hours, minutes };
+    }
+    if (typeof val === 'string') {
+        const [h, m] = val.split(':').map(Number);
+        return { hours: h || 0, minutes: m || 0 };
+    }
+    return { hours: 0, minutes: 0 };
+}
+
+export function formatTimeInput(val: string | number): string {
+    if (typeof val === 'string') return val;
+    const h = Math.floor(val);
+    const m = Math.round((val - h) * 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
 /**
@@ -51,17 +71,22 @@ export function generateTimeSlots(
     }
 
     // 2. Setup start/end times for the day
+    const start = parseTimeSetting(schedule.startHour)
+    const end = parseTimeSetting(schedule.endHour)
+    const lStart = parseTimeSetting(schedule.lunchStart)
+    const lEnd = parseTimeSetting(schedule.lunchEnd)
+
     let currentTime = new Date(date)
-    currentTime.setHours(schedule.startHour, 0, 0, 0)
+    currentTime.setHours(start.hours, start.minutes, 0, 0)
 
     const endTime = new Date(date)
-    endTime.setHours(schedule.endHour, 0, 0, 0)
+    endTime.setHours(end.hours, end.minutes, 0, 0)
 
     const lunchStart = new Date(date)
-    lunchStart.setHours(schedule.lunchStart, 0, 0, 0)
+    lunchStart.setHours(lStart.hours, lStart.minutes, 0, 0)
     
     const lunchEnd = new Date(date)
-    lunchEnd.setHours(schedule.lunchEnd, 0, 0, 0)
+    lunchEnd.setHours(lEnd.hours, lEnd.minutes, 0, 0)
 
     // Grid step in minutes. Can be adjusted to 15 or 30.
     const stepMinutes = 30

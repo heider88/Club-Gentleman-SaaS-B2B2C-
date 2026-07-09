@@ -5,21 +5,23 @@ import { toast } from "sonner"
 import { Save } from "lucide-react"
 import { updateBarberProfile } from "@/app/actions/admin"
 
+import { formatTimeInput } from "@/lib/availability"
+
 // Types for Schedule Settings JSONB
 export interface ScheduleSettings {
     workDays: number[] // 0 = Domingo, 1 = Lunes...
-    startHour: number  // 9 = 9:00 AM
-    endHour: number    // 19 = 7:00 PM
-    lunchStart: number
-    lunchEnd: number
+    startHour: string | number
+    endHour: string | number
+    lunchStart: string | number
+    lunchEnd: string | number
 }
 
 const DEFAULT_SCHEDULE: ScheduleSettings = {
     workDays: [1, 2, 3, 4, 5, 6],
-    startHour: 9,
-    endHour: 19,
-    lunchStart: 13,
-    lunchEnd: 14
+    startHour: "09:00",
+    endHour: "19:00",
+    lunchStart: "13:00",
+    lunchEnd: "14:00"
 }
 
 const DAYS = [
@@ -48,9 +50,9 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
         }))
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
-        setSettings(prev => ({ ...prev, [name]: parseInt(value) }))
+        setSettings(prev => ({ ...prev, [name]: value }))
     }
 
     const handleSave = async () => {
@@ -89,27 +91,19 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Hora Inicio</label>
-                    <select name="startHour" value={settings.startHour} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none">
-                        {[...Array(24)].map((_, i) => <option key={`start-${i}`} value={i}>{i.toString().padStart(2, '0')}:00</option>)}
-                    </select>
+                    <input type="time" name="startHour" value={formatTimeInput(settings.startHour)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Hora Fin</label>
-                    <select name="endHour" value={settings.endHour} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none">
-                        {[...Array(24)].map((_, i) => <option key={`end-${i}`} value={i}>{i.toString().padStart(2, '0')}:00</option>)}
-                    </select>
+                    <input type="time" name="endHour" value={formatTimeInput(settings.endHour)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 text-orange-400">Inicio Almuerzo</label>
-                    <select name="lunchStart" value={settings.lunchStart} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none">
-                        {[...Array(24)].map((_, i) => <option key={`lunchS-${i}`} value={i}>{i.toString().padStart(2, '0')}:00</option>)}
-                    </select>
+                    <input type="time" name="lunchStart" value={formatTimeInput(settings.lunchStart)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1 text-orange-400">Fin Almuerzo</label>
-                    <select name="lunchEnd" value={settings.lunchEnd} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary appearance-none">
-                        {[...Array(24)].map((_, i) => <option key={`lunchE-${i}`} value={i}>{i.toString().padStart(2, '0')}:00</option>)}
-                    </select>
+                    <input type="time" name="lunchEnd" value={formatTimeInput(settings.lunchEnd)} onChange={handleChange} className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white outline-none focus:border-primary" />
                 </div>
             </div>
 

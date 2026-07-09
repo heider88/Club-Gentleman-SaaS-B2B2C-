@@ -340,7 +340,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         let totalSalesGenerated = 0;
 
         const comisionesData = barbers.map(barber => {
-            const barberAppts = completedAppts.filter(a => a.barber_id === barber.id && (a.services?.price || 0) > 0)
+            const barberAppts = completedAppts.filter(a => a.barber_id === barber.id)
             let totalRevenue = 0
             barberAppts.forEach(a => totalRevenue += (a.services?.price || 0))
             const commPercent = barber.commission_percentage || 50
@@ -961,7 +961,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         
         // Calculate data per collaborator
         const collaboratorData = barbers.map(barber => {
-            const barberAppts = validAppts.filter(a => a.barber_id === barber.id && (a.services?.price || 0) > 0)
+            const barberAppts = validAppts.filter(a => a.barber_id === barber.id)
             const count = barberAppts.length
             return {
                 id: barber.id,

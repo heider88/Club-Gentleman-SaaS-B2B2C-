@@ -5,21 +5,22 @@ import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 import { toast } from "sonner"
 import { Camera, Save, Clock, CalendarDays, Phone } from "lucide-react"
+import { formatTimeInput } from "@/lib/availability"
 
 type ScheduleSettings = {
     workDays: number[];
-    startHour: number;
-    endHour: number;
-    lunchStart: number;
-    lunchEnd: number;
+    startHour: string | number;
+    endHour: string | number;
+    lunchStart: string | number;
+    lunchEnd: string | number;
 }
 
 const DEFAULT_SCHEDULE: ScheduleSettings = {
     workDays: [1, 2, 3, 4, 5, 6],
-    startHour: 9,
-    endHour: 19,
-    lunchStart: 13,
-    lunchEnd: 14
+    startHour: "09:00",
+    endHour: "19:00",
+    lunchStart: "13:00",
+    lunchEnd: "14:00"
 }
 
 const DAYS_MAP = [
@@ -336,22 +337,20 @@ export default function ProfilePage() {
                                     <h4 className="text-[10px] font-bold uppercase tracking-widest text-dash-text-soft border-l-2 border-white pl-3">Jornada General</h4>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Apertura (Hora Militar)</label>
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Apertura</label>
                                         <input
-                                            type="number" 
-                                            min="0" max="23"
-                                            value={schedule.startHour}
-                                            onChange={e => setSchedule(s => ({ ...s, startHour: parseInt(e.target.value) || 0 }))}
+                                            type="time" 
+                                            value={formatTimeInput(schedule.startHour)}
+                                            onChange={e => setSchedule(s => ({ ...s, startHour: e.target.value }))}
                                             className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text font-oswald text-lg outline-none focus:border-white/50 transition-colors"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Cierre (Hora Militar)</label>
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Cierre</label>
                                         <input
-                                            type="number"
-                                            min="1" max="24"
-                                            value={schedule.endHour}
-                                            onChange={e => setSchedule(s => ({ ...s, endHour: parseInt(e.target.value) || 0 }))}
+                                            type="time"
+                                            value={formatTimeInput(schedule.endHour)}
+                                            onChange={e => setSchedule(s => ({ ...s, endHour: e.target.value }))}
                                             className="w-full p-3 bg-dash-bg border border-dash-border text-dash-text font-oswald text-lg outline-none focus:border-white/50 transition-colors"
                                         />
                                     </div>
@@ -362,22 +361,20 @@ export default function ProfilePage() {
                                     <h4 className="text-[10px] font-bold uppercase tracking-widest text-red-500/80 border-l-2 border-red-500/50 pl-3">Descanso de Barberos</h4>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Inicio Almuerzo (Hora)</label>
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Inicio Almuerzo</label>
                                         <input
-                                            type="number"
-                                            min="0" max="23"
-                                            value={schedule.lunchStart}
-                                            onChange={e => setSchedule(s => ({ ...s, lunchStart: parseInt(e.target.value) || 0 }))}
+                                            type="time"
+                                            value={formatTimeInput(schedule.lunchStart)}
+                                            onChange={e => setSchedule(s => ({ ...s, lunchStart: e.target.value }))}
                                             className="w-full p-3 bg-dash-bg border border-dash-border focus:border-red-500/50 text-dash-text font-oswald text-lg outline-none transition-colors"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Fin Almuerzo (Hora)</label>
+                                        <label className="text-[10px] text-dash-text-muted uppercase tracking-widest font-bold">Fin Almuerzo</label>
                                         <input
-                                            type="number"
-                                            min="1" max="24"
-                                            value={schedule.lunchEnd}
-                                            onChange={e => setSchedule(s => ({ ...s, lunchEnd: parseInt(e.target.value) || 0 }))}
+                                            type="time"
+                                            value={formatTimeInput(schedule.lunchEnd)}
+                                            onChange={e => setSchedule(s => ({ ...s, lunchEnd: e.target.value }))}
                                             className="w-full p-3 bg-dash-bg border border-dash-border focus:border-red-500/50 text-dash-text font-oswald text-lg outline-none transition-colors"
                                         />
                                     </div>

@@ -59,7 +59,7 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         if (profileError || !barberProfile) return { success: false, error: "Profesional no encontrado." };
 
         const schedule = barberProfile.schedule_settings as {
-            workDays: number[], startHour: number, endHour: number, lunchStart: number, lunchEnd: number
+            workDays: number[], startHour: string|number, endHour: string|number, lunchStart: string|number, lunchEnd: string|number
         };
 
         const startDateUTC = new Date(validated.data.startTime);
@@ -86,16 +86,27 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         const dayOfWeek = bogotaDate.getDay();
         const startHourNum = bogotaDate.getHours() + (bogotaDate.getMinutes() / 60);
 
+        const parseToNum = (val: string | number) => {
+            if (typeof val === 'number') return val;
+            const [h, m] = val.split(':').map(Number);
+            return (h || 0) + (m || 0)/60;
+        }
+
+        const sStart = parseToNum(schedule.startHour);
+        const sEnd = parseToNum(schedule.endHour);
+        const lStart = parseToNum(schedule.lunchStart);
+        const lEnd = parseToNum(schedule.lunchEnd);
+
         // ¿Es día laboral?
         if (!schedule.workDays.includes(dayOfWeek)) {
             return { success: false, error: "El profesional no trabaja en este día de la semana." };
         }
 
         // ¿Está dentro del horario y fuera del almuerzo?
-        if (startHourNum < schedule.startHour || startHourNum >= schedule.endHour) {
+        if (startHourNum < sStart || startHourNum >= sEnd) {
             return { success: false, error: "El horario seleccionado está fuera del horario laboral." };
         }
-        if (startHourNum >= schedule.lunchStart && startHourNum < schedule.lunchEnd) {
+        if (startHourNum >= lStart && startHourNum < lEnd) {
             return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
         }
 
