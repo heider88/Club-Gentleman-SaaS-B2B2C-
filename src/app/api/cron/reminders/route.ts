@@ -63,12 +63,14 @@ export async function GET(request: Request) {
                         })
                     );
 
-                    const { error: resendError } = await mailClient.emails.send({
+                    const response = await mailClient.emails.send({
                         from: EMAIL_FROM,
                         to: appt.customer_email,
                         subject: `⏰ Recordatorio de tu cita para hoy - Club Gentleman`,
                         html: emailHtml,
-                    }).then(() => ({ error: null })).catch((err) => ({ error: err }));
+                    }).catch((err) => ({ error: err, data: null }));
+                    
+                    const resendError = response.error;
 
                     if (resendError) {
                         console.error(`Fallo enviando recordatorio a ${appt.customer_email}:`, resendError);
