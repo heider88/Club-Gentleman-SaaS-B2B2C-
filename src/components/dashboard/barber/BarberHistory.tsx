@@ -39,19 +39,44 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
     useEffect(() => {
         const fetchHistoryData = async () => {
             setLoading(true)
+            
+            // Timezone fix para Bogotá
             const now = new Date()
-            let startStr = ""
-            let endStr = ""
+            const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Bogota',
+                year: 'numeric', month: 'numeric', day: 'numeric',
+            });
+            const parts = bogotaFormatter.formatToParts(now);
+            const b: any = {};
+            parts.forEach(p => b[p.type] = p.value);
+            const yyyy = Number(b.year);
+            const mm = Number(b.month) - 1;
+            const dd = Number(b.day);
+            
+            let queryStart = "";
+            let queryEnd = "";
 
             if (filter === 'daily') {
-                startStr = startOfDay(now).toISOString()
-                endStr = endOfDay(now).toISOString()
+                const dateStr = `${yyyy}-${String(mm + 1).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+                queryStart = `${dateStr}T05:00:00.000Z`;
+                queryEnd = new Date(new Date(queryStart).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
             } else if (filter === 'weekly') {
-                startStr = startOfWeek(now, { weekStartsOn: 1 }).toISOString()
-                endStr = endOfWeek(now, { weekStartsOn: 1 }).toISOString()
+                const d = new Date(yyyy, mm, dd);
+                const dow = d.getDay();
+                const diff = d.getDate() - dow + (dow === 0 ? -6 : 1);
+                
+                const monday = new Date(d.setDate(diff));
+                const dateStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+                
+                queryStart = `${dateStr}T05:00:00.000Z`;
+                queryEnd = new Date(new Date(queryStart).getTime() + (7 * 24 * 60 * 60 * 1000) - 1).toISOString();
             } else if (filter === 'monthly') {
-                startStr = startOfMonth(now).toISOString()
-                endStr = endOfMonth(now).toISOString()
+                const firstDayStr = `${yyyy}-${String(mm + 1).padStart(2, '0')}-01`;
+                queryStart = `${firstDayStr}T05:00:00.000Z`;
+                
+                const lastDay = new Date(yyyy, mm + 1, 0); 
+                const lastDayStr = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+                queryEnd = new Date(new Date(`${lastDayStr}T05:00:00.000Z`).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
             }
 
             const { data, error } = await supabase
@@ -60,12 +85,13 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                     id, 
                     start_time, 
                     customer_name, 
-                    services(name, price)
+                    customer_phone,
+                    status,
+                    services (name, price)
                 `)
                 .eq('barber_id', barberId)
-                .eq('status', apptStatus)
-                .gte('start_time', startStr)
-                .lte('start_time', endStr)
+                .gte('start_time', queryStart)
+                .lte('start_time', queryEnd)
                 .order('start_time', { ascending: false })
 
             if (error) {
