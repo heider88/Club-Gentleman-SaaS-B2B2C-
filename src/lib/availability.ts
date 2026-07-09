@@ -7,7 +7,7 @@ export interface TimeSlot {
 
 export interface ScheduleSettings {
     workDays: number[] // 0=Sun, 1=Mon, etc.
-    disabledSlots?: string[] // "HH:mm" formatted disabled 15-min slots
+    disabledSlots?: Record<number, string[]> | string[] // "HH:mm" formatted disabled 15-min slots
     startHour?: string | number // Kept for backward compatibility
     endHour?: string | number
     lunchStart?: string | number
@@ -16,7 +16,7 @@ export interface ScheduleSettings {
 
 export const DEFAULT_SCHEDULE: ScheduleSettings = {
     workDays: [1, 2, 3, 4, 5, 6], // Mon-Sat
-    disabledSlots: []
+    disabledSlots: {}
 }
 
 // Represent an occupied block of time (either an appointment or manual block)
@@ -97,14 +97,23 @@ export function generateTimeSlots(
 
     // Check if slot string (HH:mm) is manually disabled by admin
     const isDisabledManually = (slotStart: Date, slotEnd: Date) => {
-        if (!schedule.disabledSlots || schedule.disabledSlots.length === 0) return false;
+        if (!schedule.disabledSlots) return false;
+        
+        let disabledForDay: string[] = [];
+        if (Array.isArray(schedule.disabledSlots)) {
+            disabledForDay = schedule.disabledSlots;
+        } else {
+            disabledForDay = schedule.disabledSlots[dayOfWeek] || [];
+        }
+
+        if (disabledForDay.length === 0) return false;
 
         // A service might span multiple 15-minute intervals. 
         // We need to check if ANY 15-minute block within the service duration is disabled.
         let checkTime = new Date(slotStart);
         while (checkTime < slotEnd) {
             const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
-            if (schedule.disabledSlots.includes(timeString)) {
+            if (disabledForDay.includes(timeString)) {
                 return true;
             }
             checkTime = addMinutes(checkTime, 15);

@@ -19,7 +19,7 @@ interface ScheduleSettings {
     lunchStart?: string | number;
     lunchEnd?: string | number;
     workDays: number[];
-    disabledSlots?: string[];
+    disabledSlots?: Record<number, string[]> | string[];
 }
 
 interface CalendarViewProps {
@@ -117,11 +117,20 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
         const isColliding = (slotStart: Date, slotEnd: Date) => {
             // Check manual disabled slots
-            if (scheduleSettings.disabledSlots && scheduleSettings.disabledSlots.length > 0) {
+            let disabledForDay: string[] = [];
+            if (scheduleSettings.disabledSlots) {
+                if (Array.isArray(scheduleSettings.disabledSlots)) {
+                    disabledForDay = scheduleSettings.disabledSlots;
+                } else {
+                    disabledForDay = scheduleSettings.disabledSlots[selectedDate.getDay()] || [];
+                }
+            }
+
+            if (disabledForDay.length > 0) {
                 let checkTime = new Date(slotStart);
                 while (isBefore(checkTime, slotEnd)) {
                     const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
-                    if (scheduleSettings.disabledSlots.includes(timeString)) {
+                    if (disabledForDay.includes(timeString)) {
                         return true;
                     }
                     checkTime = addMinutes(checkTime, 15);
