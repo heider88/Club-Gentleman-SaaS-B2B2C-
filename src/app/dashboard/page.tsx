@@ -52,54 +52,71 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     const barberName = profile?.full_name?.split(' ')[0] || 'Barbero'
     const userRole = profile?.role || 'barber'
 
-    // 4. Fechas exactas del "Día Seleccionado"
+    // 4. Fechas exactas del "Día Seleccionado" ajustadas a la Zona Horaria de Bogotá (UTC-5)
     const params = await searchParams;
-    let selectedDate = new Date();
-    
-    // Convert to timezone-independent local string YYYY-MM-DD
-    const yyyy = selectedDate.getFullYear();
-    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(selectedDate.getDate()).padStart(2, '0');
-    let dateStr = `${yyyy}-${mm}-${dd}`;
+    let dateStr = "";
 
     if (params.date) {
         dateStr = params.date;
-        const [year, month, day] = dateStr.split('-').map(Number);
-        selectedDate = new Date(year, month - 1, day);
+    } else {
+        const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Bogota',
+            year: 'numeric', month: 'numeric', day: 'numeric',
+        });
+        const parts = bogotaFormatter.formatToParts(new Date());
+        const b: any = {};
+        parts.forEach(p => b[p.type] = p.value);
+        dateStr = `${b.year}-${b.month.padStart(2, '0')}-${b.day.padStart(2, '0')}`;
     }
-    
-    const startStr = startOfDay(selectedDate).toISOString()
-    const endStr = endOfDay(selectedDate).toISOString()
 
-    // 5. Consulta Supabase
-    // OJO: Si eres 'admin', mostramos las citas de TODOS los barberos.
-    // Además, el admin puede tener un filtro extra `view` para día/semana/mes.
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day);
+
+    // En Bogotá (UTC-5), el día comienza a las 05:00:00 UTC y termina a las 04:59:59 del día siguiente
+    let queryStart = `${dateStr}T05:00:00.000Z`;
+    let endMs = new Date(queryStart).getTime() + (24 * 60 * 60 * 1000) - 1;
+    let queryEnd = new Date(endMs).toISOString();
+
     const view = params.view || 'daily';
-    let queryStart = startStr;
-    let queryEnd = endStr;
 
     if (userRole === 'admin') {
         if (view === 'weekly') {
-            // Asume que la semana empieza el lunes (1)
-            const d = new Date(selectedDate);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+            const d = new Date(year, month - 1, day);
+            const dow = d.getDay();
+            const diff = d.getDate() - dow + (dow === 0 ? -6 : 1);
+            
             const monday = new Date(d.setDate(diff));
-            monday.setHours(0,0,0,0);
+            const yyyyM = monday.getFullYear();
+            const mmM = String(monday.getMonth() + 1).padStart(2, '0');
+            const ddM = String(monday.getDate()).padStart(2, '0');
+            
+            queryStart = `${yyyyM}-${mmM}-${ddM}T05:00:00.000Z`;
             
             const sunday = new Date(monday);
             sunday.setDate(monday.getDate() + 6);
-            sunday.setHours(23,59,59,999);
+            const yyyyS = sunday.getFullYear();
+            const mmS = String(sunday.getMonth() + 1).padStart(2, '0');
+            const ddS = String(sunday.getDate()).padStart(2, '0');
             
-            queryStart = monday.toISOString();
-            queryEnd = sunday.toISOString();
+            const sundayStart = `${yyyyS}-${mmS}-${ddS}T05:00:00.000Z`;
+            queryEnd = new Date(new Date(sundayStart).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
+            
         } else if (view === 'monthly') {
-            const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-            const lastDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-            lastDay.setHours(23,59,59,999);
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0); 
             
-            queryStart = firstDay.toISOString();
-            queryEnd = lastDay.toISOString();
+            const yyyyF = firstDay.getFullYear();
+            const mmF = String(firstDay.getMonth() + 1).padStart(2, '0');
+            const ddF = String(firstDay.getDate()).padStart(2, '0');
+            
+            queryStart = `${yyyyF}-${mmF}-${ddF}T05:00:00.000Z`;
+            
+            const yyyyL = lastDay.getFullYear();
+            const mmL = String(lastDay.getMonth() + 1).padStart(2, '0');
+            const ddL = String(lastDay.getDate()).padStart(2, '0');
+            
+            const lastDayStart = `${yyyyL}-${mmL}-${ddL}T05:00:00.000Z`;
+            queryEnd = new Date(new Date(lastDayStart).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
         }
     }
 
