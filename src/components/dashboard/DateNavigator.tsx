@@ -4,13 +4,14 @@ import { format, addDays, subDays, addWeeks, subWeeks, addMonths, subMonths } fr
 import { es } from "date-fns/locale"
 import { ChevronLeft, ChevronRight, CalendarDays, Loader2 } from "lucide-react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useTransition } from "react"
+import { useTransition, useRef } from "react"
 
 export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [isPending, startTransition] = useTransition()
+    const dateInputRef = useRef<HTMLInputElement>(null)
     
     const view = searchParams.get('view') || 'daily'
 
@@ -93,19 +94,23 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
                 <ChevronLeft className="w-5 h-5" />
             </button>
             
-            <label className={`relative px-4 py-2 flex items-center justify-center gap-2 min-w-[240px] transition-opacity cursor-pointer hover:bg-white/5 rounded-lg group ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            <button 
+                onClick={() => {
+                    if (dateInputRef.current && 'showPicker' in HTMLInputElement.prototype) {
+                        try { dateInputRef.current.showPicker(); } catch (e) {}
+                    }
+                }}
+                disabled={isPending}
+                className={`relative px-4 py-2 flex items-center justify-center gap-2 min-w-[240px] transition-opacity cursor-pointer hover:bg-white/5 rounded-lg group ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+            >
                 {/* Input de tipo fecha (nativo) invisible superpuesto */}
                 <input 
+                    ref={dateInputRef}
                     type="date" 
                     value={currentDateStr}
                     onChange={handleDateChange}
-                    onClick={(e) => {
-                        // Fuerza a que el calendario se abra al dar clic en la computadora
-                        if ('showPicker' in HTMLInputElement.prototype) {
-                            try { e.currentTarget.showPicker(); } catch (err) {}
-                        }
-                    }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    className="absolute w-0 h-0 opacity-0 overflow-hidden"
+                    style={{ border: 'none', padding: 0, margin: 0 }}
                 />
                 
                 {isPending ? (
@@ -116,7 +121,7 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
                 <span className="text-sm font-bold uppercase tracking-widest text-dash-text group-hover:text-primary transition-colors">
                     {displayLabel}
                 </span>
-            </label>
+            </button>
 
             <button 
                 onClick={handleNextDay}
