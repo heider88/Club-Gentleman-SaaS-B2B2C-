@@ -134,7 +134,7 @@ export function BarberScheduleManager({ barberId, initialSettings }: { barberId:
     if (start.hours <= end.hours) {
         while (current <= endTime) {
             daySlots.push(`${current.getHours().toString().padStart(2, '0')}:${current.getMinutes().toString().padStart(2, '0')}`)
-            current.setMinutes(current.getMinutes() + 15)
+            current.setMinutes(current.getMinutes() + 5)
         }
     }
 
