@@ -63,7 +63,7 @@ export async function GET(request: Request) {
                         })
                     );
 
-                    const { error: resendError } = await mailClient.sendMail({
+                    const { error: resendError } = await mailClient.emails.send({
                         from: EMAIL_FROM,
                         to: appt.customer_email,
                         subject: `⏰ Recordatorio de tu cita para hoy - Club Gentleman`,

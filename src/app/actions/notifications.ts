@@ -65,7 +65,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         );
 
         console.log("Despachando correo...");
-        const { error } = await mailClient.sendMail({
+        const { error } = await mailClient.emails.send({
             from: EMAIL_FROM,
             to: payload.email,
             subject: `Confirmación de cita - ${payload.serviceName}`,
@@ -75,7 +75,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         // ---- 2. ENVÍO DE CORREO AL ADMINISTRADOR (BARBERÍA) ----
         console.log("Despachando correo de aviso al administrador...");
         const adminEmail = process.env.ADMIN_EMAIL || "clubgentleman156@gmail.com";
-        const { error: adminError } = await mailClient.sendMail({
+        const { error: adminError } = await mailClient.emails.send({
             from: EMAIL_FROM,
             to: adminEmail,
             subject: `🎉 NUEVA RESERVA: ${payload.customerName} - ${payload.date} ${payload.time}`,
@@ -134,7 +134,7 @@ export async function sendRescheduleNotifications(payload: BookingNotificationPa
         );
 
         console.log("Despachando correo...");
-        const { error } = await mailClient.sendMail({
+        const { error } = await mailClient.emails.send({
             from: EMAIL_FROM,
             to: payload.email,
             subject: `Cita Reagendada - ${payload.serviceName}`,
@@ -143,7 +143,7 @@ export async function sendRescheduleNotifications(payload: BookingNotificationPa
 
         console.log("Despachando correo de aviso al administrador...");
         const adminEmail = process.env.ADMIN_EMAIL || "clubgentleman156@gmail.com";
-        const { error: adminError } = await mailClient.sendMail({
+        const { error: adminError } = await mailClient.emails.send({
             from: EMAIL_FROM,
             to: adminEmail,
             subject: `🔄 CITA REAGENDADA: ${payload.customerName} - Nueva fecha: ${payload.date} ${payload.time}`,
