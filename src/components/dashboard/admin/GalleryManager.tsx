@@ -7,6 +7,7 @@ import Image from "next/image"
 import { addGalleryImage, deleteGalleryImage, uploadGalleryImageDirect } from "@/app/actions/gallery"
 
 import { useRouter } from "next/navigation"
+import imageCompression from 'browser-image-compression'
 
 export function GalleryManager({ initialImages }: { initialImages: any[] }) {
     const [images, setImages] = useState(initialImages)
@@ -46,11 +47,19 @@ export function GalleryManager({ initialImages }: { initialImages: any[] }) {
         }
 
         setIsUploading(true)
-        const toastId = toast.loading("Subiendo imagen...")
+        const toastId = toast.loading("Comprimiendo y subiendo imagen...")
 
         try {
+            // Compress image to save storage and bandwidth
+            const options = {
+                maxSizeMB: 0.5, // 500KB max for gallery to preserve decent quality
+                maxWidthOrHeight: 1200, 
+                useWebWorker: true
+            }
+            const compressedFile = await imageCompression(file, options)
+
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', compressedFile, file.name);
 
             const res = await uploadGalleryImageDirect(formData);
             

@@ -5,6 +5,7 @@ import { GalleryManager } from "./GalleryManager"
 import { saveSiteSettings, SiteSettingsPayload, uploadSectionImage } from "@/app/actions/settings"
 import { toast } from "sonner"
 import { HelpCircle, Save, Plus, Trash2, GripVertical, Image as ImageIcon, Link as LinkIcon, Instagram, Facebook } from "lucide-react"
+import imageCompression from 'browser-image-compression'
 
 export function BusinessSettingsTabs({ 
     initialSettings, 
@@ -469,10 +470,17 @@ export function BusinessSettingsTabs({
                                                     // Since BusinessSettings is a client component saving a JSON to DB, 
                                                     // we need to upload the image to Supabase Storage first.
                                                     
-                                                    const toastId = toast.loading("Subiendo imagen...");
+                                                    const toastId = toast.loading("Comprimiendo y subiendo imagen...");
                                                     try {
+                                                        const options = {
+                                                            maxSizeMB: 0.5, // 500KB Max
+                                                            maxWidthOrHeight: 1200,
+                                                            useWebWorker: true
+                                                        }
+                                                        const compressedFile = await imageCompression(file, options);
+
                                                         const formData = new FormData();
-                                                        formData.append("file", file);
+                                                        formData.append("file", compressedFile, file.name);
                                                         
                                                         const res = await uploadSectionImage(formData);
                                                         

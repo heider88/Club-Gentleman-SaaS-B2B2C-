@@ -33,6 +33,8 @@ const DAYS_MAP = [
     { label: "Sábado", value: 6 },
 ]
 
+import imageCompression from 'browser-image-compression';
+
 export default function ProfilePage() {
     const supabase = createClient()
     const [loading, setLoading] = useState(true)
@@ -113,10 +115,18 @@ export default function ProfilePage() {
         setUploading(true)
 
         try {
+            // Compress image before upload
+            const options = {
+                maxSizeMB: 0.3, // Compress to max 300KB
+                maxWidthOrHeight: 800, // Max dimension 800px (good for avatars)
+                useWebWorker: true
+            }
+            const compressedFile = await imageCompression(file, options)
+
             // Nota: Debemos tener un bucket public "avatars" configurado en Supabase
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
-                .upload(filePath, file)
+                .upload(filePath, compressedFile)
 
             if (uploadError) throw uploadError
 
