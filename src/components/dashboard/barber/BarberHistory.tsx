@@ -33,7 +33,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
     // Derived KPIs
     const totalRevenue = appointments.reduce((sum, a) => sum + (a.services?.price || 0), 0)
     const totalAppointments = appointments.length
-    totalRevenue * ((100 - commissionPercentage) / 100)
+    // const shopCut = totalRevenue * ((100 - commissionPercentage) / 100)
     const barberCut = totalRevenue * (commissionPercentage / 100)
 
     useEffect(() => {
