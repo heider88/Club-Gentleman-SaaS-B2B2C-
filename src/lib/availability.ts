@@ -93,7 +93,7 @@ export function generateTimeSlots(
     }
 
     // Grid step in minutes.
-    const stepMinutes = 15
+    const stepMinutes = 5
 
     // Check if slot string (HH:mm) is manually disabled by admin
     const isDisabledManually = (slotStart: Date, slotEnd: Date) => {
@@ -108,15 +108,15 @@ export function generateTimeSlots(
 
         if (disabledForDay.length === 0) return false;
 
-        // A service might span multiple 15-minute intervals. 
-        // We need to check if ANY 15-minute block within the service duration is disabled.
+        // A service might span multiple intervals. 
+        // We need to check if ANY 5-minute block within the service duration is disabled.
         let checkTime = new Date(slotStart);
         while (checkTime < slotEnd) {
             const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
             if (disabledForDay.includes(timeString)) {
                 return true;
             }
-            checkTime = addMinutes(checkTime, 15);
+            checkTime = addMinutes(checkTime, 5);
         }
         return false;
     }

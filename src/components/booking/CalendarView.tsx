@@ -133,7 +133,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                     if (disabledForDay.includes(timeString)) {
                         return true;
                     }
-                    checkTime = addMinutes(checkTime, 15);
+                    checkTime = addMinutes(checkTime, 5);
                 }
             }
 
@@ -203,7 +203,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                 });
             }
 
-            current = addMinutes(current, 15);
+            current = addMinutes(current, 5);
         }
 
         setSlots(generatedSlots)
