@@ -95,24 +95,13 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
         setLoadingAction('edit');
         try {
             const supabase = createClient();
-            
-            // 1. Get the new service details if it changed to calculate the new end_time
-            let newEndTime = appt.end_time;
-            if (editForm.service_id !== appt.service_id && availableServices.length > 0) {
-                const selectedService = availableServices.find(s => s.id === editForm.service_id);
-                if (selectedService) {
-                    const duration = selectedService.duration_minutes || 30;
-                    newEndTime = addMinutes(new Date(appt.start_time), duration).toISOString();
-                }
-            }
 
             const { error } = await supabase
                 .from('appointments')
                 .update({ 
                     customer_name: editForm.name.trim(),
                     customer_phone: editForm.phone.trim(),
-                    service_id: editForm.service_id,
-                    end_time: newEndTime
+                    service_id: editForm.service_id
                 })
                 .eq('id', appt.id);
                 
