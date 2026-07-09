@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { ChevronRight, CalendarX2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { parseTimeSetting } from "@/lib/availability"
+import { getBarberAvailabilityData } from "@/app/actions/appointments"
 
 interface TimeSlot {
     time: string;
@@ -70,31 +71,23 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         async function preloadData() {
             setLoading(true);
             setError(null);
-            const supabase = createClient();
             
             // Calculamos el rango desde hoy hasta 14 días adelante
             const startRangeStr = startOfDay(new Date()).toISOString();
             const endRangeStr = endOfDay(addDays(new Date(), 14)).toISOString();
 
             try {
-                // Promise.all para ejecutar consultas concurrentes
-                // 1. Obtener horario ESPECÍFICO del Barbero seleccionado
-                const [barberProfileRes, appointmentsRes, blocksRes] = await Promise.all([
-                    supabase.from('profiles').select('schedule_settings').eq('id', barberId).single(),
-                    supabase.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
-                    supabase.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
-                ]);
+                const response = await getBarberAvailabilityData(barberId, startRangeStr, endRangeStr);
+                
+                if (!response.success) throw new Error(response.error || "Error al cargar la disponibilidad");
 
                 // Fallback de seguridad extrema si el barbero aún no tiene configurado un horario
                 const defaultFallbackSettings: ScheduleSettings = { startHour: "09:00", endHour: "19:00", lunchStart: "13:00", lunchEnd: "14:00", workDays: [1, 2, 3, 4, 5, 6] };
-                const settings = barberProfileRes.data?.schedule_settings || defaultFallbackSettings;
-
-                if (appointmentsRes.error) throw appointmentsRes.error;
-                if (blocksRes.error) throw blocksRes.error;
+                const settings = response.schedule_settings || defaultFallbackSettings;
                 
                 setScheduleSettings(settings as ScheduleSettings);
-                setAllAppointments((appointmentsRes.data || []).filter(a => a.status !== 'cancelled'));
-                setAllBlocks(blocksRes.data || []);
+                setAllAppointments((response.appointments || []).filter((a: any) => a.status !== 'cancelled'));
+                setAllBlocks(response.blocks || []);
             }  
     catch (err: unknown) {
                 console.error("Error preloading data:", err);

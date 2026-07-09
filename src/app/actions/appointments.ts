@@ -201,6 +201,27 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
     }
 }
 
+export async function getBarberAvailabilityData(barberId: string, startRangeStr: string, endRangeStr: string) {
+    try {
+        const adminClient = createAdminClient();
+        const [barberProfileRes, appointmentsRes, blocksRes] = await Promise.all([
+            adminClient.from('profiles').select('schedule_settings').eq('id', barberId).single(),
+            adminClient.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
+            adminClient.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
+        ]);
+
+        return {
+            success: true,
+            schedule_settings: barberProfileRes.data?.schedule_settings || null,
+            appointments: appointmentsRes.data || [],
+            blocks: blocksRes.data || []
+        };
+    } catch (error) {
+        console.error("Error fetching availability data:", error);
+        return { success: false, error: "Error fetching availability" };
+    }
+}
+
 export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string, newBarberId?: string) {
     try {
         const { userId, role } = await getUserRole();
