@@ -76,8 +76,14 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
         displayLabel = format(currentDate, "MMMM yyyy", { locale: es });
     }
 
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.value) return;
+        const [y, m, d] = e.target.value.split('-').map(Number);
+        navigateToDate(new Date(y, m - 1, d));
+    }
+
     return (
-        <div className="flex items-center bg-dash-panel border border-dash-border rounded-xl p-1 shadow-sm w-fit">
+        <div className="flex items-center bg-dash-panel border border-dash-border rounded-xl p-1 shadow-sm w-fit relative">
             <button 
                 onClick={handlePrevDay}
                 disabled={isPending}
@@ -87,16 +93,24 @@ export function DateNavigator({ currentDateStr }: { currentDateStr: string }) {
                 <ChevronLeft className="w-5 h-5" />
             </button>
             
-            <div className={`px-4 py-2 flex items-center justify-center gap-2 min-w-[240px] transition-opacity ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+            <label className={`relative px-4 py-2 flex items-center justify-center gap-2 min-w-[240px] transition-opacity cursor-pointer hover:bg-white/5 rounded-lg group ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                {/* Input de tipo fecha (nativo) invisible superpuesto */}
+                <input 
+                    type="date" 
+                    value={currentDateStr}
+                    onChange={handleDateChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                
                 {isPending ? (
                     <Loader2 className="w-4 h-4 text-dash-text animate-spin" />
                 ) : (
-                    <CalendarDays className="w-4 h-4 text-dash-text-muted" />
+                    <CalendarDays className="w-4 h-4 text-dash-text-muted group-hover:text-primary transition-colors" />
                 )}
-                <span className="text-sm font-bold uppercase tracking-widest text-dash-text">
+                <span className="text-sm font-bold uppercase tracking-widest text-dash-text group-hover:text-primary transition-colors">
                     {displayLabel}
                 </span>
-            </div>
+            </label>
 
             <button 
                 onClick={handleNextDay}
