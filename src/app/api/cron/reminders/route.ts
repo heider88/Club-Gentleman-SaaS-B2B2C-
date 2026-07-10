@@ -59,7 +59,7 @@ export async function GET(request: Request) {
                             customerName: appt.customer_name,
                             serviceName: (Array.isArray(serviceInfo) ? serviceInfo[0]?.name : serviceInfo?.name) || 'Servicio de Barbería',
                             barberName: (Array.isArray(profileInfo) ? profileInfo[0]?.full_name : profileInfo?.full_name) || 'Tu Barbero',
-                            time: new Date(appt.start_time).toLocaleString('es-CO', { hour: '2-digit', minute: '2-digit' })
+                            time: new Date(appt.start_time).toLocaleString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit' })
                         })
                     );
 

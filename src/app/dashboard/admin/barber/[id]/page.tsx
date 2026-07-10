@@ -133,7 +133,7 @@ export default async function BarberManagerPage({ params }: { params: Promise<{ 
                             {appointments && appointments.length > 0 ? appointments.map((appt: any) => (
                                 <div key={appt.id} className="p-4 bg-dash-panel/40 border border-white/10 rounded-xl">
                                     <div className="flex justify-between items-start mb-2">
-                                        <p className="text-dash-text font-bold text-sm">{new Date(appt.start_time).toLocaleString('es-CO', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                                        <p className="text-dash-text font-bold text-sm">{new Date(appt.start_time).toLocaleString('es-CO', { timeZone: 'America/Bogota', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                                         <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${appt.status === 'pending' ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'}`}>
                                             {appt.status}
                                         </span>
