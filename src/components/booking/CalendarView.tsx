@@ -209,13 +209,11 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             const timeStr = format(slotStart, 'h:mm a');
             const available = !isColliding(slotStart, slotEnd);
             
-            // Solo añadir a la lista visual los slots que realmente están disponibles
-            if (available) {
-                generatedSlots.push({
-                    time: timeStr,
-                    available: true
-                });
-            }
+            // Mostrar todos los slots en la lista visual, para que el cliente vea cuáles están inhabilitados
+            generatedSlots.push({
+                time: timeStr,
+                available: available
+            });
 
             current = addMinutes(current, 5);
         }

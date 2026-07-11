@@ -42,9 +42,28 @@ export function ContactForm({ bookingData, onSuccess, onError }: ContactFormProp
         let endTime: Date;
 
         try {
-            // Prepare Start and End time safely preserving local timezone (using parse for 12h format)
-            const { parse } = require('date-fns');
-            startTime = parse(bookingData.time, 'h:mm a', bookingData.date);
+            // Garantizar que la hora se guarde estrictamente en la zona horaria de Bogotá (UTC-5)
+            const year = bookingData.date.getFullYear();
+            const month = String(bookingData.date.getMonth() + 1).padStart(2, '0');
+            const day = String(bookingData.date.getDate()).padStart(2, '0');
+            
+            const match = bookingData.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) throw new Error("Formato de hora inválido");
+            
+            let hours = parseInt(match[1]);
+            const minutes = parseInt(match[2]);
+            const ampm = match[3].toUpperCase();
+            
+            if (ampm === 'PM' && hours < 12) hours += 12;
+            if (ampm === 'AM' && hours === 12) hours = 0;
+            
+            const hourStr = String(hours).padStart(2, '0');
+            const minuteStr = String(minutes).padStart(2, '0');
+            
+            // Bogotá no tiene horario de verano, siempre es -05:00
+            const isoStringWithOffset = `${year}-${month}-${day}T${hourStr}:${minuteStr}:00-05:00`;
+            
+            startTime = new Date(isoStringWithOffset);
             endTime = new Date(startTime.getTime() + bookingData.serviceDuration * 60000);
             
             if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {

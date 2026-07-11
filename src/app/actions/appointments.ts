@@ -116,18 +116,48 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
         }
 
-        // Validación de disabledSlots (15-min granular)
+        // Validación de disabledSlots granular (revisando cada 5 mins de la duración del servicio)
         if (schedule.disabledSlots) {
-            const timeString = `${bogotaDate.getHours().toString().padStart(2, '0')}:${bogotaDate.getMinutes().toString().padStart(2, '0')}`;
             let disabledForDay: string[] = [];
             if (Array.isArray(schedule.disabledSlots)) {
                 disabledForDay = schedule.disabledSlots;
             } else {
                 disabledForDay = (schedule.disabledSlots as Record<number, string[]>)[dayOfWeek] || [];
             }
-            if (disabledForDay.includes(timeString)) {
-                return { success: false, error: "El horario seleccionado está deshabilitado manualmente por el profesional." };
+            
+            if (disabledForDay.length > 0) {
+                const endDateUTC = new Date(validated.data.endTime);
+                // Usar un puntero temporal para iterar desde el inicio hasta el fin de la cita
+                const checkDate = new Date(startDateUTC);
+                
+                while (checkDate < endDateUTC) {
+                    const bogotaCheckParts = bogotaFormatter.formatToParts(checkDate);
+                    const bCheck = {} as any;
+                    bogotaCheckParts.forEach(p => bCheck[p.type] = parseInt(p.value));
+                    const timeString = `${bCheck.hour.toString().padStart(2, '0')}:${bCheck.minute.toString().padStart(2, '0')}`;
+                    
+                    if (disabledForDay.includes(timeString)) {
+                        return { success: false, error: "El horario seleccionado (o parte de su duración) está deshabilitado manualmente por el profesional." };
+                    }
+                    // Avanzar 5 minutos
+                    checkDate.setMinutes(checkDate.getMinutes() + 5);
+                }
             }
+        }
+
+        // Validación de Availability Blocks
+        const { data: overlappingBlocks, error: blocksError } = await adminClient
+            .from('availability_blocks')
+            .select('id')
+            .or(`barber_id.eq.${validated.data.barberId},barber_id.is.null`)
+            .lt('start_time', validated.data.endTime)
+            .gt('end_time', validated.data.startTime);
+
+        if (blocksError) {
+            return { success: false, error: "Error al validar la disponibilidad." };
+        }
+        if (overlappingBlocks && overlappingBlocks.length > 0) {
+            return { success: false, error: "El horario seleccionado está bloqueado por el administrador." };
         }
 
         // 3. Inserción Segura
@@ -236,7 +266,7 @@ export async function getBarberAvailabilityData(barberId: string, startRangeStr:
         const [barberProfileRes, appointmentsRes, blocksRes] = await Promise.all([
             adminClient.from('profiles').select('schedule_settings').eq('id', barberId).single(),
             adminClient.from('appointments').select('start_time, end_time, status').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr),
-            adminClient.from('availability_blocks').select('start_time, end_time').eq('barber_id', barberId).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
+            adminClient.from('availability_blocks').select('start_time, end_time').or(`barber_id.eq.${barberId},barber_id.is.null`).gte('start_time', startRangeStr).lte('start_time', endRangeStr)
         ]);
 
         return {
@@ -293,6 +323,23 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
             } else {
                 return { success: false, error: "No tienes permiso para reasignar esta cita a otro barbero." };
             }
+        }
+
+        const finalBarberId = updateData.barber_id || appt.barber_id;
+
+        // Validación de Availability Blocks
+        const { data: overlappingBlocks, error: blocksError } = await adminClient
+            .from('availability_blocks')
+            .select('id')
+            .or(`barber_id.eq.${finalBarberId},barber_id.is.null`)
+            .lt('start_time', newEndTime)
+            .gt('end_time', newStartTime);
+
+        if (blocksError) {
+            return { success: false, error: "Error al validar la disponibilidad del nuevo horario." };
+        }
+        if (overlappingBlocks && overlappingBlocks.length > 0) {
+            return { success: false, error: "El nuevo horario entra en conflicto con un bloque de inactividad." };
         }
 
         // 2. Perform reschedule update
