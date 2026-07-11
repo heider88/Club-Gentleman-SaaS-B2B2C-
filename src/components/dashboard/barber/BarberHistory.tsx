@@ -90,6 +90,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                     services (name, price)
                 `)
                 .eq('barber_id', barberId)
+                .eq('status', apptStatus)
                 .gte('start_time', queryStart)
                 .lte('start_time', queryEnd)
                 .order('start_time', { ascending: false })
