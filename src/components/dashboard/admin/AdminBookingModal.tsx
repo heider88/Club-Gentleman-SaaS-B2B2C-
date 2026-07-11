@@ -27,6 +27,7 @@ export function AdminBookingModal() {
     const [customerPhone, setCustomerPhone] = useState("")
     const [customerEmail, setCustomerEmail] = useState("")
     
+    const [isExtraordinary, setIsExtraordinary] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const supabase = createClient()
     const router = useRouter()
@@ -76,7 +77,8 @@ export function AdminBookingModal() {
             customerPhone: customerPhone || "N/A",
             customerEmail: customerEmail || "local@barberia.app",
             startTime: startDateTime.toISOString(),
-            endTime: endDateTime.toISOString()
+            endTime: endDateTime.toISOString(),
+            isExtraordinary: isExtraordinary
         })
 
         setIsSaving(false)
@@ -98,7 +100,7 @@ export function AdminBookingModal() {
         setCustomerName("")
         setCustomerPhone("")
         setCustomerEmail("")
-        setSelectedDate(new Date())
+        setIsExtraordinary(false)
     }
 
     return (
@@ -211,8 +213,23 @@ export function AdminBookingModal() {
                                                     setSelectedTime(time)
                                                     setSelectedDate(date)
                                                 }}
+                                                ignoreScheduleLimits={isExtraordinary}
                                             />
                                         </div>
+                                        
+                                        <div className="mt-4 flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-white flex items-center gap-2">
+                                                    🔥 Horario Extraordinario
+                                                </span>
+                                                <span className="text-[10px] text-white/50">Ignorar límites y bloqueos</span>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" className="sr-only peer" checked={isExtraordinary} onChange={e => setIsExtraordinary(e.target.checked)} />
+                                                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                            </label>
+                                        </div>
+
                                         {selectedTime && (
                                             <div className="mt-4 flex flex-col items-center justify-center gap-1 text-primary bg-primary/10 py-3 rounded-xl border border-primary/20">
                                                 <div className="flex items-center gap-2 font-bold">

@@ -29,9 +29,10 @@ interface CalendarViewProps {
     durationMinutes: number;
     onSelect: (time: string, date: Date) => void;
     allowPastTimes?: boolean; // Prop opcional para que los admins agenden en el pasado
+    ignoreScheduleLimits?: boolean; // Prop opcional para que los admins ignoren los límites de horario y deshabilitaciones manuales
 }
 
-export function CalendarView({ barberId, date: initialDate, durationMinutes, onSelect, allowPastTimes = false }: CalendarViewProps) {
+export function CalendarView({ barberId, date: initialDate, durationMinutes, onSelect, allowPastTimes = false, ignoreScheduleLimits = false }: CalendarViewProps) {
     const [slots, setSlots] = useState<TimeSlot[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -110,51 +111,53 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         const dayBlocks = allBlocks.filter(b => isSameDay(new Date(b.start_time), selectedDate));
 
         const isColliding = (slotStart: Date, slotEnd: Date) => {
-            // Check manual disabled slots
-            let disabledForDay: string[] = [];
-            if (scheduleSettings.disabledSlots) {
-                if (Array.isArray(scheduleSettings.disabledSlots)) {
-                    disabledForDay = scheduleSettings.disabledSlots;
-                } else {
-                    disabledForDay = scheduleSettings.disabledSlots[selectedDate.getDay()] || [];
-                }
-            }
-
-            if (disabledForDay.length > 0) {
-                let checkTime = new Date(slotStart);
-                while (isBefore(checkTime, slotEnd)) {
-                    const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
-                    if (disabledForDay.includes(timeString)) {
-                        return true;
+            if (!ignoreScheduleLimits) {
+                // Check manual disabled slots
+                let disabledForDay: string[] = [];
+                if (scheduleSettings.disabledSlots) {
+                    if (Array.isArray(scheduleSettings.disabledSlots)) {
+                        disabledForDay = scheduleSettings.disabledSlots;
+                    } else {
+                        disabledForDay = scheduleSettings.disabledSlots[selectedDate.getDay()] || [];
                     }
-                    checkTime = addMinutes(checkTime, 5);
+                }
+
+                if (disabledForDay.length > 0) {
+                    let checkTime = new Date(slotStart);
+                    while (isBefore(checkTime, slotEnd)) {
+                        const timeString = `${checkTime.getHours().toString().padStart(2, '0')}:${checkTime.getMinutes().toString().padStart(2, '0')}`;
+                        if (disabledForDay.includes(timeString)) {
+                            return true;
+                        }
+                        checkTime = addMinutes(checkTime, 5);
+                    }
+                }
+
+                // Check lunch
+                if (scheduleSettings.lunchStart && scheduleSettings.lunchEnd) {
+                    const ls = parseTimeSetting(scheduleSettings.lunchStart);
+                    const le = parseTimeSetting(scheduleSettings.lunchEnd);
+                    const lunchStart = new Date(selectedDate);
+                    lunchStart.setHours(ls.hours, ls.minutes, 0, 0);
+                    const lunchEnd = new Date(selectedDate);
+                    lunchEnd.setHours(le.hours, le.minutes, 0, 0);
+
+                    if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
+                }
+                
+                // Check blocks
+                for (const block of dayBlocks) {
+                    const blkStart = new Date(block.start_time);
+                    const blkEnd = new Date(block.end_time);
+                    if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
                 }
             }
 
-            // Check lunch
-            if (scheduleSettings.lunchStart && scheduleSettings.lunchEnd) {
-                const ls = parseTimeSetting(scheduleSettings.lunchStart);
-                const le = parseTimeSetting(scheduleSettings.lunchEnd);
-                const lunchStart = new Date(selectedDate);
-                lunchStart.setHours(ls.hours, ls.minutes, 0, 0);
-                const lunchEnd = new Date(selectedDate);
-                lunchEnd.setHours(le.hours, le.minutes, 0, 0);
-
-                if (isBefore(slotStart, lunchEnd) && isAfter(slotEnd, lunchStart)) return true;
-            }
-
-            // Check appointments
+            // Check appointments (Always check to prevent double bookings even in extraordinary mode)
             for (const appt of dayAppointments) {
                 const apptStart = new Date(appt.start_time);
                 const apptEnd = new Date(appt.end_time);
                 if (isBefore(slotStart, apptEnd) && isAfter(slotEnd, apptStart)) return true;
-            }
-
-            // Check blocks
-            for (const block of dayBlocks) {
-                const blkStart = new Date(block.start_time);
-                const blkEnd = new Date(block.end_time);
-                if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
             }
 
             // Check if in past (if today) unless explicitly allowed
@@ -187,12 +190,12 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         const sh = scheduleSettings.startHour !== undefined ? parseTimeSetting(scheduleSettings.startHour) : { hours: 0, minutes: 0 };
         const eh = scheduleSettings.endHour !== undefined ? parseTimeSetting(scheduleSettings.endHour) : { hours: 23, minutes: 59 };
         
-        current.setHours(sh.hours, sh.minutes, 0, 0);
+        current.setHours(ignoreScheduleLimits ? 0 : sh.hours, ignoreScheduleLimits ? 0 : sh.minutes, 0, 0);
         const endTime = new Date(selectedDate);
-        endTime.setHours(eh.hours, eh.minutes, 59, 999);
+        endTime.setHours(ignoreScheduleLimits ? 23 : eh.hours, ignoreScheduleLimits ? 59 : eh.minutes, 59, 999);
 
         const dayOfWeek = selectedDate.getDay();
-        if (!scheduleSettings.workDays.includes(dayOfWeek)) {
+        if (!ignoreScheduleLimits && !scheduleSettings.workDays.includes(dayOfWeek)) {
             setSlots([]);
             return;
         }
@@ -202,7 +205,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             const slotStart = new Date(current);
             const slotEnd = addMinutes(current, durationMinutes);
 
-            if (isAfter(slotEnd, endTime)) {
+            if (!ignoreScheduleLimits && isAfter(slotEnd, endTime)) {
                 break;
             }
 

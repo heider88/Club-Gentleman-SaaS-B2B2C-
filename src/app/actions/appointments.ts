@@ -30,6 +30,7 @@ const createAppointmentSchema = z.object({
     customerPhone: z.string().trim().min(8, "Teléfono inválido").transform(v => v.replace(/[^\d+]/g, '')),
     startTime: z.string().trim().refine(val => !isNaN(Date.parse(val)), { message: "Fecha de inicio inválida" }),
     endTime: z.string().trim().refine(val => !isNaN(Date.parse(val)), { message: "Fecha de fin inválida" }),
+    isExtraordinary: z.boolean().optional()
 });
 
 export async function createAppointmentAction(payload: z.infer<typeof createAppointmentSchema>) {
@@ -103,61 +104,84 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
         const lStart = parseToNum(schedule.lunchStart);
         const lEnd = parseToNum(schedule.lunchEnd);
 
-        // ¿Es día laboral?
-        if (!schedule.workDays.includes(dayOfWeek)) {
-            return { success: false, error: "El profesional no trabaja en este día de la semana." };
-        }
-
-        // ¿Está dentro del horario y fuera del almuerzo?
-        if (startHourNum < sStart || startHourNum >= sEnd) {
-            return { success: false, error: "El horario seleccionado está fuera del horario laboral." };
-        }
-        if (lStart !== null && lEnd !== null && startHourNum >= lStart && startHourNum < lEnd) {
-            return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
-        }
-
-        // Validación de disabledSlots granular (revisando cada 5 mins de la duración del servicio)
-        if (schedule.disabledSlots) {
-            let disabledForDay: string[] = [];
-            if (Array.isArray(schedule.disabledSlots)) {
-                disabledForDay = schedule.disabledSlots;
-            } else {
-                disabledForDay = (schedule.disabledSlots as Record<number, string[]>)[dayOfWeek] || [];
-            }
-            
-            if (disabledForDay.length > 0) {
-                const endDateUTC = new Date(validated.data.endTime);
-                // Usar un puntero temporal para iterar desde el inicio hasta el fin de la cita
-                const checkDate = new Date(startDateUTC);
-                
-                while (checkDate < endDateUTC) {
-                    const bogotaCheckParts = bogotaFormatter.formatToParts(checkDate);
-                    const bCheck = {} as any;
-                    bogotaCheckParts.forEach(p => bCheck[p.type] = parseInt(p.value));
-                    const timeString = `${bCheck.hour.toString().padStart(2, '0')}:${bCheck.minute.toString().padStart(2, '0')}`;
-                    
-                    if (disabledForDay.includes(timeString)) {
-                        return { success: false, error: "El horario seleccionado (o parte de su duración) está deshabilitado manualmente por el profesional." };
+        // Seguridad: Verificar si la cita es extraordinaria y el usuario tiene permisos
+        let isForceMode = false;
+        if (validated.data.isExtraordinary) {
+            try {
+                const { createClient } = await import("@/lib/supabase/server");
+                const supabase = await createClient();
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+                    if (profile?.role === 'admin') {
+                        isForceMode = true;
                     }
-                    // Avanzar 5 minutos
-                    checkDate.setMinutes(checkDate.getMinutes() + 5);
+                }
+            } catch (e) {
+                console.error("Error validando permisos extraordinarios:", e);
+            }
+            if (!isForceMode) {
+                return { success: false, error: "ACCESO DENEGADO: No tienes permiso de administrador para forzar un horario extraordinario." };
+            }
+        }
+
+        if (!isForceMode) {
+            // ¿Es día laboral?
+            if (!schedule.workDays.includes(dayOfWeek)) {
+                return { success: false, error: "El profesional no trabaja en este día de la semana." };
+            }
+
+            // ¿Está dentro del horario y fuera del almuerzo?
+            if (startHourNum < sStart || startHourNum >= sEnd) {
+                return { success: false, error: "El horario seleccionado está fuera del horario laboral." };
+            }
+            if (lStart !== null && lEnd !== null && startHourNum >= lStart && startHourNum < lEnd) {
+                return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
+            }
+
+            // Validación de disabledSlots granular (revisando cada 5 mins de la duración del servicio)
+            if (schedule.disabledSlots) {
+                let disabledForDay: string[] = [];
+                if (Array.isArray(schedule.disabledSlots)) {
+                    disabledForDay = schedule.disabledSlots;
+                } else {
+                    disabledForDay = (schedule.disabledSlots as Record<number, string[]>)[dayOfWeek] || [];
+                }
+                
+                if (disabledForDay.length > 0) {
+                    const endDateUTC = new Date(validated.data.endTime);
+                    // Usar un puntero temporal para iterar desde el inicio hasta el fin de la cita
+                    const checkDate = new Date(startDateUTC);
+                    
+                    while (checkDate < endDateUTC) {
+                        const bogotaCheckParts = bogotaFormatter.formatToParts(checkDate);
+                        const bCheck = {} as any;
+                        bogotaCheckParts.forEach(p => bCheck[p.type] = parseInt(p.value));
+                        const timeString = `${bCheck.hour.toString().padStart(2, '0')}:${bCheck.minute.toString().padStart(2, '0')}`;
+                        
+                        if (disabledForDay.includes(timeString)) {
+                            return { success: false, error: "El horario seleccionado (o parte de su duración) está deshabilitado manualmente por el profesional." };
+                        }
+                        // Avanzar 5 minutos
+                        checkDate.setMinutes(checkDate.getMinutes() + 5);
+                    }
                 }
             }
-        }
 
-        // Validación de Availability Blocks
-        const { data: overlappingBlocks, error: blocksError } = await adminClient
-            .from('availability_blocks')
-            .select('id')
-            .or(`barber_id.eq.${validated.data.barberId},barber_id.is.null`)
-            .lt('start_time', validated.data.endTime)
-            .gt('end_time', validated.data.startTime);
+            // Validación de Availability Blocks
+            const { data: overlappingBlocks, error: blocksError } = await adminClient
+                .from('availability_blocks')
+                .select('id')
+                .or(`barber_id.eq.${validated.data.barberId},barber_id.is.null`)
+                .lt('start_time', validated.data.endTime)
+                .gt('end_time', validated.data.startTime);
 
-        if (blocksError) {
-            return { success: false, error: "Error al validar la disponibilidad." };
-        }
-        if (overlappingBlocks && overlappingBlocks.length > 0) {
-            return { success: false, error: "El horario seleccionado está bloqueado por el administrador." };
+            if (blocksError) {
+                return { success: false, error: "Error al validar la disponibilidad." };
+            }
+            if (overlappingBlocks && overlappingBlocks.length > 0) {
+                return { success: false, error: "El horario seleccionado está bloqueado por el administrador." };
+            }
         }
 
         // 3. Inserción Segura
@@ -281,7 +305,7 @@ export async function getBarberAvailabilityData(barberId: string, startRangeStr:
     }
 }
 
-export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string, newBarberId?: string) {
+export async function rescheduleAppointment(appointmentId: string, newStartTime: string, newEndTime: string, newBarberId?: string, isExtraordinary?: boolean) {
     try {
         const { userId, role } = await getUserRole();
         const adminClient = createAdminClient();
@@ -326,20 +350,23 @@ export async function rescheduleAppointment(appointmentId: string, newStartTime:
         }
 
         const finalBarberId = updateData.barber_id || appt.barber_id;
+        const isForceMode = isExtraordinary && role === 'admin';
 
-        // Validación de Availability Blocks
-        const { data: overlappingBlocks, error: blocksError } = await adminClient
-            .from('availability_blocks')
-            .select('id')
-            .or(`barber_id.eq.${finalBarberId},barber_id.is.null`)
-            .lt('start_time', newEndTime)
-            .gt('end_time', newStartTime);
+        if (!isForceMode) {
+            // Validación de Availability Blocks
+            const { data: overlappingBlocks, error: blocksError } = await adminClient
+                .from('availability_blocks')
+                .select('id')
+                .or(`barber_id.eq.${finalBarberId},barber_id.is.null`)
+                .lt('start_time', newEndTime)
+                .gt('end_time', newStartTime);
 
-        if (blocksError) {
-            return { success: false, error: "Error al validar la disponibilidad del nuevo horario." };
-        }
-        if (overlappingBlocks && overlappingBlocks.length > 0) {
-            return { success: false, error: "El nuevo horario entra en conflicto con un bloque de inactividad." };
+            if (blocksError) {
+                return { success: false, error: "Error al validar la disponibilidad del nuevo horario." };
+            }
+            if (overlappingBlocks && overlappingBlocks.length > 0) {
+                return { success: false, error: "El nuevo horario entra en conflicto con un bloque de inactividad." };
+            }
         }
 
         // 2. Perform reschedule update

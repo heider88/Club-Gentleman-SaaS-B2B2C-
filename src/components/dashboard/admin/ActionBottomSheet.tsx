@@ -30,6 +30,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [view, setView] = useState<'menu' | 'reschedule' | 'edit'>('menu');
     const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
+    const [isExtraordinary, setIsExtraordinary] = useState(false);
     const [availableServices, setAvailableServices] = useState<any[]>([]);
     const [loadingServices, setLoadingServices] = useState(false);
     
@@ -73,7 +74,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
             const newStart = parse(timeStr, 'h:mm a', new Date(date));
             const newEnd = addMinutes(newStart, duration);
 
-            const result = await rescheduleAppointment(appt.id, newStart.toISOString(), newEnd.toISOString(), currentBarberId);
+            const result = await rescheduleAppointment(appt.id, newStart.toISOString(), newEnd.toISOString(), currentBarberId, isExtraordinary);
             if (result?.success) {
                 toast.success("Cita reagendada exitosamente");
                 await onAction('reschedule', appt.id); // Para refrescar
@@ -229,12 +230,29 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                                     <p className="text-sm font-bold text-dash-text animate-pulse">Reagendando...</p>
                                 </div>
                             ) : (
-                                <CalendarView 
-                                    barberId={currentBarberId} 
-                                    date={new Date(appt.start_time)}
-                                    durationMinutes={appt.services?.duration_minutes || differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time))}
-                                    onSelect={handleReschedule}
-                                />
+                                <div className="space-y-4">
+                                    {isAdmin && (
+                                        <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5 mb-2">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-white flex items-center gap-2">
+                                                    🔥 Horario Extraordinario
+                                                </span>
+                                                <span className="text-[10px] text-white/50">Ignorar límites y bloqueos</span>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" className="sr-only peer" checked={isExtraordinary} onChange={e => setIsExtraordinary(e.target.checked)} />
+                                                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                            </label>
+                                        </div>
+                                    )}
+                                    <CalendarView 
+                                        barberId={currentBarberId} 
+                                        date={new Date(appt.start_time)}
+                                        durationMinutes={appt.services?.duration_minutes || differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time))}
+                                        onSelect={handleReschedule}
+                                        ignoreScheduleLimits={isExtraordinary}
+                                    />
+                                </div>
                             )}
                         </div>
                     </>
