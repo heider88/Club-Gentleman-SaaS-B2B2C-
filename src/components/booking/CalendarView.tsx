@@ -148,7 +148,9 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                 // Check blocks
                 for (const block of dayBlocks) {
                     const blkStart = new Date(block.start_time);
+                    blkStart.setSeconds(0, 0);
                     const blkEnd = new Date(block.end_time);
+                    blkEnd.setSeconds(0, 0);
                     if (isBefore(slotStart, blkEnd) && isAfter(slotEnd, blkStart)) return true;
                 }
             }
@@ -156,7 +158,9 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
             // Check appointments (Always check to prevent double bookings even in extraordinary mode)
             for (const appt of dayAppointments) {
                 const apptStart = new Date(appt.start_time);
+                apptStart.setSeconds(0, 0);
                 const apptEnd = new Date(appt.end_time);
+                apptEnd.setSeconds(0, 0);
                 if (isBefore(slotStart, apptEnd) && isAfter(slotEnd, apptStart)) return true;
             }
 
