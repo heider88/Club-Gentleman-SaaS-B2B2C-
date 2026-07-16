@@ -47,10 +47,10 @@ export default async function LandingPage() {
     ...barbers,
     {
       id: 'static-receptionist',
-      full_name: 'Recepcionista (Prueba)',
-      specialty: 'Atención al Cliente',
+      full_name: 'Nicolás Beltrán V.',
+      specialty: 'Recepcionista - "Nick"',
       bio: 'La primera sonrisa al entrar al club. Encargado de coordinar tu experiencia y asegurar que tu visita sea perfecta.',
-      avatar_url: null, // Si deseas, luego puedes colocar una URL de imagen aquí
+      avatar_url: '/recepcionista.jpeg',
     }
   ];
 
