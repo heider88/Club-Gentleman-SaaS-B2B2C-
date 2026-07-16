@@ -42,6 +42,18 @@ export default async function LandingPage() {
 
   const barbers = barbersData || [];
 
+  // Inyección de recepcionista/staff (solo visual, no interactúa con DB ni reservas)
+  const teamMembers = [
+    ...barbers,
+    {
+      id: 'static-receptionist',
+      full_name: 'Recepcionista (Prueba)',
+      specialty: 'Atención al Cliente',
+      bio: 'La primera sonrisa al entrar al club. Encargado de coordinar tu experiencia y asegurar que tu visita sea perfecta.',
+      avatar_url: null, // Si deseas, luego puedes colocar una URL de imagen aquí
+    }
+  ];
+
   // Fetch Services
   const { data: servicesData } = await supabase
       .from('services')
@@ -250,7 +262,7 @@ export default async function LandingPage() {
         </div>
 
         {/* Team Section */}
-        <BarbersList barbers={barbers} />
+        <BarbersList barbers={teamMembers} />
 
         {/* Location Section */}
         <section id="ubicacion" className="w-full max-w-screen-xl mx-auto pt-20 relative">
