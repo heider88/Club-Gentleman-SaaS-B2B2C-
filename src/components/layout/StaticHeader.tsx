@@ -147,7 +147,7 @@ export function StaticHeader() {
                                                 >
                                                     {sub.iconName === 'instagram' && <Instagram className="w-4 h-4 text-pink-400" />}
                                                     {sub.iconName === 'facebook' && <Facebook className="w-4 h-4 text-blue-400" />}
-                                                    {sub.iconName === 'tiktok' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v11a7 7 0 1 1-7-7v3a4 4 0 0 0 4 4z"></path></svg>}
+                                                    {sub.iconName === 'tiktok' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 3.18-4.51v-3.5a6.33 6.33 0 0 0-5.39 10.69 6.33 6.33 0 0 0 10.86-4.42V8.69a8.18 8.18 0 0 0 4.77 1.53V6.79a4.83 4.83 0 0 1-1-.1z"/></svg>}
                                                     {sub.name}
                                                 </Link>
                                             ))}
