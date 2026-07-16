@@ -54,7 +54,8 @@ export function StaticHeader() {
             label: "CONTÁCTANOS",
             dropdown: [
                 { name: "Instagram", href: "https://www.instagram.com/club_gentlemanbarber?igsh=cGcwd3F0YXEzb2hl&utm_source=qr", iconName: "instagram" },
-                { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100065179103783", iconName: "facebook" }
+                { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100065179103783", iconName: "facebook" },
+                { name: "TikTok", href: "https://www.tiktok.com/@club.gentleman.ba?_r=1&_t=ZS-983XejWgLTN", iconName: "tiktok" }
             ]
         }
     ]
@@ -146,6 +147,7 @@ export function StaticHeader() {
                                                 >
                                                     {sub.iconName === 'instagram' && <Instagram className="w-4 h-4 text-pink-400" />}
                                                     {sub.iconName === 'facebook' && <Facebook className="w-4 h-4 text-blue-400" />}
+                                                    {sub.iconName === 'tiktok' && <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3v11a7 7 0 1 1-7-7v3a4 4 0 0 0 4 4z"></path></svg>}
                                                     {sub.name}
                                                 </Link>
                                             ))}
