@@ -91,6 +91,18 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
 
         const dayOfWeek = bogotaDate.getDay();
         const startHourNum = bogotaDate.getHours() + (bogotaDate.getMinutes() / 60);
+        
+        const endDateUTC = new Date(validated.data.endTime);
+        const bogotaEndParts = bogotaFormatter.formatToParts(endDateUTC);
+        const bEnd = {} as any;
+        bogotaEndParts.forEach(p => bEnd[p.type] = parseInt(p.value));
+        const bogotaEndDate = new Date(bEnd.year, bEnd.month - 1, bEnd.day, bEnd.hour, bEnd.minute, bEnd.second);
+        
+        let endHourNum = bogotaEndDate.getHours() + (bogotaEndDate.getMinutes() / 60);
+        // Ajuste si la cita termina a medianoche exacta o pasa al siguiente día
+        if (bogotaEndDate.getDate() !== bogotaDate.getDate() || endHourNum === 0) {
+            endHourNum = 24;
+        }
 
         const parseToNum = (val?: string | number) => {
             if (val === undefined || val === null) return null;
@@ -132,11 +144,13 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             }
 
             // ¿Está dentro del horario y fuera del almuerzo?
-            if (startHourNum < sStart || startHourNum >= sEnd) {
-                return { success: false, error: "El horario seleccionado está fuera del horario laboral." };
+            if (startHourNum < sStart || startHourNum >= sEnd || endHourNum > sEnd) {
+                return { success: false, error: "El horario seleccionado (o su duración) excede el horario laboral." };
             }
-            if (lStart !== null && lEnd !== null && startHourNum >= lStart && startHourNum < lEnd) {
-                return { success: false, error: "El horario seleccionado interfiere con el receso del profesional." };
+            if (lStart !== null && lEnd !== null) {
+                if (startHourNum < lEnd && endHourNum > lStart) {
+                    return { success: false, error: "La duración del servicio interfiere con el receso del profesional." };
+                }
             }
 
             // Validación de disabledSlots granular (revisando cada 5 mins de la duración del servicio)
