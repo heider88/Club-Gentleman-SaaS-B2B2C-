@@ -82,15 +82,18 @@ export const WeeklyGrid = ({
             {/* Eje Y: Columna de Horas Fija */}
             <div className="w-10 md:w-12 shrink-0 bg-dash-panel border-r border-dash-border sticky left-0 z-30">
                 <div className="h-10 border-b border-dash-border sticky top-0 bg-dash-panel z-40" />
-                {timeSlots.map((time, idx) => (
-                    <div key={idx} className="relative border-b border-dash-border/30 bg-dash-panel" style={{ height: ROW_HEIGHT }}>
-                        {time.getMinutes() === 0 && (
-                            <span className="absolute -top-2 right-1.5 text-[8px] md:text-[9px] font-mono text-dash-text-muted">
-                                {format(time, 'h:mm a')}
-                            </span>
-                        )}
-                    </div>
-                ))}
+                {timeSlots.map((time, idx) => {
+                    const isHour = time.getMinutes() === 0;
+                    return (
+                        <div key={idx} className={`relative border-b bg-dash-panel ${isHour ? 'border-dash-border/40 border-solid' : 'border-dash-border/10 border-dashed'}`} style={{ height: ROW_HEIGHT / 2 }}>
+                            {isHour && (
+                                <span className="absolute -top-2 right-1.5 text-[8px] md:text-[9px] font-mono text-dash-text-muted">
+                                    {format(time, 'h:mm a')}
+                                </span>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Eje X: Columnas de Días */}

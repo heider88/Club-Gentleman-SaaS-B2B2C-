@@ -70,15 +70,18 @@ export const DailyGrid = ({
             <div className="w-12 md:w-14 shrink-0 bg-dash-panel border-r border-dash-border sticky left-0 z-30">
                 {/* Cabecera vacía esquina superior izquierda */}
                 <div className="h-10 border-b border-dash-border sticky top-0 bg-dash-panel z-40" /> 
-                {timeSlots.map((time, idx) => (
-                    <div key={idx} className="h-[60px] relative border-b border-dash-border/30 bg-dash-panel">
-                        {time.getMinutes() === 0 && (
-                            <span className="absolute -top-2.5 right-2 text-[9px] md:text-[10px] font-mono text-dash-text-muted">
-                                {format(time, 'h:mm a')}
-                            </span>
-                        )}
-                    </div>
-                ))}
+                {timeSlots.map((time, idx) => {
+                    const isHour = time.getMinutes() === 0;
+                    return (
+                        <div key={idx} className={`h-[30px] relative border-b bg-dash-panel ${isHour ? 'border-dash-border/40 border-solid' : 'border-dash-border/10 border-dashed'}`}>
+                            {isHour && (
+                                <span className="absolute -top-2.5 right-2 text-[9px] md:text-[10px] font-mono text-dash-text-muted">
+                                    {format(time, 'h:mm a')}
+                                </span>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Eje X: Columnas de Barberos (Scroll horizontal) */}
