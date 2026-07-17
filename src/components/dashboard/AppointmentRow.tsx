@@ -134,11 +134,7 @@ export function AppointmentRow({ appt, userRole }: { appt: AppointmentWithServic
                             </button>
                             {showOptions && (
                                 <div className="absolute right-0 top-full mt-2 w-40 bg-dash-panel-alt border border-dash-border-alt shadow-2xl z-30 py-1 animate-in slide-in-from-top-2 fade-in duration-200">
-                                    {appt.customer_phone && appt.customer_phone !== "N/A" && (
-                                        <a href={`tel:${appt.customer_phone}`} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-dash-text-soft hover:text-dash-text hover:bg-white/5 flex items-center gap-3">
-                                            <Phone className="w-3.5 h-3.5" /> Llamar
-                                        </a>
-                                    )}
+                                    
                                     {isAdmin && (
                                         <button 
                                             onClick={() => updateStatus('cancelled')}
