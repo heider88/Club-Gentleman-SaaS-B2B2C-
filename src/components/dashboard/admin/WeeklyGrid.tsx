@@ -107,18 +107,23 @@ export const WeeklyGrid = ({
 
                     // Calcular solapamientos para distribuirlas en el ancho de la columna
                     const sortedAppts = [...dayAppts].sort((a,b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
-                    const overlappingInfo = sortedAppts.map(appt => {
-                        const start = new Date(appt.start_time).getTime();
-                        const end = new Date(appt.end_time).getTime();
-                        const overlapping = sortedAppts.filter(other => {
-                            const oStart = new Date(other.start_time).getTime();
-                            const oEnd = new Date(other.end_time).getTime();
-                            return (start < oEnd && end > oStart);
+                    const withVisuals = sortedAppts.map(appt => {
+                        const actualDuration = differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time));
+                        const visualDuration = Math.max(actualDuration, 25);
+                        const vStart = new Date(appt.start_time).getTime();
+                        const vEnd = vStart + (visualDuration * 60000);
+                        return { appt, vStart, vEnd, actualDuration, visualDuration };
+                    });
+
+                    const overlappingInfo = withVisuals.map(item => {
+                        const overlapping = withVisuals.filter(other => {
+                            return (item.vStart < other.vEnd && item.vEnd > other.vStart);
                         });
                         return {
-                            appt,
+                            appt: item.appt,
+                            visualDuration: item.visualDuration,
                             count: overlapping.length,
-                            index: overlapping.findIndex(o => o.id === appt.id)
+                            index: overlapping.findIndex(o => o.appt.id === item.appt.id)
                         };
                     });
 
@@ -153,7 +158,7 @@ export const WeeklyGrid = ({
                             {overlappingInfo.map(info => {
                                 const { appt, count, index } = info;
                                 const isCompleted = appt.status === 'completed';
-                                const duration = Math.max(differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time)), 15); // min 15 mins
+                                const duration = info.visualDuration;
                                 
                                 const top = calculateTopMins(appt.start_time);
                                 const height = duration * PIXELS_PER_MINUTE;
@@ -166,9 +171,9 @@ export const WeeklyGrid = ({
                                 const widthPct = 90 / count;
                                 const leftPct = 5 + (index * widthPct);
                                 
-                                let statusClasses = `${bgSolidClass} ${borderColorClass} opacity-100 hover:brightness-110`;
+                                let statusClasses = `${bgSolidClass} ${borderColorClass} opacity-100 hover:brightness-110 hover:z-50`;
                                 if (isCompleted) {
-                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed';
+                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed hover:z-50';
                                 }
 
                                 return (

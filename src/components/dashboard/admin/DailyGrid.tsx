@@ -115,24 +115,49 @@ export const DailyGrid = ({
                                 })}
                             </div>
 
-                            {/* Bloques de Citas */}
-                            {col.appointments.map(appt => {
-                                const isCompleted = appt.status === 'completed';
-                                const duration = Math.max(differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time)), 15); // min 15 mins to be visible
-                                const height = duration * PIXELS_PER_MINUTE; 
-                                const top = calculateTopMins(appt.start_time);
+                            {/* Bloques de Citas con manejo de solapamientos visuales */}
+                            {(() => {
+                                const sortedAppts = [...col.appointments].sort((a,b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+                                
+                                const withVisuals = sortedAppts.map(appt => {
+                                    const actualDuration = differenceInMinutes(new Date(appt.end_time), new Date(appt.start_time));
+                                    const visualDuration = Math.max(actualDuration, 25); // Mínimo 25 mins visuales para evitar que se tapen
+                                    const vStart = new Date(appt.start_time).getTime();
+                                    const vEnd = vStart + (visualDuration * 60000);
+                                    return { appt, vStart, vEnd, actualDuration, visualDuration };
+                                });
 
-                                let statusClasses = `${bgSolidClass} ${borderSolidClass} opacity-100 shadow-md hover:brightness-110`;
-                                if (isCompleted) {
-                                    statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed shadow-none hover:bg-neutral-800';
-                                }
+                                const overlappingInfo = withVisuals.map(item => {
+                                    const overlapping = withVisuals.filter(other => {
+                                        return (item.vStart < other.vEnd && item.vEnd > other.vStart);
+                                    });
+                                    return {
+                                        ...item,
+                                        count: overlapping.length,
+                                        index: overlapping.findIndex(o => o.appt.id === item.appt.id)
+                                    };
+                                });
 
-                                return (
-                                    <div 
-                                        key={appt.id}
-                                        onClick={() => onAppointmentTap(appt)}
-                                        className={`absolute left-1 right-1 p-2 rounded-sm cursor-pointer border-l-[3px] overflow-hidden z-10 transition-all active:scale-95 ${statusClasses}`}
-                                        style={{ top: `${top}px`, height: `${height}px` }}
+                                return overlappingInfo.map(info => {
+                                    const { appt, visualDuration } = info;
+                                    const isCompleted = appt.status === 'completed';
+                                    const height = visualDuration * PIXELS_PER_MINUTE; 
+                                    const top = calculateTopMins(appt.start_time);
+                                    
+                                    const widthPct = 96 / info.count;
+                                    const leftPct = 2 + (info.index * widthPct);
+
+                                    let statusClasses = `${bgSolidClass} ${borderSolidClass} opacity-100 shadow-md hover:brightness-110 hover:z-50`;
+                                    if (isCompleted) {
+                                        statusClasses = 'bg-neutral-900 border-neutral-700 opacity-80 border-dashed shadow-none hover:bg-neutral-800 hover:z-50';
+                                    }
+
+                                    return (
+                                        <div 
+                                            key={appt.id}
+                                            onClick={() => onAppointmentTap(appt)}
+                                            className={`absolute p-2 rounded-sm cursor-pointer border-l-[3px] overflow-hidden z-10 transition-all active:scale-95 ${statusClasses}`}
+                                            style={{ top: `${top}px`, height: `${height}px`, left: `${leftPct}%`, width: `${widthPct}%` }}
                                     >
                                         <div className="flex justify-between items-start">
                                             <h4 className={`text-xs font-medium capitalize leading-tight truncate ${isCompleted ? 'text-neutral-500 line-through' : 'text-white'}`}>
@@ -148,9 +173,10 @@ export const DailyGrid = ({
                                         <span className={`text-[9px] font-mono absolute bottom-1 left-2 right-2 truncate text-right ${isCompleted ? 'text-neutral-600' : 'text-white/70 font-bold'}`}>
                                             {format(new Date(appt.start_time), 'h:mm a')} - {format(new Date(appt.end_time), 'h:mm a')}
                                         </span>
-                                    </div>
-                                )
-                            })}
+                                        </div>
+                                    )
+                                })
+                            })()}
                         </div>
                     )
                 })}
