@@ -40,44 +40,41 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         const fetchHistoryData = async () => {
             setLoading(true)
             
-            // Timezone fix para Bogotá
-            const now = new Date()
-            const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/Bogota',
-                year: 'numeric', month: 'numeric', day: 'numeric',
-            });
-            const parts = bogotaFormatter.formatToParts(now);
-            const b: any = {};
-            parts.forEach(p => b[p.type] = p.value);
-            const yyyy = Number(b.year);
-            const mm = Number(b.month) - 1;
-            const dd = Number(b.day);
+            // Obtener fecha actual en Bogotá
+            const bogotaTimeString = new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' });
+            const bogotaDate = new Date(bogotaTimeString);
             
-            let queryStart = "";
-            let queryEnd = "";
+            // Usaremos date-fns nativo que es 100% estable, forzando las horas de inicio/fin manuales para simular UTC-5 en la base de datos
+            let start = new Date(bogotaDate);
+            let end = new Date(bogotaDate);
 
             if (filter === 'daily') {
-                const dateStr = `${yyyy}-${String(mm + 1).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
-                queryStart = `${dateStr}T05:00:00.000Z`;
-                queryEnd = new Date(new Date(queryStart).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
+                start = startOfDay(bogotaDate);
+                end = endOfDay(bogotaDate);
             } else if (filter === 'weekly') {
-                const d = new Date(yyyy, mm, dd);
-                const dow = d.getDay();
-                const diff = d.getDate() - dow + (dow === 0 ? -6 : 1);
-                
-                const monday = new Date(d.setDate(diff));
-                const dateStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
-                
-                queryStart = `${dateStr}T05:00:00.000Z`;
-                queryEnd = new Date(new Date(queryStart).getTime() + (7 * 24 * 60 * 60 * 1000) - 1).toISOString();
+                start = startOfWeek(bogotaDate, { weekStartsOn: 1 }); // Semana inicia el lunes
+                end = endOfWeek(bogotaDate, { weekStartsOn: 1 });
             } else if (filter === 'monthly') {
-                const firstDayStr = `${yyyy}-${String(mm + 1).padStart(2, '0')}-01`;
-                queryStart = `${firstDayStr}T05:00:00.000Z`;
-                
-                const lastDay = new Date(yyyy, mm + 1, 0); 
-                const lastDayStr = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
-                queryEnd = new Date(new Date(`${lastDayStr}T05:00:00.000Z`).getTime() + (24 * 60 * 60 * 1000) - 1).toISOString();
+                start = startOfMonth(bogotaDate);
+                end = endOfMonth(bogotaDate);
             }
+
+            // Convertimos la fecha calculada localmente a un string ISO pero FORZANDO el huso horario de Bogotá (-05:00) para la BD
+            // Postgres timestamp with time zone (timestamptz) acepta este formato nativamente: YYYY-MM-DDTHH:mm:ss-05:00
+            
+            const formatToBogotaISO = (dateToFormat: Date, isEnd: boolean) => {
+                const y = dateToFormat.getFullYear();
+                const m = String(dateToFormat.getMonth() + 1).padStart(2, '0');
+                const d = String(dateToFormat.getDate()).padStart(2, '0');
+                
+                if (isEnd) {
+                    return `${y}-${m}-${d}T23:59:59.999-05:00`;
+                }
+                return `${y}-${m}-${d}T00:00:00.000-05:00`;
+            }
+
+            const queryStart = formatToBogotaISO(start, false);
+            const queryEnd = formatToBogotaISO(end, true);
 
             const { data, error } = await supabase
                 .from('appointments')
