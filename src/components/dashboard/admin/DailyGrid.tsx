@@ -100,13 +100,16 @@ export const DailyGrid = ({
 
                             {/* Celdas interactivas para Crear Nueva Cita */}
                             <div className="absolute inset-0 top-10 flex flex-col z-0">
-                                {timeSlots.map((time, idx) => (
-                                    <div 
-                                        key={`slot-${idx}`} 
-                                        className="h-[30px] border-b border-dash-border/10 hover:bg-white/5 cursor-pointer"
-                                        onClick={() => onSlotTap(col.barberId, time)}
-                                    />
-                                ))}
+                                {timeSlots.map((time, idx) => {
+                                    const isHour = time.getMinutes() === 0;
+                                    return (
+                                        <div 
+                                            key={`slot-${idx}`} 
+                                            className={`h-[30px] border-b hover:bg-white/5 cursor-pointer ${isHour ? 'border-dash-border/40 border-solid' : 'border-dash-border/10 border-dashed'}`}
+                                            onClick={() => onSlotTap(col.barberId, time)}
+                                        />
+                                    );
+                                })}
                             </div>
 
                             {/* Bloques de Citas */}
@@ -139,8 +142,8 @@ export const DailyGrid = ({
                                                 {appt.services?.name?.toLowerCase() || 'Servicio'}
                                             </p>
                                         )}
-                                        <span className={`text-[9px] font-mono absolute bottom-1 right-1 ${isCompleted ? 'text-neutral-600' : 'text-white/50'}`}>
-                                            {format(new Date(appt.start_time), 'h:mm a')}
+                                        <span className={`text-[9px] font-mono absolute bottom-1 left-2 right-2 truncate text-right ${isCompleted ? 'text-neutral-600' : 'text-white/70 font-bold'}`}>
+                                            {format(new Date(appt.start_time), 'h:mm a')} - {format(new Date(appt.end_time), 'h:mm a')}
                                         </span>
                                     </div>
                                 )

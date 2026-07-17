@@ -133,14 +133,17 @@ export const WeeklyGrid = ({
 
                             {/* Fondo clickeable para huecos */}
                             <div className="absolute inset-0 top-10 flex flex-col z-0">
-                                {timeSlots.map((time, idx) => (
-                                    <div 
-                                        key={`slot-${idx}`} 
-                                        className="border-b border-dash-border/10 hover:bg-white/5 cursor-pointer active:bg-white/10"
-                                        style={{ height: ROW_HEIGHT / 2 }} // Slots de 30 mins
-                                        onClick={() => onSlotTap(selectedBarbers[0], time)}
-                                    />
-                                ))}
+                                {timeSlots.map((time, idx) => {
+                                    const isHour = time.getMinutes() === 0;
+                                    return (
+                                        <div 
+                                            key={`slot-${idx}`} 
+                                            className={`border-b hover:bg-white/5 cursor-pointer active:bg-white/10 ${isHour ? 'border-dash-border/40 border-solid' : 'border-dash-border/10 border-dashed'}`}
+                                            style={{ height: ROW_HEIGHT / 2 }} // Slots de 30 mins
+                                            onClick={() => onSlotTap(selectedBarbers[0], time)}
+                                        />
+                                    );
+                                })}
                             </div>
 
                             {/* Tarjetas de citas */}
@@ -177,11 +180,11 @@ export const WeeklyGrid = ({
                                             left: `${leftPct}%`,
                                         }}
                                     >
-                                        <div className="flex items-center gap-1 mb-0.5">
-                                            <span className={`text-[9px] font-mono leading-none ${isCompleted ? 'text-neutral-400' : 'text-white'}`}>
-                                                {format(new Date(appt.start_time), 'h:mm a')}
+                                        <div className="flex items-center gap-1 mb-0.5 truncate flex-wrap">
+                                            <span className={`text-[8.5px] md:text-[9px] font-mono leading-none font-bold ${isCompleted ? 'text-neutral-400' : 'text-white'}`}>
+                                                {format(new Date(appt.start_time), 'h:mm')} - {format(new Date(appt.end_time), 'h:mm a')}
                                             </span>
-                                            {isCompleted && <span className="text-white font-bold text-[8px] leading-none">✓</span>}
+                                            {isCompleted && <span className="text-white font-bold text-[8px] leading-none shrink-0">✓</span>}
                                         </div>
                                         {height >= 30 && (
                                             <span className={`text-[10px] md:text-[11px] font-medium leading-tight truncate capitalize ${isCompleted ? 'text-neutral-500 line-through' : 'text-white'}`}>
