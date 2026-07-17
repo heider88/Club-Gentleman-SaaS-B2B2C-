@@ -64,7 +64,7 @@ export function AppointmentRow({ appt, userRole }: { appt: AppointmentWithServic
     }
 
     const isCompleted = status === 'completed'
-    const isCancelled = status === 'cancelled' || (appt.services?.price || 0) === 0
+    const isCancelled = status === 'cancelled'
     const isPending = status === 'pending' || status === 'confirmed'
 
     if (isCancelled) return null

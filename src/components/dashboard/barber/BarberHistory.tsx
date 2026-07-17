@@ -93,9 +93,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
             if (error) {
                 toast.error("Error al cargar el historial", { description: error.message })
             } else {
-                // Remove zero-peso/no-service appointments from the view completely, treating them as void/cancelled implicitly
-                const validAppointments = (data as any || []).filter((a: any) => (a.services?.price || 0) > 0);
-                setAppointments(validAppointments)
+                setAppointments(data as any || [])
             }
             setLoading(false)
         }
@@ -157,13 +155,17 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-dash-border pb-6">
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <div className="flex bg-transparent border border-dash-border p-1">
-                        {['Hoy', 'Semana', 'Mes'].map(f => (
+                        {[
+                            { value: 'daily', label: 'Hoy' },
+                            { value: 'weekly', label: 'Semana' },
+                            { value: 'monthly', label: 'Mes' }
+                        ].map(f => (
                             <button 
-                                key={f} 
-                                onClick={() => setFilter(f as typeof filter)}
-                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}
+                                key={f.value} 
+                                onClick={() => setFilter(f.value as FilterType)}
+                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f.value ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}
                             >
-                                {f}
+                                {f.label}
                             </button>
                         ))}
                     </div>
