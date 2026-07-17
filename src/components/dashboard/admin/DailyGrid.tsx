@@ -58,11 +58,12 @@ export const DailyGrid = ({
         <div className="flex-1 overflow-auto flex bg-dash-bg relative">
             {/* Fondo de cuadrícula global (Líneas claras continuas) */}
             <div 
-                className="absolute inset-0 z-0 pointer-events-none"
+                className="absolute left-0 right-0 z-0 pointer-events-none"
                 style={{ 
                     backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px)', 
                     backgroundSize: `100% ${ROW_HEIGHT / 2}px`,
-                    marginTop: '40px' // Offset para evadir el header sticky
+                    top: '40px', // Offset para evadir el header sticky
+                    height: `${timeSlots.length * (ROW_HEIGHT / 2)}px` // Forzar la altura exacta para que no se corte al hacer scroll
                 }} 
             />
 
