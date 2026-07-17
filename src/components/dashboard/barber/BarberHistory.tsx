@@ -40,11 +40,11 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         const fetchHistoryData = async () => {
             setLoading(true)
             
-            // Obtener fecha actual en Bogotá
-            const bogotaTimeString = new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' });
-            const bogotaDate = new Date(bogotaTimeString);
+            // Parseo robusto y directo de la fecha local
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const bogotaDate = new Date(utc + (3600000 * -5)); // UTC-5 estricto matemático
             
-            // Usaremos date-fns nativo que es 100% estable, forzando las horas de inicio/fin manuales para simular UTC-5 en la base de datos
             let start = new Date(bogotaDate);
             let end = new Date(bogotaDate);
 
@@ -52,17 +52,15 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                 start = startOfDay(bogotaDate);
                 end = endOfDay(bogotaDate);
             } else if (filter === 'weekly') {
-                start = startOfWeek(bogotaDate, { weekStartsOn: 1 }); // Semana inicia el lunes
+                start = startOfWeek(bogotaDate, { weekStartsOn: 1 });
                 end = endOfWeek(bogotaDate, { weekStartsOn: 1 });
             } else if (filter === 'monthly') {
                 start = startOfMonth(bogotaDate);
                 end = endOfMonth(bogotaDate);
             }
 
-            // Convertimos la fecha calculada localmente a un string ISO pero FORZANDO el huso horario de Bogotá (-05:00) para la BD
-            // Postgres timestamp with time zone (timestamptz) acepta este formato nativamente: YYYY-MM-DDTHH:mm:ss-05:00
-            
-            const formatToBogotaISO = (dateToFormat: Date, isEnd: boolean) => {
+            // Construir el string ISO UTC de forma manual para evitar corrupciones RangeError
+            const formatToBogotaUTC = (dateToFormat: Date, isEnd: boolean) => {
                 const y = dateToFormat.getFullYear();
                 const m = String(dateToFormat.getMonth() + 1).padStart(2, '0');
                 const d = String(dateToFormat.getDate()).padStart(2, '0');
@@ -71,10 +69,10 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
                     return `${y}-${m}-${d}T23:59:59.999-05:00`;
                 }
                 return `${y}-${m}-${d}T00:00:00.000-05:00`;
-            }
+            };
 
-            const queryStart = formatToBogotaISO(start, false);
-            const queryEnd = formatToBogotaISO(end, true);
+            const queryStart = formatToBogotaUTC(start, false);
+            const queryEnd = formatToBogotaUTC(end, true);
 
             const { data, error } = await supabase
                 .from('appointments')
