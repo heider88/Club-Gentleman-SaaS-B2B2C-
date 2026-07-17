@@ -40,18 +40,13 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         const fetchHistoryData = async () => {
             setLoading(true)
             
-            // Timezone fix para Bogotá
-            const now = new Date()
-            const bogotaFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/Bogota',
-                year: 'numeric', month: 'numeric', day: 'numeric',
-            });
-            const parts = bogotaFormatter.formatToParts(now);
-            const b: any = {};
-            parts.forEach(p => b[p.type] = p.value);
-            const yyyy = Number(b.year);
-            const mm = Number(b.month) - 1;
-            const dd = Number(b.day);
+            // Timezone fix para Bogotá (Más robusto para Safari/Móviles)
+            const bogotaTimeString = new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' });
+            const bogotaDate = new Date(bogotaTimeString);
+            
+            const yyyy = bogotaDate.getFullYear();
+            const mm = bogotaDate.getMonth(); // 0-indexed
+            const dd = bogotaDate.getDate();
             
             let queryStart = "";
             let queryEnd = "";
