@@ -183,14 +183,16 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                                 <Edit className="w-4 h-4" /> Editar Detalles
                             </button>
                             
-                            <button 
-                                onClick={() => handleAction('cancel')} 
-                                disabled={!!loadingAction}
-                                className="w-full py-3.5 bg-red-500/10 text-red-500 font-bold text-xs uppercase tracking-widest rounded-md border border-red-500/20 active:scale-95 transition-transform flex justify-center items-center gap-2 disabled:opacity-50"
-                            >
-                                {loadingAction === 'cancel' ? <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"/> : <UserX className="w-4 h-4" />}
-                                Cancelar Cita
-                            </button>
+                            {isAdmin && (
+                                <button 
+                                    onClick={() => handleAction('cancel')} 
+                                    disabled={!!loadingAction}
+                                    className="w-full py-3.5 bg-red-500/10 text-red-500 font-bold text-xs uppercase tracking-widest rounded-md border border-red-500/20 active:scale-95 transition-transform flex justify-center items-center gap-2 disabled:opacity-50"
+                                >
+                                    {loadingAction === 'cancel' ? <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"/> : <UserX className="w-4 h-4" />}
+                                    Cancelar Cita
+                                </button>
+                            )}
                         </div>
                     </>
                 ) : view === 'reschedule' ? (
