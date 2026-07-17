@@ -127,8 +127,8 @@ export function AdminCalendarView({ appointments, userRole, selectedDate = new D
     }, [appointments, selectedBarbers]);
 
     const { startHour, endHour, barberColumns } = useMemo(() => {
-        let minTime = 9 * 60 
-        let maxTime = 20 * 60 
+        let minTime = 8 * 60 // Default 8am
+        let maxTime = 22 * 60 // Default 10pm (22:00)
         const columnsMap = new Map<string, BarberColumn>()
 
         // Initialize columns for all selected barbers to ensure they show up even if empty
