@@ -23,9 +23,36 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
     const [customerPhone, setCustomerPhone] = useState("")
     const [customerEmail, setCustomerEmail] = useState("")
     
+    const [pastCustomers, setPastCustomers] = useState<any[]>([])
+    const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
+
     const [isSaving, setIsSaving] = useState(false)
     const supabase = createClient()
     const router = useRouter()
+
+    useEffect(() => {
+        if (isOpen && pastCustomers.length === 0) {
+            async function fetchCustomers() {
+                const { data } = await supabase
+                    .from('appointments')
+                    .select('customer_name, customer_phone, customer_email')
+                    .order('start_time', { ascending: false })
+                    .limit(500)
+
+                if (data) {
+                    const unique = new Map()
+                    data.forEach(c => {
+                        const key = (c.customer_name || '').toLowerCase().trim()
+                        if (key && !unique.has(key)) {
+                            unique.set(key, c)
+                        }
+                    })
+                    setPastCustomers(Array.from(unique.values()))
+                }
+            }
+            fetchCustomers()
+        }
+    }, [isOpen, pastCustomers.length, supabase])
 
     useEffect(() => {
         if (isOpen && services.length === 0) {
@@ -39,6 +66,17 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
     }, [isOpen, barberId, services.length, supabase])
 
     const selectedService = services.find(s => s.id === selectedServiceId)
+
+    const filteredCustomers = pastCustomers.filter(c => 
+        (c.customer_name || '').toLowerCase().includes(customerName.toLowerCase())
+    )
+
+    const handleSelectCustomer = (customer: any) => {
+        setCustomerName(customer.customer_name || "")
+        setCustomerPhone(customer.customer_phone || "")
+        setCustomerEmail(customer.customer_email || "")
+        setShowCustomerDropdown(false)
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -118,10 +156,36 @@ export function InternalBookingModal({ barberId }: { barberId: string }) {
                                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                                                 <input 
                                                     type="text" required
-                                                    value={customerName} onChange={e => setCustomerName(e.target.value)}
+                                                    value={customerName} 
+                                                    onChange={e => {
+                                                        setCustomerName(e.target.value)
+                                                        setShowCustomerDropdown(true)
+                                                    }}
+                                                    onFocus={() => setShowCustomerDropdown(true)}
+                                                    onBlur={() => setShowCustomerDropdown(false)}
                                                     placeholder="Ej: Juan Pérez"
                                                     className="w-full p-3 pl-10 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none text-white text-sm"
+                                                    autoComplete="off"
                                                 />
+                                                
+                                                {/* Dropdown de Autocompletado */}
+                                                {showCustomerDropdown && customerName && filteredCustomers.length > 0 && (
+                                                    <div className="absolute z-50 w-full mt-1 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+                                                        {filteredCustomers.map((customer, idx) => (
+                                                            <div 
+                                                                key={idx}
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault() // Evita que el onBlur del input se dispare primero
+                                                                    handleSelectCustomer(customer)
+                                                                }}
+                                                                className="px-4 py-3 hover:bg-white/5 cursor-pointer flex flex-col gap-0.5 border-b border-white/5 last:border-0"
+                                                            >
+                                                                <span className="text-sm text-white font-medium">{customer.customer_name}</span>
+                                                                <span className="text-xs text-white/40">{customer.customer_phone || "Sin teléfono"}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="space-y-2">
