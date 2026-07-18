@@ -153,12 +153,14 @@ export function AppointmentCard({ appt, userRole }: { appt: AppointmentWithServi
                                 <UserX className="w-5 h-5" />
                             </button>
                         )}
+                        {isAdmin && (
                             <button 
                                 onClick={() => updateStatus('completed')}
                                 className="flex-1 bg-dash-text text-black hover:opacity-80 py-3 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-xl active:scale-[0.98] border border-transparent"
                             >
-                            Finalizar y Cobrar
-                        </button>
+                                Finalizar y Cobrar
+                            </button>
+                        )}
 
                         {/* Cancel Confirmation Popup */}
                         {showCancelModal && isAdmin && (

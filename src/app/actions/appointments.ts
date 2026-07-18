@@ -269,9 +269,14 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
             if (error) return { success: false, error: error.message };
             return { success: true };
         } else {
-            // Barber can only update their OWN appointments, and CANNOT cancel them
+            // Barber can only update their OWN appointments, but NOW they CANNOT mark as completed or cancelled.
+            // All financial and status-closing operations belong to the admin.
             if (newStatus === 'cancelled') {
                 return { success: false, error: "Acceso Denegado: Solo el Administrador puede cancelar citas." };
+            }
+            
+            if (newStatus === 'completed') {
+                return { success: false, error: "Acceso Denegado: Solo el Administrador puede cobrar y completar servicios." };
             }
 
             // Let's verify ownership first using admin client

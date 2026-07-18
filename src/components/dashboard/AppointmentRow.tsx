@@ -113,14 +113,16 @@ export function AppointmentRow({ appt, userRole }: { appt: AppointmentWithServic
                 )}
                 {isPending ? (
                     <>
-                        <button 
-                            onClick={() => updateStatus('completed')}
-                            className="w-9 h-9 md:w-auto md:px-4 md:py-2 flex items-center justify-center bg-dash-text text-black hover:opacity-80 transition-all active:scale-95 shadow-lg"
-                            title="Finalizar"
-                        >
-                            <CheckCircle2 className="w-4 h-4 md:mr-2" />
-                            <span className="hidden md:inline font-bold text-[10px] uppercase tracking-widest">Cobrar</span>
-                        </button>
+                        {isAdmin && (
+                            <button 
+                                onClick={() => updateStatus('completed')}
+                                className="w-9 h-9 md:w-auto md:px-4 md:py-2 flex items-center justify-center bg-dash-text text-black hover:opacity-80 transition-all active:scale-95 shadow-lg"
+                                title="Finalizar"
+                            >
+                                <CheckCircle2 className="w-4 h-4 md:mr-2" />
+                                <span className="hidden md:inline font-bold text-[10px] uppercase tracking-widest">Cobrar</span>
+                            </button>
+                        )}
                         
                         <div className="relative" ref={optionsRef}>
                             <button 
