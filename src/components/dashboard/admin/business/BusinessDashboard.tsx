@@ -43,7 +43,10 @@ interface AppointmentRecord {
 
 export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], defaultTab: string }) {
     const supabase = createClient()
-    const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('monthly')
+    const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly' | 'custom'>('monthly')
+    const [customStartDate, setCustomStartDate] = useState<string>(format(new Date(), 'yyyy-MM-01'))
+    const [customEndDate, setCustomEndDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
+    
     const [selectedBarberId, setSelectedBarberId] = useState<string>('all')
     const [allAppointments, setAllAppointments] = useState<AppointmentRecord[]>([])
     const [loading, setLoading] = useState(true)
@@ -62,6 +65,9 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
             } else if (timeRange === 'monthly') {
                 startDate = startOfMonth(now)
                 endDate = endOfMonth(now)
+            } else if (timeRange === 'custom') {
+                startDate = startOfDay(new Date(customStartDate + 'T00:00:00'))
+                endDate = endOfDay(new Date(customEndDate + 'T00:00:00'))
             }
 
             const { data, error } = await supabase
@@ -79,7 +85,7 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
         }
         
         fetchAppointments()
-    }, [timeRange, supabase])
+    }, [timeRange, customStartDate, customEndDate, supabase])
 
     // Filter appointments based on selected barber
     const appointments = selectedBarberId === 'all' 
@@ -1164,20 +1170,39 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                 </select>
 
                 {/* Selector de Periodo */}
-                <div className="inline-flex bg-black/40 border border-white/10 rounded-none p-1 shadow-lg h-[34px]">
-                    {['daily', 'weekly', 'monthly'].map((tr) => (
-                        <button
-                            key={tr}
-                            onClick={() => setTimeRange(tr as any)}
-                            className={`px-6 py-0 flex items-center text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-none h-full ${
-                                timeRange === tr 
-                                ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
-                                : 'text-white/50 hover:text-white hover:bg-white/5'
-                            }`}
-                        >
-                            {tr === 'daily' ? 'Hoy' : tr === 'weekly' ? 'Semana' : 'Mes'}
-                        </button>
-                    ))}
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="inline-flex bg-black/40 border border-white/10 rounded-none p-1 shadow-lg h-[34px]">
+                        {['daily', 'weekly', 'monthly', 'custom'].map((tr) => (
+                            <button
+                                key={tr}
+                                onClick={() => setTimeRange(tr as any)}
+                                className={`px-4 sm:px-6 py-0 flex items-center text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-none h-full ${
+                                    timeRange === tr 
+                                    ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
+                                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                {tr === 'daily' ? 'Hoy' : tr === 'weekly' ? 'Semana' : tr === 'monthly' ? 'Mes' : 'Rango'}
+                            </button>
+                        ))}
+                    </div>
+
+                    {timeRange === 'custom' && (
+                        <div className="flex items-center gap-2 bg-black/40 border border-white/10 p-1 shadow-lg h-[34px]">
+                            <input 
+                                type="date" 
+                                value={customStartDate}
+                                onChange={(e) => setCustomStartDate(e.target.value)}
+                                className="bg-transparent text-white text-xs px-2 outline-none border-r border-white/10 [color-scheme:dark]"
+                            />
+                            <input 
+                                type="date" 
+                                value={customEndDate}
+                                onChange={(e) => setCustomEndDate(e.target.value)}
+                                className="bg-transparent text-white text-xs px-2 outline-none [color-scheme:dark]"
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 

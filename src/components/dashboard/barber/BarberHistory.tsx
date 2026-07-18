@@ -14,7 +14,7 @@ import { toast } from "sonner"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 
-type FilterType = 'daily' | 'weekly' | 'monthly'
+type FilterType = 'daily' | 'weekly' | 'monthly' | 'custom'
 
 interface AppointmentRecord {
     id: string
@@ -26,6 +26,9 @@ interface AppointmentRecord {
 export function BarberHistory({ barberId, barberName, commissionPercentage }: { barberId: string, barberName: string, commissionPercentage: number }) {
     const supabase = createClient()
     const [filter, setFilter] = useState<FilterType>('daily')
+    const [customStartStr, setCustomStartStr] = useState<string>(format(new Date(), 'yyyy-MM-01'))
+    const [customEndStr, setCustomEndStr] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
+
     const [apptStatus, setApptStatus] = useState<'completed' | 'cancelled'>('completed')
     const [appointments, setAppointments] = useState<AppointmentRecord[]>([])
     const [loading, setLoading] = useState(true)
@@ -57,6 +60,10 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
             } else if (filter === 'monthly') {
                 start = startOfMonth(bogotaDate);
                 end = endOfMonth(bogotaDate);
+            } else if (filter === 'custom') {
+                // Forzamos la zona horaria manual usando los strings ingresados
+                start = new Date(customStartStr + 'T00:00:00');
+                end = new Date(customEndStr + 'T00:00:00');
             }
 
             // Construir el string ISO UTC de forma manual para evitar corrupciones RangeError
@@ -99,7 +106,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         }
         
         fetchHistoryData()
-    }, [filter, apptStatus, barberId, supabase])
+    }, [filter, customStartStr, customEndStr, apptStatus, barberId, supabase])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount)
@@ -121,7 +128,7 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
         
         doc.setFontSize(10)
         doc.setTextColor(100)
-        const periodLabels = { daily: 'Hoy', weekly: 'Esta Semana', monthly: 'Este Mes' }
+        const periodLabels = { daily: 'Hoy', weekly: 'Esta Semana', monthly: 'Este Mes', custom: 'Rango Personalizado' }
         doc.text(`Periodo: ${periodLabels[filter]} - Generado: ${format(new Date(), 'dd/MM/yyyy h:mm a')}`, 14, 34)
         
         doc.setFontSize(12)
@@ -152,27 +159,48 @@ export function BarberHistory({ barberId, barberName, commissionPercentage }: { 
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-dash-border pb-6">
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <div className="flex bg-transparent border border-dash-border p-1">
-                        {[
-                            { value: 'daily', label: 'Hoy' },
-                            { value: 'weekly', label: 'Semana' },
-                            { value: 'monthly', label: 'Mes' }
-                        ].map(f => (
-                            <button 
-                                key={f.value} 
-                                onClick={() => setFilter(f.value as FilterType)}
-                                className={`flex-1 sm:px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all ${filter === f.value ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}
-                            >
-                                {f.label}
-                            </button>
-                        ))}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-dash-border pb-6">
+                <div className="flex flex-col gap-4 w-full sm:w-auto">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex bg-transparent border border-dash-border p-1 w-full sm:w-auto">
+                            {[
+                                { value: 'daily', label: 'Hoy' },
+                                { value: 'weekly', label: 'Semana' },
+                                { value: 'monthly', label: 'Mes' },
+                                { value: 'custom', label: 'Rango' }
+                            ].map(f => (
+                                <button 
+                                    key={f.value} 
+                                    onClick={() => setFilter(f.value as FilterType)}
+                                    className={`flex-1 sm:flex-none sm:px-6 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${filter === f.value ? 'bg-dash-text/10 border border-dash-text/20 text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}
+                                >
+                                    {f.label}
+                                </button>
+                            ))}
+                        </div>
+                        
+                        <div className="flex bg-dash-panel border border-dash-border p-1 w-full sm:w-auto">
+                            <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'completed' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Completados</button>
+                            <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'cancelled' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Cancelados</button>
+                        </div>
                     </div>
-                    <div className="flex bg-dash-panel border border-dash-border p-1">
-                        <button onClick={() => setApptStatus('completed')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'completed' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Completados</button>
-                        <button onClick={() => setApptStatus('cancelled')} className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${apptStatus === 'cancelled' ? 'bg-dash-panel-alt text-dash-text' : 'text-dash-text-muted hover:text-dash-text'}`}>Cancelados</button>
-                    </div>
+
+                    {filter === 'custom' && (
+                        <div className="flex items-center gap-2 bg-transparent border border-dash-border p-1 w-full sm:w-auto animate-in fade-in zoom-in-95">
+                            <input 
+                                type="date" 
+                                value={customStartStr}
+                                onChange={(e) => setCustomStartStr(e.target.value)}
+                                className="bg-dash-panel text-dash-text text-xs p-2 outline-none border-r border-dash-border flex-1 [color-scheme:dark]"
+                            />
+                            <input 
+                                type="date" 
+                                value={customEndStr}
+                                onChange={(e) => setCustomEndStr(e.target.value)}
+                                className="bg-dash-panel text-dash-text text-xs p-2 outline-none flex-1 [color-scheme:dark]"
+                            />
+                        </div>
+                    )}
                 </div>
                 
                 <button 
