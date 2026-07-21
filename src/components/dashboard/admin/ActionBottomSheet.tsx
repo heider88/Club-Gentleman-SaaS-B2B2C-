@@ -141,7 +141,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                             </p>
                             {appt.customer_phone && appt.customer_phone !== "N/A" && (
                                 <a 
-                                    href={`https://wa.me/${appt.customer_phone.replace(/\D/g, '')}?text=Hola%20${encodeURIComponent(appt.customer_name.split(' ')[0])},%20te%20escribimos%20de%20Club%20Gentleman`}
+                                    href={`https://wa.me/${((p) => { const c = p.replace(/\\D/g, ''); return c.length === 10 ? '57' + c : c; })(appt.customer_phone)}?text=Hola%20${encodeURIComponent(appt.customer_name.split(' ')[0])},%20te%20escribimos%20de%20Club%20Gentleman`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="mt-4 w-full py-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-bold text-xs uppercase tracking-widest rounded-md border border-[#25D366]/30 active:scale-95 transition-all flex justify-center items-center gap-2"
