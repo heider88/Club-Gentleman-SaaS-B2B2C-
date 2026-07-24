@@ -66,8 +66,11 @@ export function BusinessDashboard({ barbers, defaultTab }: { barbers: Barber[], 
                 startDate = startOfMonth(now)
                 endDate = endOfMonth(now)
             } else if (timeRange === 'custom') {
-                startDate = startOfDay(new Date(customStartDate + 'T00:00:00'))
-                endDate = endOfDay(new Date(customEndDate + 'T00:00:00'))
+                // Parse correctly using local timezone instead of forcing UTC that shifts hours
+                const [startYear, startMonth, startDay] = customStartDate.split('-').map(Number)
+                const [endYear, endMonth, endDay] = customEndDate.split('-').map(Number)
+                startDate = new Date(startYear, startMonth - 1, startDay, 0, 0, 0)
+                endDate = new Date(endYear, endMonth - 1, endDay, 23, 59, 59)
             }
 
             const { data, error } = await supabase
