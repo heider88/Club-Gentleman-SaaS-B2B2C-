@@ -3,7 +3,7 @@
 import { format, differenceInMinutes, addMinutes, parse } from "date-fns"
 import { es } from "date-fns/locale"
 import { CheckCircle2, UserX, Edit, X, CalendarClock, ChevronLeft, MessageCircle } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { CalendarView } from "@/components/booking/CalendarView"
 import { rescheduleAppointment } from "@/app/actions/appointments"
@@ -40,6 +40,18 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
         phone: appt?.customer_phone || '',
         service_id: appt?.service_id || appt?.services?.id || ''
     });
+
+    // Resetear el formulario y la vista cuando se selecciona una nueva cita
+    useEffect(() => {
+        if (appt) {
+            setEditForm({
+                name: appt.customer_name || '',
+                phone: appt.customer_phone || '',
+                service_id: appt.service_id || appt.services?.id || ''
+            });
+            setView('menu');
+        }
+    }, [appt]);
 
     if (!appt) return null;
 
