@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/app/actions/settings"
 
 // Revalidar caché de la Landing Page cada 1 hora (3600 segundos) automáticamente,
 // y también de forma inmediata cuando el Admin suba una foto desde el panel.
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function LandingPage() {
   const supabase = await createClient()

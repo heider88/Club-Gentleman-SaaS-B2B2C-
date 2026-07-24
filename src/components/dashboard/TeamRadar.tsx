@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Users, Clock, CheckCircle2 } from "lucide-react"
@@ -110,7 +111,7 @@ export function TeamRadar({ currentUserId }: { currentUserId: string }) {
                     <div key={member.id} className="snap-start min-w-[200px] bg-dash-panel border border-dash-border p-3 flex items-center gap-3">
                         <div className="w-10 h-10 bg-dash-panel-alt border border-dash-border-alt flex items-center justify-center text-xl relative shrink-0 overflow-hidden">
                             {member.avatarUrl ? (
-                                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
+                                <Image src={member.avatarUrl} alt={member.name} fill className="object-cover" sizes="40px" />
                             ) : (
                                 <span className="opacity-70">🧔🏻‍♂️</span>
                             )}

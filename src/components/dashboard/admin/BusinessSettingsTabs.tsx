@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useTransition } from "react"
 import { GalleryManager } from "./GalleryManager"
 import { saveSiteSettings, SiteSettingsPayload, uploadSectionImage } from "@/app/actions/settings"
@@ -443,7 +444,7 @@ export function BusinessSettingsTabs({
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                             {(section.images || []).map((imgUrl, i) => (
                                                 <div key={i} className="aspect-square relative rounded-xl overflow-hidden border border-white/10 group">
-                                                    <img src={imgUrl} alt="Sección" className="w-full h-full object-cover" />
+                                                    <Image src={imgUrl} alt="Sección" fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                                         <button 
                                                             onClick={() => updateSection(section.id, 'images', (section.images || []).filter((_: string, index: number) => index !== i))}
