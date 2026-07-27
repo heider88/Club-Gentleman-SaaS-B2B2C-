@@ -85,7 +85,9 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
 
                 // Fallback de seguridad extrema si el barbero aún no tiene configurado un horario
                 const defaultFallbackSettings: ScheduleSettings = { startHour: "09:00", endHour: "19:00", lunchStart: "13:00", lunchEnd: "14:00", workDays: [1, 2, 3, 4, 5, 6] };
-                const settings = response.schedule_settings || defaultFallbackSettings;
+                const settings = (response.schedule_settings && Object.keys(response.schedule_settings).length > 0) 
+                    ? { ...defaultFallbackSettings, ...(response.schedule_settings as any) } 
+                    : defaultFallbackSettings;
                 
                 setScheduleSettings(settings as ScheduleSettings);
                 setAllAppointments((response.appointments || []).filter((a: any) => a.status !== 'cancelled'));
@@ -172,7 +174,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                     timeZone: 'America/Bogota',
                     year: 'numeric', month: 'numeric', day: 'numeric',
                     hour: 'numeric', minute: 'numeric', second: 'numeric',
-                    hour12: false
+                    hourCycle: 'h23'
                 });
                 const parts = bogotaFormatter.formatToParts(now);
                 const b: any = {};
@@ -191,15 +193,16 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
         }
 
         let current = new Date(selectedDate);
-        const sh = scheduleSettings.startHour !== undefined ? parseTimeSetting(scheduleSettings.startHour) : { hours: 0, minutes: 0 };
-        const eh = scheduleSettings.endHour !== undefined ? parseTimeSetting(scheduleSettings.endHour) : { hours: 23, minutes: 59 };
+        const sh = scheduleSettings.startHour != null ? parseTimeSetting(scheduleSettings.startHour) : { hours: 0, minutes: 0 };
+        const eh = scheduleSettings.endHour != null ? parseTimeSetting(scheduleSettings.endHour) : { hours: 23, minutes: 59 };
         
         current.setHours(ignoreScheduleLimits ? 0 : sh.hours, ignoreScheduleLimits ? 0 : sh.minutes, 0, 0);
         const endTime = new Date(selectedDate);
         endTime.setHours(ignoreScheduleLimits ? 23 : eh.hours, ignoreScheduleLimits ? 59 : eh.minutes, 59, 999);
 
         const dayOfWeek = selectedDate.getDay();
-        if (!ignoreScheduleLimits && !scheduleSettings.workDays.includes(dayOfWeek)) {
+        const workDays = scheduleSettings.workDays || [1, 2, 3, 4, 5, 6];
+        if (!ignoreScheduleLimits && !workDays.includes(dayOfWeek)) {
             setSlots([]);
             return;
         }
@@ -277,7 +280,7 @@ export function CalendarView({ barberId, date: initialDate, durationMinutes, onS
                     >
                         {days.map((d) => {
                             const isSelected = isSameDay(d, selectedDate)
-                            const isWorkingDay = scheduleSettings ? scheduleSettings.workDays.includes(d.getDay()) : true;
+                            const isWorkingDay = scheduleSettings ? (scheduleSettings.workDays || [1,2,3,4,5,6]).includes(d.getDay()) : true;
                             
                             return (
                                 <button

@@ -59,7 +59,7 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
 
         if (profileError || !barberProfile) return { success: false, error: "Profesional no encontrado." };
 
-        const schedule = barberProfile.schedule_settings as {
+        let schedule = barberProfile.schedule_settings as {
             workDays: number[], 
             startHour?: string|number, 
             endHour?: string|number, 
@@ -67,6 +67,12 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             lunchEnd?: string|number,
             disabledSlots?: Record<number, string[]> | string[]
         };
+
+        if (!schedule || Object.keys(schedule).length === 0) {
+            schedule = { startHour: "09:00", endHour: "19:00", lunchStart: "13:00", lunchEnd: "14:00", workDays: [1, 2, 3, 4, 5, 6] };
+        } else {
+            if (!schedule.workDays) schedule.workDays = [1, 2, 3, 4, 5, 6];
+        }
 
         const startDateUTC = new Date(validated.data.startTime);
         if (isNaN(startDateUTC.getTime())) {
@@ -78,7 +84,7 @@ export async function createAppointmentAction(payload: z.infer<typeof createAppo
             timeZone: 'America/Bogota',
             year: 'numeric', month: 'numeric', day: 'numeric',
             hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
+            hourCycle: 'h23'
         });
         
         // Parseamos la fecha local de bogotá

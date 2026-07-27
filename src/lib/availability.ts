@@ -64,7 +64,8 @@ export function generateTimeSlots(
 
     // 1. Check if day is working day
     const dayOfWeek = date.getDay()
-    if (!schedule.workDays.includes(dayOfWeek)) {
+    const workDays = schedule.workDays || DEFAULT_SCHEDULE.workDays;
+    if (!workDays.includes(dayOfWeek)) {
         return [] // Closed today
     }
 

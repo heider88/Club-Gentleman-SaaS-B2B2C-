@@ -75,8 +75,8 @@ export default function ProfilePage() {
                         avatar_url: data.avatar_url || ""
                     })
 
-                    if (data.schedule_settings) {
-                        setSchedule(data.schedule_settings as ScheduleSettings)
+                    if (data.schedule_settings && Object.keys(data.schedule_settings).length > 0) {
+                        setSchedule({ ...DEFAULT_SCHEDULE, ...(data.schedule_settings as ScheduleSettings) })
                     }
                 }
             }
@@ -92,10 +92,11 @@ export default function ProfilePage() {
 
     const toggleWorkDay = (dayValue: number) => {
         setSchedule(prev => {
-            const isSelected = prev.workDays.includes(dayValue)
+            const currentWorkDays = prev.workDays || [1, 2, 3, 4, 5, 6]
+            const isSelected = currentWorkDays.includes(dayValue)
             const newDays = isSelected
-                ? prev.workDays.filter(d => d !== dayValue)
-                : [...prev.workDays, dayValue]
+                ? currentWorkDays.filter(d => d !== dayValue)
+                : [...currentWorkDays, dayValue]
             return { ...prev, workDays: newDays }
         })
     }
@@ -323,7 +324,7 @@ export default function ProfilePage() {
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {DAYS_MAP.map(day => {
-                                        const isSelected = schedule.workDays.includes(day.value)
+                                        const isSelected = (schedule.workDays || [1,2,3,4,5,6]).includes(day.value)
                                         return (
                                             <button
                                                 key={day.value}
