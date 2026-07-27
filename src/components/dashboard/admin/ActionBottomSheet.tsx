@@ -103,7 +103,6 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
 
         const handleSaveDetails = async () => {
         if (!editForm.name.trim()) return toast.error("El nombre es requerido");
-        if (!editForm.service_id) return toast.error("El servicio es requerido");
         
         setLoadingAction('edit');
         try {
@@ -113,8 +112,7 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                 .from('appointments')
                 .update({ 
                     customer_name: editForm.name.trim(),
-                    customer_phone: editForm.phone.trim(),
-                    service_id: editForm.service_id
+                    customer_phone: editForm.phone.trim()
                 })
                 .eq('id', appt.id);
                 
@@ -306,19 +304,21 @@ export const ActionBottomSheet = ({ appt, onClose, onAction, barbers = [], isAdm
                                     placeholder="Número de teléfono"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2">Servicio</label>
+                            <div className="opacity-70">
+                                <label className="block text-xs text-dash-text-soft uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    Servicio <span className="normal-case text-[10px] bg-dash-panel px-1.5 py-0.5 rounded text-dash-text-soft">Solo lectura</span>
+                                </label>
                                 <select 
                                     value={editForm.service_id} 
-                                    onChange={e => setEditForm({...editForm, service_id: e.target.value})}
-                                    disabled={loadingServices}
-                                    className="w-full bg-dash-panel-alt border border-dash-border text-dash-text text-sm rounded-lg p-3.5 outline-none focus:border-primary transition-colors appearance-none disabled:opacity-50"
+                                    disabled
+                                    className="w-full bg-dash-panel-alt/50 border border-dash-border/50 text-dash-text text-sm rounded-lg p-3.5 outline-none appearance-none cursor-not-allowed"
                                 >
-                                    <option value="" disabled>{loadingServices ? "Cargando servicios..." : "Selecciona un servicio"}</option>
-                                    {availableServices.map(s => (
+                                    <option value={editForm.service_id}>{appt.services?.name || "Servicio no disponible"}</option>
+                                    {availableServices.filter(s => s.id === editForm.service_id).map(s => (
                                         <option key={s.id} value={s.id}>{s.name} - ${s.price}</option>
                                     ))}
                                 </select>
+                                <p className="text-[10px] text-dash-text-soft mt-1.5 leading-tight">Para cambiar el servicio y mantener la agenda sin conflictos, es necesario cancelar esta cita y crear una nueva.</p>
                             </div>
                             
                             <button 
