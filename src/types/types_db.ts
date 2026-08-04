@@ -17,6 +17,51 @@ export interface ScheduleSettings {
 export interface Database {
     public: {
         Tables: {
+            notifications: {
+                Row: {
+                    id: string
+                    barber_id: string
+                    appointment_id: string | null
+                    message: string
+                    appointment_date: string
+                    is_read: boolean
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    barber_id: string
+                    appointment_id?: string | null
+                    message: string
+                    appointment_date: string
+                    is_read?: boolean
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    barber_id?: string
+                    appointment_id?: string | null
+                    message?: string
+                    appointment_date?: string
+                    is_read?: boolean
+                    created_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "notifications_barber_id_fkey"
+                        columns: ["barber_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "notifications_appointment_id_fkey"
+                        columns: ["appointment_id"]
+                        isOneToOne: false
+                        referencedRelation: "appointments"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            },
             profiles: {
                 Row: {
                     id: string

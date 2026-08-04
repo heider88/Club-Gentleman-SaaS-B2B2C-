@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client"
 import { ThemeToggle } from "./ThemeToggle"
 import { useState } from "react"
 
+import { NotificationBell } from "./NotificationBell"
+
 export function DashboardSidebar({ role }: { role: string }) {
     const pathname = usePathname()
     const router = useRouter()
@@ -145,6 +147,11 @@ export function DashboardSidebar({ role }: { role: string }) {
                             })}
                         </div>
                     )}
+                    
+                    <div className="flex md:flex-col shrink-0 md:shrink md:mt-2">
+                        <span className="hidden md:block text-[9px] font-bold uppercase tracking-[0.2em] text-dash-text-muted px-4 py-2">Alertas</span>
+                        <NotificationBell isCollapsed={isCollapsed} />
+                    </div>
                 </nav>
 
                 {/* Footer del Sidebar: Theme y Logout */}
