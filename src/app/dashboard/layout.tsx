@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar"
 import { DashboardThemeProvider } from "@/components/dashboard/DashboardThemeProvider"
+import { NotificationBell } from "@/components/dashboard/NotificationBell"
 import { Oswald, Plus_Jakarta_Sans } from "next/font/google"
 
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" })
@@ -46,6 +47,8 @@ export default async function DashboardLayout({
                 
                 {/* Center Glow matches customer view */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#6D3294]/5 hidden sm:block sm:blur-[120px] pointer-events-none -z-10 transform-gpu" />
+
+                <NotificationBell />
 
                 {/* Pasamos el rol evaluado en el servidor hacia nuestro componente cliente */}
                 <div className="z-10 flex flex-col md:flex-row w-full h-full relative">

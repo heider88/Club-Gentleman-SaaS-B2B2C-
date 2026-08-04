@@ -16,7 +16,7 @@ type Notification = {
     created_at: string;
 }
 
-export function NotificationBell({ isCollapsed }: { isCollapsed?: boolean }) {
+export function NotificationBell() {
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState<string | null>(null)
@@ -109,41 +109,37 @@ export function NotificationBell({ isCollapsed }: { isCollapsed?: boolean }) {
     const unreadCount = notifications.filter(n => !n.is_read).length
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="fixed top-4 right-4 md:top-8 md:right-8 z-50" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "flex flex-col md:flex-row items-center justify-center md:justify-start px-4 md:px-4 py-3 md:py-2.5 transition-all gap-1 md:gap-3 relative group w-full rounded-lg",
-                    isOpen ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
+                    "w-12 h-12 flex items-center justify-center rounded-full transition-all border border-dash-border bg-dash-panel hover:bg-dash-panel-alt shadow-lg",
+                    isOpen && "ring-2 ring-dash-text bg-dash-panel-alt"
                 )}
             >
                 <div className="relative flex items-center justify-center">
-                    <Bell className="w-5 h-5 md:w-4 md:h-4 text-dash-text-muted group-hover:text-dash-text shrink-0" />
+                    <Bell className="w-5 h-5 text-dash-text-muted hover:text-dash-text transition-colors" />
                     {unreadCount > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)] border border-dash-panel">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                     )}
                 </div>
-                
-                <span className={cn(
-                    "text-[8px] md:text-[10px] font-bold uppercase tracking-widest hidden md:block whitespace-nowrap text-dash-text-muted group-hover:text-dash-text transition-opacity duration-200",
-                    isCollapsed ? "opacity-0" : "opacity-100"
-                )}>
-                    Notificaciones
-                </span>
             </button>
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute bottom-full left-0 md:bottom-auto md:top-full md:left-full md:-ml-4 mb-2 md:mb-0 md:mt-0 w-[280px] bg-dash-panel border border-dash-border shadow-2xl rounded-xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-3 border-b border-dash-border bg-dash-panel-alt/50">
+                <div className="absolute top-full right-0 mt-3 w-[320px] bg-dash-panel border border-dash-border shadow-2xl rounded-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-200">
+                    <div className="p-4 border-b border-dash-border bg-dash-panel-alt/50 flex justify-between items-center">
                         <h3 className="font-oswald uppercase tracking-widest text-sm font-medium text-dash-text">Notificaciones</h3>
+                        {unreadCount > 0 && (
+                            <span className="text-[10px] uppercase font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded-full">{unreadCount} Nuevas</span>
+                        )}
                     </div>
                     
-                    <div className="max-h-[300px] overflow-y-auto scrollbar-hide">
+                    <div className="max-h-[350px] overflow-y-auto scrollbar-hide">
                         {notifications.length === 0 ? (
-                            <div className="p-6 text-center text-dash-text-muted text-xs">
+                            <div className="p-8 text-center text-dash-text-muted text-xs">
                                 No tienes notificaciones recientes.
                             </div>
                         ) : (
@@ -153,20 +149,20 @@ export function NotificationBell({ isCollapsed }: { isCollapsed?: boolean }) {
                                         key={notification.id}
                                         onClick={() => handleNotificationClick(notification)}
                                         className={cn(
-                                            "w-full text-left p-4 border-b border-dash-border/50 hover:bg-white/[0.02] transition-colors flex flex-col gap-1 relative",
+                                            "w-full text-left p-4 border-b border-dash-border/50 hover:bg-white/[0.04] transition-colors flex flex-col gap-1.5 relative",
                                             !notification.is_read ? "bg-white/[0.02]" : ""
                                         )}
                                     >
                                         {!notification.is_read && (
-                                            <div className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-500" />
+                                            <div className="absolute left-3 top-6 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                                         )}
                                         <p className={cn(
-                                            "text-sm font-jakarta pl-3",
+                                            "text-sm font-jakarta pl-5",
                                             !notification.is_read ? "text-dash-text font-semibold" : "text-dash-text-soft"
                                         )}>
                                             {notification.message}
                                         </p>
-                                        <span className="text-[10px] text-dash-text-muted uppercase tracking-wider pl-3">
+                                        <span className="text-[10px] text-dash-text-muted uppercase tracking-wider pl-5">
                                             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: es })}
                                         </span>
                                     </button>
