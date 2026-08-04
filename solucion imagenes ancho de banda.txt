@@ -1,0 +1,28 @@
+Solución de Optimización de Imágenes (Vercel & Supabase)
+========================================================
+
+EL PROBLEMA
+-----------
+1. Vercel: Se superó el límite de la capa gratuita (5,000 transformaciones de imágenes al mes). Seguir usando el componente <Image> de Next.js por defecto iba a causar errores 402 en la carga de imágenes.
+2. Supabase: Hace 15 días se recibió una advertencia por superar el límite de 5.5 GB de ancho de banda de salida (egress bandwidth).
+
+LA SOLUCIÓN IMPLEMENTADA
+------------------------
+Se implementó un "Custom Image Loader" en Next.js (src/utils/imageLoader.ts) configurado en next.config.ts. 
+Este loader intercepta todas las peticiones de imágenes externas (Supabase, Unsplash, etc.) y las redirige a un CDN público, gratuito y open-source llamado `wsrv.nl` (respaldado por Cloudflare).
+
+BENEFICIOS (Por qué no hay que preocuparse)
+-------------------------------------------
+- Vercel: 0 transformaciones consumidas. El problema de Vercel está 100% solucionado porque Vercel ya no procesa las imágenes.
+- Supabase: Reducción drástica del ancho de banda. El CDN (wsrv.nl) descarga la imagen de Supabase UNA SOLA VEZ y luego se la sirve desde su propia memoria caché global a todos los usuarios.
+
+CONTRAS Y CONSIDERACIONES (Trade-offs)
+--------------------------------------
+1. Dependencia de un tercero (wsrv.nl): Al ser un servicio gratuito de la comunidad, no hay un "SLA" (Acuerdo de Nivel de Servicio). Si el servicio llega a caerse, las imágenes externas (galería, avatares) no cargarán hasta que se recupere. Las imágenes locales (logo, etc.) seguirán funcionando normalmente.
+2. Caché Persistente: wsrv.nl cachea las imágenes agresivamente (hasta 31 días). Si actualizas una imagen en Supabase pero mantienes EXACTAMENTE la misma URL, los usuarios podrían seguir viendo la imagen vieja. Para solucionarlo, siempre sube las imágenes nuevas con un nombre distinto.
+3. Advertencias en consola local: En modo desarrollo o durante los tests e2e, Next.js puede arrojar pequeñas advertencias de que el "loader no implementa width" para las imágenes locales. No tiene impacto real en el usuario final.
+
+ARCHIVOS MODIFICADOS:
+- next.config.ts (se configuró el loader custom)
+- src/utils/imageLoader.ts (se creó la lógica del CDN)
+- src/utils/imageLoader.test.ts (se agregaron pruebas unitarias)
