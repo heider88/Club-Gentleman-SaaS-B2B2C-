@@ -103,6 +103,11 @@ export function AdminBookingModal() {
         if (!selectedBarberId) return toast.error("Selecciona un barbero.")
         if (!selectedService || !selectedTime) return toast.error("Selecciona servicio y hora.")
 
+        const cleanPhone = customerPhone.replace(/[^\d]/g, '');
+        if (cleanPhone.length !== 10) {
+            return toast.error("El número de teléfono debe tener exactamente 10 dígitos.");
+        }
+
         setIsSaving(true)
         
         const startDateTime = parse(selectedTime, 'h:mm a', selectedDate)
@@ -112,7 +117,7 @@ export function AdminBookingModal() {
             barberId: selectedBarberId,
             serviceId: selectedService.id,
             customerName: customerName || "Cliente",
-            customerPhone: customerPhone || "N/A",
+            customerPhone: cleanPhone,
             customerEmail: customerEmail || "local@barberia.app",
             startTime: startDateTime.toISOString(),
             endTime: endDateTime.toISOString(),
@@ -222,13 +227,16 @@ export function AdminBookingModal() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Teléfono (Opc.)</label>
+                                        <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Teléfono *</label>
                                         <div className="relative">
                                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                                             <input 
                                                 type="tel"
-                                                value={customerPhone} onChange={e => setCustomerPhone(e.target.value)}
-                                                placeholder="Ej: 300..."
+                                                required
+                                                minLength={10}
+                                                maxLength={10}
+                                                value={customerPhone} onChange={e => setCustomerPhone(e.target.value.replace(/[^\d]/g, ''))}
+                                                placeholder="Ej: 3001234567"
                                                 className="w-full p-3 pl-10 rounded-xl bg-black/50 border border-white/10 focus:border-primary outline-none text-white text-sm"
                                             />
                                         </div>

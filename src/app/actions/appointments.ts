@@ -27,7 +27,7 @@ const createAppointmentSchema = z.object({
     serviceId: z.string().uuid("ID de servicio inválido"),
     customerName: z.string().trim().min(2, "El nombre es muy corto"),
     customerEmail: z.string().trim().toLowerCase().email("Correo electrónico inválido"),
-    customerPhone: z.string().trim().min(8, "Teléfono inválido").transform(v => v.replace(/[^\d+]/g, '')),
+    customerPhone: z.string().trim().transform(v => v.replace(/[^\d]/g, '')).refine(v => v.length === 10, { message: "El teléfono debe tener 10 dígitos" }),
     startTime: z.string().trim().refine(val => !isNaN(Date.parse(val)), { message: "Fecha de inicio inválida" }),
     endTime: z.string().trim().refine(val => !isNaN(Date.parse(val)), { message: "Fecha de fin inválida" }),
     isExtraordinary: z.boolean().optional()
@@ -35,8 +35,18 @@ const createAppointmentSchema = z.object({
 
 export async function createAppointmentAction(payload: z.infer<typeof createAppointmentSchema>) {
     try {
-        // 1. Verificación Anti-Spam (Rate Limiting)
-        if (ratelimit) {
+        // 1. Verificación Anti-Spam (Rate Limiting) - Ignorar si es Barbero/Admin
+        let isInternalUser = false;
+        try {
+            const { createClient } = await import("@/lib/supabase/server");
+            const supabase = await createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) isInternalUser = true;
+        } catch(e) {
+            console.error("Error comprobando sesión interna:", e);
+        }
+
+        if (ratelimit && !isInternalUser) {
             const headersList = await headers();
             const ip = headersList.get("x-forwarded-for") || "127.0.0.1";
             const { success } = await ratelimit.limit(`booking_${ip}`);
